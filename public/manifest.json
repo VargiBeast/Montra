@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Saldo — Personal Finance",
+  "short_name": "Saldo",
+  "description": "A thoughtful way to keep track of your money and purchases.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a1422",
+  "theme_color": "#0a1422",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

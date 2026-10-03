@@ -1,0 +1,1 @@
+- [Saldo data safety](saldo-data-safety.md) — use the existing Supabase project as source of truth; do not reset data or change schema/RLS without an explained need.

@@ -1,0 +1,740 @@
+You are a senior full-stack engineer and product designer.
+
+I have an existing personal finance and purchase-tracking web app called **Saldo**, imported from my existing GitHub repository.
+
+I want you to **properly rebuild and restructure the existing app**, not simply patch the current single HTML file.
+
+## CORE GOAL
+
+Turn the existing Saldo app into a professional, production-ready, mobile-first web application with a clean, scalable file structure.
+
+The app must still be a website, but it should also be installable as a PWA on iPhone and feel like a real mobile app.
+
+The entire user interface must be in **English**.
+
+Do not translate technical code, database column names, Supabase table names, or existing API identifiers. Only translate the user-facing interface.
+
+---
+
+# 1. RESTRUCTURE THE PROJECT
+
+The current project is heavily based on one large HTML file.
+
+Do NOT keep everything inside one HTML file.
+
+Convert it into a proper multi-file application with a logical structure.
+
+Use a modern, stable frontend architecture such as:
+
+* React
+* Vite
+* JavaScript or TypeScript
+
+Prefer TypeScript if it does not make the migration unnecessarily complicated.
+
+Create a clean structure similar to:
+
+```text
+src/
+├── components/
+│   ├── BottomNavigation/
+│   ├── GlassCard/
+│   ├── TransactionCard/
+│   ├── TransactionForm/
+│   ├── BalanceCard/
+│   ├── Modal/
+│   ├── LoadingScreen/
+│   └── ...
+│
+├── pages/
+│   ├── Home/
+│   ├── Transactions/
+│   ├── More/
+│   ├── Profile/
+│   └── Login/
+│
+├── hooks/
+│   ├── useAuth
+│   ├── useTransactions
+│   └── ...
+│
+├── lib/
+│   ├── supabase
+│   ├── storage
+│   └── utils
+│
+├── services/
+│   ├── transactions
+│   ├── auth
+│   └── storage
+│
+├── styles/
+│   ├── globals
+│   ├── glass
+│   └── ...
+│
+├── types/
+│   └── ...
+│
+├── App
+├── main
+└── ...
+│
+public/
+├── icons/
+├── manifest.json
+└── ...
+```
+
+The exact structure can be improved if you have a better architecture, but it must be clearly separated into components, pages, services, utilities, styles and configuration.
+
+Do not create unnecessary files just for the sake of having more files.
+
+Keep related functionality together and make the code easy to maintain.
+
+---
+
+# 2. PRESERVE THE EXISTING SALDO APP
+
+Before changing anything:
+
+1. Inspect the entire existing project.
+2. Understand all existing functionality.
+3. Preserve the useful features already implemented.
+4. Do not delete existing functionality without a reason.
+5. Do not replace the app with a generic finance dashboard.
+6. Preserve the identity and purpose of Saldo.
+
+The existing app includes things such as:
+
+* Balance
+* Money coming in
+* Purchases
+* Transaction history
+* Editing transactions
+* Deleting transactions
+* Purchase links
+* Purchase images
+* Notes
+* Payment methods
+* Dates
+* Recent transactions
+* Theme settings
+* Backup/export/import
+* Profile/account
+* Bottom navigation
+* Liquid Glass visual design
+
+Keep these features.
+
+---
+
+# 3. MAKE THE ENTIRE UI ENGLISH
+
+Translate every user-facing piece of text into natural English.
+
+Examples:
+
+Norwegian → English
+
+* Hjem → Home
+* Logg → Transactions
+* Mer → More
+* Nytt kjøp → New Purchase
+* Penger inn → Add Money
+* Saldo → Balance
+* Kjøp → Purchase
+* Beløp → Amount
+* Dato → Date
+* Betalingsmetode → Payment Method
+* Notat → Note
+* Produktlenke → Product Link
+* Lagre → Save
+* Avbryt → Cancel
+* Slett → Delete
+* Rediger → Edit
+* Profil → Profile
+* Innstillinger → Settings
+* Logg ut → Sign Out
+
+Do not use awkward literal translations.
+
+The English should feel like a polished modern finance/productivity app.
+
+All buttons, menus, labels, placeholders, alerts, empty states, error messages, onboarding text and settings must be English.
+
+---
+
+# 4. LIQUID GLASS DESIGN
+
+Preserve and significantly improve the existing Liquid Glass aesthetic.
+
+The design should feel:
+
+* Premium
+* Modern
+* Minimal
+* iOS-inspired
+* Clean
+* Smooth
+* Sophisticated
+
+Avoid making it look like a generic banking dashboard.
+
+Use:
+
+* Glass surfaces
+* Blur
+* Subtle transparency
+* Soft borders
+* Depth
+* Smooth animations
+* Large rounded corners
+* Good typography
+* Strong spacing system
+* Subtle gradients
+* Beautiful cards
+* Proper dark mode
+* Proper light mode
+
+Do not overdo glass effects to the point that text becomes hard to read.
+
+Prioritize usability over visual effects.
+
+---
+
+# 5. MOBILE FIRST
+
+The primary device is an iPhone.
+
+Optimize the entire application for:
+
+* 375px
+* 390px
+* 393px
+* 430px
+
+It must:
+
+* Never horizontally scroll
+* Have comfortable touch targets
+* Work correctly with the iOS keyboard
+* Respect safe-area insets
+* Handle dynamic viewport height
+* Have a proper bottom navigation
+* Have smooth mobile sheets/modals
+* Prevent accidental button presses
+* Have readable typography
+* Feel like a native mobile application
+
+Desktop should still work well.
+
+---
+
+# 6. SUPABASE
+
+Use Supabase as the backend.
+
+Do not create a fake backend.
+
+Do not use localStorage as the main database.
+
+Use Supabase for:
+
+* Authentication
+* Database
+* Cloud synchronization
+* Storage
+
+The existing Supabase project must remain the source of truth.
+
+Use environment variables.
+
+For example:
+
+```text
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+```
+
+Never expose:
+
+* Supabase service-role keys
+* Google OAuth client secrets
+* Any other private credentials
+
+in frontend code.
+
+---
+
+# 7. DATABASE
+
+The existing database contains:
+
+```text
+public.transactions
+```
+
+with:
+
+```text
+id
+user_id
+type
+name
+amount
+date
+method
+link
+note
+image_url
+created_at
+```
+
+The transaction type is:
+
+```text
+in
+out
+```
+
+Use the existing schema.
+
+Do not unnecessarily modify the database.
+
+Do not delete existing records.
+
+Respect the existing Row Level Security policies.
+
+Every user's transactions must remain private to that user.
+
+---
+
+# 8. AUTHENTICATION
+
+Implement Supabase Authentication properly.
+
+Support:
+
+### Google
+
+Google login is already configured.
+
+### Apple
+
+Prepare the architecture for Apple Sign In.
+
+### Email
+
+Allow email authentication as a fallback.
+
+The login screen should be clean and premium.
+
+Example structure:
+
+```text
+Welcome to Saldo
+
+Manage your money simply.
+
+[ Continue with Google ]
+
+[ Continue with Apple ]
+
+or
+
+Email
+[ Enter your email ]
+
+[ Continue with Email ]
+```
+
+Do not make the login screen cluttered.
+
+---
+
+# 9. AUTH SESSION HANDLING
+
+Make authentication extremely robust.
+
+The current version has had problems with:
+
+* White screens
+* Mobile loading problems
+* OAuth redirects
+* Supabase session initialization
+
+Fix these properly.
+
+At startup:
+
+1. Show a proper loading screen.
+2. Safely retrieve the existing Supabase session.
+3. Determine whether the user is authenticated.
+4. Render either Login or the main application.
+5. Never leave the user with a blank white screen.
+
+Do not perform problematic awaited Supabase operations directly inside the `onAuthStateChange` callback.
+
+Handle authentication errors gracefully.
+
+If Supabase is temporarily unavailable, show a useful error state instead of a blank page.
+
+---
+
+# 10. TRANSACTIONS
+
+Transactions must be fully cloud-based.
+
+Users should be able to:
+
+* Create a purchase
+* Create incoming money
+* Edit transactions
+* Delete transactions
+* View transaction details
+* Add notes
+* Add payment methods
+* Add dates
+* Add product links
+* Add purchase images
+
+Changes should immediately synchronize with Supabase.
+
+---
+
+# 11. PRODUCT LINKS
+
+Product links must be real clickable links.
+
+When a transaction contains a product URL:
+
+* Display it clearly.
+* Make it tappable.
+* Open the URL safely.
+* Validate that it uses HTTP or HTTPS.
+* Do not execute arbitrary JavaScript URLs.
+* Make it work correctly on iPhone Safari.
+
+---
+
+# 12. PURCHASE IMAGES
+
+The existing private Supabase Storage bucket is:
+
+```text
+purchase-images
+```
+
+Keep it private.
+
+Images should be stored using the user's ID as the folder path.
+
+Use signed URLs to display private images.
+
+Important:
+
+When editing a purchase without uploading a new image:
+
+**keep the existing image.**
+
+Do not accidentally set `image_url` to null.
+
+When replacing an image:
+
+1. Upload the new image.
+2. Update the database.
+3. Remove the old image when appropriate.
+
+When deleting a transaction:
+
+* Delete the transaction.
+* Clean up its associated storage object when possible.
+
+Add sensible file-size and file-type validation.
+
+---
+
+# 13. BALANCE
+
+The home screen should clearly show:
+
+* Current balance
+* Total money in
+* Total money spent
+* Recent transactions
+
+The balance should be calculated from the actual Supabase transaction data.
+
+Do not hard-code financial values.
+
+---
+
+# 14. BACKUP
+
+Keep the backup functionality.
+
+Allow the user to:
+
+* Export their data
+* Import a backup
+
+Make the experience understandable for normal users.
+
+Do not expose private Supabase credentials in backups.
+
+---
+
+# 15. THEMES
+
+Keep:
+
+* Light
+* Dark
+* System
+
+Theme preference should persist locally.
+
+The theme system should be clean and reliable.
+
+---
+
+# 16. PWA
+
+Make Saldo a proper Progressive Web App.
+
+Create:
+
+```text
+manifest.json
+```
+
+and a service worker.
+
+Add proper:
+
+* App name
+* Short name
+* Icons
+* Theme color
+* Display mode
+* Apple mobile web app metadata
+
+The app should be installable through iPhone Safari.
+
+It should open without the normal Safari UI when launched from the Home Screen where iOS allows it.
+
+Create proper app icons in:
+
+```text
+public/icons/
+```
+
+Do not use a random placeholder icon.
+
+The icon should match the Saldo visual identity.
+
+---
+
+# 17. LOADING AND ERROR STATES
+
+Never show a blank white page.
+
+Every important async operation should have a proper state:
+
+* Loading
+* Success
+* Empty
+* Error
+
+For example:
+
+```text
+Loading your balance...
+```
+
+instead of a blank screen.
+
+If something fails:
+
+```text
+Something went wrong
+
+We couldn't load your transactions.
+
+[ Try Again ]
+```
+
+Do not expose raw technical errors to normal users unless useful.
+
+Log technical errors appropriately for development.
+
+---
+
+# 18. CODE QUALITY
+
+Write clean, maintainable code.
+
+Avoid:
+
+* One giant component
+* Duplicate CSS
+* Duplicate functions
+* Inline massive HTML strings
+* Global variables everywhere
+* Hard-coded user data
+* Fake APIs
+* Unnecessary dependencies
+* Dead code
+
+Use reusable components.
+
+Use clear naming.
+
+Keep business logic separate from UI.
+
+Create reusable utilities for:
+
+* Currency formatting
+* Date formatting
+* Validation
+* URL validation
+* Image handling
+* Error handling
+
+---
+
+# 19. SECURITY
+
+Treat security seriously.
+
+Use:
+
+* Supabase RLS
+* Authenticated user IDs
+* Private Storage
+* Signed URLs
+* URL validation
+* Input validation
+* Safe rendering
+* Environment variables
+
+Do not trust client-provided `user_id`.
+
+Always derive the current user from the authenticated Supabase session.
+
+Never use the service-role key in the browser.
+
+---
+
+# 20. RESPONSIVE DESKTOP VERSION
+
+Although iPhone is the primary target, the website should also look good on desktop.
+
+On larger screens:
+
+* Center the application
+* Use appropriate max-widths
+* Preserve the mobile-style navigation where appropriate or adapt it cleanly
+* Avoid making the UI excessively wide
+
+The app should feel like one coherent product across devices.
+
+---
+
+# 21. MIGRATION
+
+Do not simply delete the existing `index.html` and start over blindly.
+
+First understand the current application.
+
+Then migrate functionality into the new architecture.
+
+If the current app contains useful logic, reuse it where appropriate.
+
+The end result should be a clean application rather than a huge HTML file.
+
+---
+
+# 22. TESTING
+
+After implementation:
+
+* Run the application.
+* Fix all build errors.
+* Fix all console errors.
+* Test authentication.
+* Test logout.
+* Test creating a transaction.
+* Test editing a transaction.
+* Test deleting a transaction.
+* Test product links.
+* Test image uploads.
+* Test image replacement.
+* Test existing images during editing.
+* Test Supabase synchronization.
+* Test refreshing the page while logged in.
+* Test opening the app on mobile.
+* Test the login redirect.
+* Test dark mode.
+* Test light mode.
+* Test the PWA installation flow as far as the environment allows.
+
+Do not tell me something works without actually checking it.
+
+---
+
+# 23. IMPORTANT: DO NOT DESTROY MY DATA
+
+My existing Supabase database contains my real data.
+
+Do not:
+
+* Drop tables
+* Delete transactions
+* Reset the database
+* Replace the database
+* Create fake demo transactions
+* Change RLS policies unnecessarily
+
+If a database change is genuinely required, explain it before making it and provide the SQL.
+
+---
+
+# 24. FINAL RESULT
+
+The finished Saldo app should feel like a serious modern personal finance app rather than a single HTML project.
+
+I want:
+
+```text
+Clean architecture
++
+Modern Liquid Glass UI
++
+English interface
++
+Supabase authentication
++
+Cloud database
++
+Private image storage
++
+Google login
++
+Apple-ready authentication
++
+Email login
++
+PWA
++
+Excellent iPhone experience
++
+Responsive desktop website
+```
+
+Most importantly:
+
+**Keep the existing Saldo identity and functionality while turning the underlying codebase into a professional, maintainable multi-file application.**
+
+Start by inspecting the existing project before making major changes.
