@@ -1,962 +1,3 @@
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07111f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Saldo">
-  <link rel="apple-touch-icon" href="icon-180.png">
-  <title>Saldo</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    :root {
-      --bg: #07111f;
-      --bg2: #0b1728;
-      --card: rgba(255,255,255,.075);
-      --card-strong: rgba(255,255,255,.11);
-      --border: rgba(255,255,255,.12);
-      --text: #f5f7fb;
-      --muted: #8f9bad;
-      --green: #55e6a5;
-      --red: #ff6678;
-      --blue: #69a8ff;
-      --nav: rgba(9,17,29,.82);
-      --input: rgba(255,255,255,.075);
-    }
-
-    body.light {
-      --bg: #f2f5f9;
-      --bg2: #e8edf4;
-      --card: rgba(255,255,255,.66);
-      --card-strong: rgba(255,255,255,.82);
-      --border: rgba(0,0,0,.08);
-      --text: #101522;
-      --muted: #697386;
-      --nav: rgba(255,255,255,.8);
-      --input: rgba(0,0,0,.045);
-    }
-
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-        "SF Pro Text", Inter, sans-serif;
-    }
-
-    body {
-      overflow-x: hidden;
-      padding-bottom: calc(90px + env(safe-area-inset-bottom));
-    }
-
-    button, input, textarea, select {
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      color: inherit;
-      cursor: pointer;
-    }
-
-    .orb {
-      position: fixed;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      filter: blur(75px);
-      opacity: .22;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .orb.one {
-      background: #176fff;
-      top: -90px;
-      right: -100px;
-    }
-
-    .orb.two {
-      background: #00d890;
-      bottom: 5%;
-      left: -130px;
-    }
-
-    #app {
-      position: relative;
-      z-index: 1;
-      max-width: 720px;
-      margin: auto;
-      padding:
-        calc(20px + env(safe-area-inset-top))
-        18px
-        25px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* LOGIN */
-
-    #loginScreen {
-      min-height: calc(100vh - env(safe-area-inset-top));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 25px;
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
-      padding: 34px 25px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-radius: 32px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.25);
-    }
-
-    .logo {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 20px;
-      border-radius: 22px;
-      display: grid;
-      place-items: center;
-      font-size: 30px;
-      font-weight: 800;
-      background: linear-gradient(145deg,#1e74ff,#36d99b);
-      box-shadow: 0 15px 45px rgba(40,130,255,.3);
-    }
-
-    .login-box h1 {
-      margin: 0;
-      font-size: 32px;
-      letter-spacing: -.8px;
-    }
-
-    .login-box p {
-      color: var(--muted);
-      line-height: 1.5;
-      margin: 9px 0 28px;
-    }
-
-    .google-btn {
-      width: 100%;
-      padding: 16px;
-      border-radius: 17px;
-      background: white;
-      color: #111;
-      font-weight: 650;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 11px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.15);
-    }
-
-    .google-icon {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* HEADER */
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-
-    .brand {
-      font-size: 27px;
-      font-weight: 800;
-      letter-spacing: -.8px;
-    }
-
-    .avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      overflow: hidden;
-      background: var(--card-strong);
-      border: 1px solid var(--border);
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* CARDS */
-
-    .glass {
-      background: var(--card);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      box-shadow: 0 16px 50px rgba(0,0,0,.12);
-    }
-
-    .balance {
-      border-radius: 29px;
-      padding: 25px;
-      margin-bottom: 13px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .balance::after {
-      content: "";
-      position: absolute;
-      width: 160px;
-      height: 160px;
-      right: -80px;
-      top: -70px;
-      border-radius: 50%;
-      background: rgba(80,160,255,.16);
-      filter: blur(10px);
-    }
-
-    .eyebrow {
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 600;
-      margin-bottom: 7px;
-    }
-
-    .balance-value {
-      font-size: clamp(39px, 11vw, 58px);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: -2.5px;
-      margin-bottom: 20px;
-    }
-
-    .balance-meta {
-      display: flex;
-      gap: 18px;
-    }
-
-    .meta-item {
-      flex: 1;
-    }
-
-    .meta-label {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-
-    .meta-value {
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .green {
-      color: var(--green);
-    }
-
-    .red {
-      color: var(--red);
-    }
-
-    /* ACTIONS */
-
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .action {
-      min-height: 62px;
-      border-radius: 20px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      font-weight: 700;
-    }
-
-    .action.primary {
-      background: linear-gradient(135deg,#247cff,#4b9aff);
-      border: 0;
-      box-shadow: 0 12px 35px rgba(40,120,255,.23);
-    }
-
-    .action.in {
-      background: linear-gradient(135deg,#24c982,#54e4a4);
-      color: #04140d;
-      border: 0;
-    }
-
-    .action-icon {
-      font-size: 22px;
-    }
-
-    /* SECTIONS */
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 22px 2px 11px;
-    }
-
-    .section-title h2 {
-      margin: 0;
-      font-size: 19px;
-      letter-spacing: -.3px;
-    }
-
-    .section-title span {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    /* TRANSACTIONS */
-
-    .transactions {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-    }
-
-    .transaction {
-      padding: 15px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      transition: transform .15s;
-    }
-
-    .transaction:active {
-      transform: scale(.98);
-    }
-
-    .transaction-icon {
-      width: 45px;
-      height: 45px;
-      flex: 0 0 45px;
-      border-radius: 15px;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      background: var(--input);
-    }
-
-    .transaction-info {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .transaction-name {
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .transaction-date {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .transaction-amount {
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 35px 15px;
-    }
-
-    /* BOTTOM NAV */
-
-    .bottom-nav {
-      position: fixed;
-      z-index: 20;
-      left: 12px;
-      right: 12px;
-      bottom: calc(10px + env(safe-area-inset-bottom));
-      max-width: 696px;
-      margin: auto;
-      padding: 8px;
-      border-radius: 25px;
-      background: var(--nav);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      box-shadow: 0 15px 45px rgba(0,0,0,.25);
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-    }
-
-    .nav-btn {
-      padding: 9px 4px;
-      border-radius: 18px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 650;
-    }
-
-    .nav-btn.active {
-      color: var(--text);
-      background: var(--card-strong);
-    }
-
-    .nav-icon {
-      display: block;
-      font-size: 20px;
-      margin-bottom: 3px;
-    }
-
-    /* SHEET */
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      background: rgba(0,0,0,.5);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .sheet {
-      width: 100%;
-      max-width: 720px;
-      max-height: 92vh;
-      overflow-y: auto;
-      background: var(--bg2);
-      border-radius: 30px 30px 0 0;
-      padding: 15px 18px calc(25px + env(safe-area-inset-bottom));
-      border-top: 1px solid var(--border);
-    }
-
-    .grabber {
-      width: 38px;
-      height: 4px;
-      border-radius: 4px;
-      background: var(--muted);
-      opacity: .45;
-      margin: 0 auto 18px;
-    }
-
-    .sheet-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .sheet-head h2 {
-      margin: 0;
-      font-size: 23px;
-    }
-
-    .close {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      background: var(--input);
-      color: var(--muted);
-      font-size: 20px;
-    }
-
-    label {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-      margin: 0 0 7px 3px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: var(--input);
-      color: var(--text);
-      outline: none;
-      border-radius: 15px;
-      padding: 14px;
-      margin-bottom: 15px;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: rgba(90,160,255,.6);
-    }
-
-    .amount-input {
-      font-size: 27px;
-      font-weight: 750;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .submit {
-      width: 100%;
-      padding: 16px;
-      border-radius: 17px;
-      background: linear-gradient(135deg,#247cff,#58a1ff);
-      font-weight: 750;
-      margin-top: 4px;
-    }
-
-    .delete-btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 17px;
-      background: rgba(255,80,100,.11);
-      color: var(--red);
-      font-weight: 700;
-      margin-top: 9px;
-    }
-
-    .preview {
-      display: none;
-      width: 100%;
-      max-height: 210px;
-      object-fit: cover;
-      border-radius: 18px;
-      margin: 0 0 15px;
-    }
-
-    /* LOG */
-
-    .search {
-      margin-bottom: 13px;
-    }
-
-    .filter-row {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      margin-bottom: 14px;
-      scrollbar-width: none;
-    }
-
-    .filter {
-      flex: 0 0 auto;
-      padding: 9px 14px;
-      border-radius: 13px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    .filter.active {
-      background: var(--text);
-      color: var(--bg);
-    }
-
-    /* MORE */
-
-    .settings-card {
-      border-radius: 23px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .setting {
-      width: 100%;
-      text-align: left;
-      background: transparent;
-      padding: 17px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .setting:last-child {
-      border-bottom: 0;
-    }
-
-    .setting-title {
-      font-weight: 650;
-    }
-
-    .setting-sub {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .danger {
-      color: var(--red);
-    }
-
-    @media (min-width: 650px) {
-      #app {
-        padding-top: 35px;
-      }
-
-      .bottom-nav {
-        bottom: 18px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="orb one"></div>
-<div class="orb two"></div>
-
-<!-- LOGIN -->
-
-<section id="loginScreen">
-  <div class="login-box">
-    <div class="logo">S</div>
-    <h1>Velkommen til Saldo</h1>
-    <p>
-      Hold styr på pengene dine. Logg inn én gang,
-      så synkroniseres Saldo på tvers av enhetene dine.
-    </p>
-
-    <button class="google-btn" onclick="loginWithGoogle()">
-      <svg class="google-icon" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M21.35 12.23c0-.78-.07-1.53-.22-2.23H12v4.22h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.38z"/>
-        <path fill="#34A853" d="M12 21.65c2.63 0 4.84-.87 6.45-2.35l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.28v2.53A9.75 9.75 0 0 0 12 21.65z"/>
-        <path fill="#FBBC05" d="M6.53 13.74A5.86 5.86 0 0 1 6.22 12c0-.61.11-1.2.31-1.74V7.73H3.28A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.06 1.03 4.27l3.25-2.53z"/>
-        <path fill="#EA4335" d="M12 6.23c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.3 14.63 2.35 12 2.35a9.75 9.75 0 0 0-8.72 5.38l3.25 2.53C7.3 7.95 9.46 6.23 12 6.23z"/>
-      </svg>
-      Fortsett med Google
-    </button>
-  </div>
-</section>
-
-<!-- APP -->
-
-<main id="app" class="hidden">
-
-  <header>
-    <div class="brand">Saldo</div>
-    <button class="avatar" onclick="openProfile()">
-      <img id="avatar" alt="">
-    </button>
-  </header>
-
-  <!-- HOME -->
-
-  <section id="homePage">
-
-    <div class="balance glass">
-      <div class="eyebrow">Disponibel saldo</div>
-      <div id="balance" class="balance-value">0 kr</div>
-
-      <div class="balance-meta">
-        <div class="meta-item">
-          <div class="meta-label">Penger inn</div>
-          <div id="totalIn" class="meta-value green">+0 kr</div>
-        </div>
-
-        <div class="meta-item">
-          <div class="meta-label">Brukt</div>
-          <div id="totalOut" class="meta-value red">−0 kr</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="action primary" onclick="openTransaction('out')">
-        <span class="action-icon">−</span>
-        Nytt kjøp
-      </button>
-
-      <button class="action in" onclick="openTransaction('in')">
-        <span class="action-icon">+</span>
-        Penger inn
-      </button>
-    </div>
-
-    <div class="section-title">
-      <h2>Siste aktivitet</h2>
-      <span id="homeCount"></span>
-    </div>
-
-    <div id="recent" class="transactions"></div>
-
-  </section>
-
-  <!-- LOG -->
-
-  <section id="logPage" class="hidden">
-
-    <div class="section-title">
-      <h2>Alle transaksjoner</h2>
-      <span id="logCount"></span>
-    </div>
-
-    <input
-      id="search"
-      class="search"
-      placeholder="Søk etter kjøp eller notat..."
-      oninput="renderLog()"
-    >
-
-    <div class="filter-row">
-      <button class="filter active" data-filter="all" onclick="setFilter('all',this)">Alle</button>
-      <button class="filter" data-filter="out" onclick="setFilter('out',this)">Kjøp</button>
-      <button class="filter" data-filter="in" onclick="setFilter('in',this)">Penger inn</button>
-    </div>
-
-    <div id="logList" class="transactions"></div>
-
-  </section>
-
-  <!-- MORE -->
-
-  <section id="morePage" class="hidden">
-
-    <div class="section-title">
-      <h2>Mer</h2>
-    </div>
-
-    <div class="settings-card glass">
-
-      <button class="setting" onclick="toggleTheme()">
-        <div>
-          <div class="setting-title">Utseende</div>
-          <div id="themeText" class="setting-sub">Mørk modus</div>
-        </div>
-        <span>›</span>
-      </button>
-
-      <button class="setting" onclick="exportData()">
-        <div>
-          <div class="setting-title">Eksporter backup</div>
-          <div class="setting-sub">Last ned alle transaksjonene dine</div>
-        </div>
-        <span>↓</span>
-      </button>
-
-      <button class="setting" onclick="document.getElementById('importFile').click()">
-        <div>
-          <div class="setting-title">Importer backup</div>
-          <div class="setting-sub">Gjenopprett data fra en JSON-fil</div>
-        </div>
-        <span>↑</span>
-      </button>
-
-      <input
-        id="importFile"
-        type="file"
-        accept=".json"
-        class="hidden"
-        onchange="importData(event)"
-      >
-
-    </div>
-
-    <div class="settings-card glass">
-
-      <button class="setting" onclick="openProfile()">
-        <div>
-          <div class="setting-title">Konto</div>
-          <div id="accountEmail" class="setting-sub"></div>
-        </div>
-        <span>›</span>
-      </button>
-
-      <button class="setting danger" onclick="signOut()">
-        <div>
-          <div class="setting-title">Logg ut</div>
-          <div class="setting-sub">Logg ut av denne enheten</div>
-        </div>
-        <span>↪</span>
-      </button>
-
-    </div>
-
-  </section>
-
-</main>
-
-<!-- NAV -->
-
-<nav id="nav" class="bottom-nav hidden">
-
-  <button class="nav-btn active" onclick="showPage('home',this)">
-    <span class="nav-icon">⌂</span>
-    Hjem
-  </button>
-
-  <button class="nav-btn" onclick="showPage('log',this)">
-    <span class="nav-icon">☷</span>
-    Logg
-  </button>
-
-  <button class="nav-btn" onclick="showPage('more',this)">
-    <span class="nav-icon">•••</span>
-    Mer
-  </button>
-
-</nav>
-
-<!-- TRANSACTION SHEET -->
-
-<div id="transactionOverlay" class="overlay hidden" onclick="overlayClose(event)">
-  <div class="sheet">
-
-    <div class="grabber"></div>
-
-    <div class="sheet-head">
-      <h2 id="formTitle">Nytt kjøp</h2>
-      <button class="close" onclick="closeTransaction()">×</button>
-    </div>
-
-    <form id="transactionForm" onsubmit="saveTransaction(event)">
-
-      <input id="editingId" type="hidden">
-
-      <label>Navn</label>
-      <input id="name" required placeholder="Hva brukte du pengene på?">
-
-      <label>Beløp</label>
-      <input
-        id="amount"
-        class="amount-input"
-        required
-        type="number"
-        min="0"
-        step="0.01"
-        inputmode="decimal"
-        placeholder="0"
-      >
-
-      <div class="form-row">
-
-        <div>
-          <label>Dato</label>
-          <input id="date" type="date" required>
-        </div>
-
-        <div>
-          <label>Betalingsmåte</label>
-          <select id="method">
-            <option>Bankkort</option>
-            <option>Vipps</option>
-            <option>Kontant</option>
-            <option>Bank</option>
-            <option>Annet</option>
-          </select>
-        </div>
-
-      </div>
-
-      <div id="purchaseFields">
-
-        <label>Lenke til produkt</label>
-        <input
-          id="link"
-          type="url"
-          placeholder="https://..."
-        >
-
-        <label>Bilde av kjøpet</label>
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-          onchange="previewImage(event)"
-        >
-
-        <img id="imagePreview" class="preview" alt="Forhåndsvisning">
-
-      </div>
-
-      <label>Notat</label>
-      <textarea id="note" placeholder="Valgfri informasjon..."></textarea>
-
-      <button class="submit" type="submit">
-        Lagre
-      </button>
-
-      <button
-        id="deleteButton"
-        type="button"
-        class="delete-btn hidden"
-        onclick="deleteTransaction()"
-      >
-        Slett transaksjon
-      </button>
-
-    </form>
-  </div>
-</div>
-
-<!-- PROFILE -->
-
-<div id="profileOverlay" class="overlay hidden" onclick="profileOverlayClose(event)">
-  <div class="sheet">
-
-    <div class="grabber"></div>
-
-    <div class="sheet-head">
-      <h2>Konto</h2>
-      <button class="close" onclick="closeProfile()">×</button>
-    </div>
-
-    <div class="glass" style="padding:20px;border-radius:22px;text-align:center">
-
-      <div class="avatar" style="margin:auto;width:70px;height:70px">
-        <img id="profileAvatar" alt="">
-      </div>
-
-      <div id="profileName" style="font-weight:750;font-size:19px;margin-top:12px"></div>
-      <div id="profileEmail" style="color:var(--muted);font-size:13px;margin-top:4px"></div>
-
-    </div>
-
-    <button
-      class="delete-btn"
-      style="margin-top:15px"
-      onclick="signOut()"
-    >
-      Logg ut
-    </button>
-
-  </div>
-</div>
-
 <script>
   /* =========================================================
      SUPABASE
@@ -968,8 +9,7 @@
   const SUPABASE_KEY =
     "sb_publishable_YzLtUjLaJn4T8tDipkfLTQ_ubpK1lQC";
 
-  const { createClient } =
-    supabase;
+  const { createClient } = supabase;
 
   const db = createClient(
     SUPABASE_URL,
@@ -986,51 +26,68 @@
      ========================================================= */
 
   async function loginWithGoogle() {
-
     const { error } = await db.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + window.location.pathname
+        redirectTo:
+          window.location.origin +
+          window.location.pathname
       }
     });
 
     if (error) {
-      alert("Kunne ikke starte Google-innlogging:\n" + error.message);
+      alert(
+        "Kunne ikke starte Google-innlogging:\n" +
+        error.message
+      );
     }
   }
 
   async function signOut() {
-
     await db.auth.signOut();
 
     user = null;
     transactions = [];
 
-    document.getElementById("app").classList.add("hidden");
-    document.getElementById("nav").classList.add("hidden");
-    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("app")
+      .classList.add("hidden");
+
+    document.getElementById("nav")
+      .classList.add("hidden");
+
+    document.getElementById("loginScreen")
+      .classList.remove("hidden");
 
     closeProfile();
   }
 
   db.auth.onAuthStateChange(async (event, session) => {
-
     if (session?.user) {
       user = session.user;
       await startApp();
     } else {
       user = null;
-      document.getElementById("loginScreen").classList.remove("hidden");
-      document.getElementById("app").classList.add("hidden");
-      document.getElementById("nav").classList.add("hidden");
+
+      document.getElementById("loginScreen")
+        .classList.remove("hidden");
+
+      document.getElementById("app")
+        .classList.add("hidden");
+
+      document.getElementById("nav")
+        .classList.add("hidden");
     }
   });
 
   async function startApp() {
+    document.getElementById("loginScreen")
+      .classList.add("hidden");
 
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("nav").classList.remove("hidden");
+    document.getElementById("app")
+      .classList.remove("hidden");
+
+    document.getElementById("nav")
+      .classList.remove("hidden");
 
     const metadata = user.user_metadata || {};
 
@@ -1041,11 +98,13 @@
 
     document.getElementById("avatar").src = avatar;
 
-    document.getElementById("accountEmail").textContent =
-      user.email || "";
+    document.getElementById("accountEmail")
+      .textContent = user.email || "";
 
     await loadTransactions();
+
     renderHome();
+    renderLog();
   }
 
   /* =========================================================
@@ -1053,7 +112,6 @@
      ========================================================= */
 
   async function loadTransactions() {
-
     const { data, error } = await db
       .from("transactions")
       .select("*")
@@ -1063,15 +121,106 @@
 
     if (error) {
       console.error(error);
-      alert("Kunne ikke laste transaksjonene.");
+      alert(
+        "Kunne ikke laste transaksjonene:\n" +
+        error.message
+      );
       return;
     }
 
     transactions = data || [];
   }
 
-  async function saveTransaction(event) {
+  /* =========================================================
+     IMAGE STORAGE
+     ========================================================= */
 
+  async function uploadPurchaseImage(file) {
+    if (!file || !user) return null;
+
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Filen er ikke et bilde.");
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error(
+        "Bildet må være mindre enn 5 MB."
+      );
+    }
+
+    const extension =
+      file.name.includes(".")
+        ? file.name.split(".").pop().toLowerCase()
+        : "jpg";
+
+    const path =
+      `${user.id}/${crypto.randomUUID()}.${extension}`;
+
+    const { error } =
+      await db.storage
+        .from("purchase-images")
+        .upload(path, file, {
+          upsert: false,
+          contentType: file.type,
+          cacheControl: "3600"
+        });
+
+    if (error) {
+      console.error(error);
+      throw new Error(
+        "Kunne ikke laste opp bildet: " +
+        error.message
+      );
+    }
+
+    return path;
+  }
+
+  async function deletePurchaseImage(path) {
+    if (!path) return;
+
+    const { error } =
+      await db.storage
+        .from("purchase-images")
+        .remove([path]);
+
+    if (error) {
+      console.warn(
+        "Kunne ikke slette gammelt bilde:",
+        error
+      );
+    }
+  }
+
+  /*
+   * Private bucket = vi trenger en signed URL
+   * for å vise bildet.
+   */
+
+  async function getImageUrl(path) {
+    if (!path) return "";
+
+    const { data, error } =
+      await db.storage
+        .from("purchase-images")
+        .createSignedUrl(path, 60 * 60);
+
+    if (error) {
+      console.error(
+        "Kunne ikke lage signed URL:",
+        error
+      );
+      return "";
+    }
+
+    return data?.signedUrl || "";
+  }
+
+  /* =========================================================
+     SAVE TRANSACTION
+     ========================================================= */
+
+  async function saveTransaction(event) {
     event.preventDefault();
 
     if (!user) return;
@@ -1082,10 +231,14 @@
     const type = currentType;
 
     const name =
-      document.getElementById("name").value.trim();
+      document.getElementById("name")
+        .value
+        .trim();
 
     const amount =
-      Number(document.getElementById("amount").value);
+      Number(
+        document.getElementById("amount").value
+      );
 
     const date =
       document.getElementById("date").value;
@@ -1094,104 +247,208 @@
       document.getElementById("method").value;
 
     const link =
-      document.getElementById("link").value.trim();
+      document.getElementById("link")
+        .value
+        .trim();
 
     const note =
-      document.getElementById("note").value.trim();
+      document.getElementById("note")
+        .value
+        .trim();
 
     const file =
-      document.getElementById("image").files[0];
+      document.getElementById("image")
+        .files[0];
 
-    if (!name || !amount || !date) return;
-
-    let imageUrl = null;
-
-    /* Upload image */
-
-    if (file && type === "out") {
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Bildet må være mindre enn 5 MB.");
-        return;
-      }
-
-      const extension =
-        file.name.split(".").pop().toLowerCase();
-
-      const path =
-        `${user.id}/${crypto.randomUUID()}.${extension}`;
-
-      const { error: uploadError } =
-        await db.storage
-          .from("purchase-images")
-          .upload(path, file, {
-            upsert: false,
-            contentType: file.type
-          });
-
-      if (uploadError) {
-        console.error(uploadError);
-        alert("Kunne ikke laste opp bildet.");
-        return;
-      }
-
-      imageUrl = path;
-    }
-
-    const payload = {
-      type,
-      name,
-      amount,
-      date,
-      method,
-      link: type === "out" ? link : null,
-      note,
-      image_url: imageUrl
-    };
-
-    let result;
-
-    if (id) {
-
-      result = await db
-        .from("transactions")
-        .update(payload)
-        .eq("id", id)
-        .eq("user_id", user.id);
-
-    } else {
-
-      result = await db
-        .from("transactions")
-        .insert({
-          ...payload,
-          user_id: user.id
-        });
-    }
-
-    if (result.error) {
-      console.error(result.error);
-      alert("Kunne ikke lagre transaksjonen.");
+    if (!name || !amount || !date) {
       return;
     }
 
+    /*
+     * Hvis vi redigerer et eksisterende kjøp,
+     * behold det gamle bildet dersom brukeren
+     * ikke velger et nytt.
+     */
+
+    const existingTransaction =
+      id
+        ? transactions.find(t => t.id === id)
+        : null;
+
+    let imageUrl =
+      existingTransaction?.image_url || null;
+
+    /*
+     * Last opp nytt bilde hvis brukeren valgte ett.
+     */
+
+    if (file && type === "out") {
+      try {
+        const newImageUrl =
+          await uploadPurchaseImage(file);
+
+        /*
+         * Det nye bildet er lastet opp.
+         * Vi beholder det gamle til databasen
+         * er oppdatert.
+         */
+
+        const oldImageUrl =
+          existingTransaction?.image_url || null;
+
+        imageUrl = newImageUrl;
+
+        const payload = {
+          type,
+          name,
+          amount,
+          date,
+          method,
+          link,
+          note,
+          image_url: imageUrl
+        };
+
+        let result;
+
+        if (id) {
+          result = await db
+            .from("transactions")
+            .update(payload)
+            .eq("id", id)
+            .eq("user_id", user.id);
+        } else {
+          result = await db
+            .from("transactions")
+            .insert({
+              ...payload,
+              user_id: user.id
+            });
+        }
+
+        if (result.error) {
+          /*
+           * Hvis databasen feiler etter upload,
+           * fjern det nye bildet igjen.
+           */
+          await deletePurchaseImage(newImageUrl);
+
+          console.error(result.error);
+
+          alert(
+            "Kunne ikke lagre transaksjonen:\n" +
+            result.error.message
+          );
+
+          return;
+        }
+
+        /*
+         * Først når databasen er lagret,
+         * sletter vi gammelt bilde.
+         */
+
+        if (
+          id &&
+          oldImageUrl &&
+          oldImageUrl !== newImageUrl
+        ) {
+          await deletePurchaseImage(oldImageUrl);
+        }
+
+      } catch (error) {
+        console.error(error);
+
+        alert(
+          error.message ||
+          "Kunne ikke laste opp bildet."
+        );
+
+        return;
+      }
+
+    } else {
+
+      /*
+       * Ingen nytt bilde:
+       * behold eksisterende image_url.
+       */
+
+      const payload = {
+        type,
+        name,
+        amount,
+        date,
+        method,
+        link: type === "out" ? link : null,
+        note,
+        image_url:
+          type === "out"
+            ? imageUrl
+            : null
+      };
+
+      let result;
+
+      if (id) {
+
+        result = await db
+          .from("transactions")
+          .update(payload)
+          .eq("id", id)
+          .eq("user_id", user.id);
+
+      } else {
+
+        result = await db
+          .from("transactions")
+          .insert({
+            ...payload,
+            user_id: user.id
+          });
+      }
+
+      if (result.error) {
+        console.error(result.error);
+
+        alert(
+          "Kunne ikke lagre transaksjonen:\n" +
+          result.error.message
+        );
+
+        return;
+      }
+    }
+
     closeTransaction();
+
     await loadTransactions();
+
     renderHome();
     renderLog();
   }
 
-  async function deleteTransaction() {
+  /* =========================================================
+     DELETE TRANSACTION
+     ========================================================= */
 
+  async function deleteTransaction() {
     const id =
       document.getElementById("editingId").value;
 
-    if (!id || !confirm("Vil du slette denne transaksjonen?")) {
+    if (
+      !id ||
+      !confirm(
+        "Vil du slette denne transaksjonen?"
+      )
+    ) {
       return;
     }
 
     const transaction =
-      transactions.find(t => t.id === id);
+      transactions.find(
+        t => t.id === id
+      );
 
     const { error } =
       await db
@@ -1201,28 +458,35 @@
         .eq("user_id", user.id);
 
     if (error) {
-      alert("Kunne ikke slette transaksjonen.");
+      console.error(error);
+
+      alert(
+        "Kunne ikke slette transaksjonen:\n" +
+        error.message
+      );
+
       return;
     }
 
     if (transaction?.image_url) {
-      await db.storage
-        .from("purchase-images")
-        .remove([transaction.image_url]);
+      await deletePurchaseImage(
+        transaction.image_url
+      );
     }
 
     closeTransaction();
+
     await loadTransactions();
+
     renderHome();
     renderLog();
   }
 
   /* =========================================================
-     UI
+     MONEY / DATE
      ========================================================= */
 
   function formatMoney(value) {
-
     return new Intl.NumberFormat("nb-NO", {
       style: "currency",
       currency: "NOK",
@@ -1231,58 +495,82 @@
   }
 
   function formatDate(value) {
-
-    return new Date(value + "T12:00:00")
-      .toLocaleDateString("nb-NO", {
+    return new Date(
+      value + "T12:00:00"
+    ).toLocaleDateString(
+      "nb-NO",
+      {
         day: "numeric",
         month: "short",
         year: "numeric"
-      });
+      }
+    );
   }
 
-  function renderHome() {
+  /* =========================================================
+     HOME
+     ========================================================= */
 
+  function renderHome() {
     let totalIn = 0;
     let totalOut = 0;
 
     for (const t of transactions) {
-
-      if (t.type === "in")
+      if (t.type === "in") {
         totalIn += Number(t.amount);
-
-      else
+      } else {
         totalOut += Number(t.amount);
+      }
     }
 
-    const balance = totalIn - totalOut;
+    const balance =
+      totalIn - totalOut;
 
-    document.getElementById("balance").textContent =
+    document.getElementById("balance")
+      .textContent =
       formatMoney(balance);
 
-    document.getElementById("totalIn").textContent =
+    document.getElementById("totalIn")
+      .textContent =
       "+" + formatMoney(totalIn);
 
-    document.getElementById("totalOut").textContent =
+    document.getElementById("totalOut")
+      .textContent =
       "−" + formatMoney(totalOut);
 
     const recent =
       transactions.slice(0, 8);
 
-    document.getElementById("homeCount").textContent =
-      transactions.length + " totalt";
+    document.getElementById("homeCount")
+      .textContent =
+      transactions.length +
+      " totalt";
 
-    document.getElementById("recent").innerHTML =
+    document.getElementById("recent")
+      .innerHTML =
       recent.length
         ? recent.map(transactionHTML).join("")
         : emptyHTML();
 
-    document.getElementById("logCount").textContent =
-      transactions.length + " totalt";
+    document.getElementById("logCount")
+      .textContent =
+      transactions.length +
+      " totalt";
   }
 
-  function transactionHTML(t) {
+  /* =========================================================
+     TRANSACTION HTML
+     ========================================================= */
 
-    const positive = t.type === "in";
+  function transactionHTML(t) {
+    const positive =
+      t.type === "in";
+
+    const hasImage =
+      Boolean(t.image_url);
+
+    const hasLink =
+      Boolean(t.link);
 
     return `
       <button
@@ -1290,43 +578,135 @@
         onclick="editTransaction('${t.id}')"
       >
 
-        <div class="transaction-icon">
-          ${positive ? "＋" : "−"}
-        </div>
+        ${
+          hasImage
+            ? `
+              <div
+                class="transaction-icon"
+                style="
+                  overflow:hidden;
+                  padding:0;
+                "
+              >
+                <img
+                  data-image-path="${escapeHTML(t.image_url)}"
+                  alt=""
+                  style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    display:block;
+                  "
+                >
+              </div>
+            `
+            : `
+              <div class="transaction-icon">
+                ${positive ? "＋" : "−"}
+              </div>
+            `
+        }
 
         <div class="transaction-info">
+
           <div class="transaction-name">
             ${escapeHTML(t.name)}
           </div>
 
           <div class="transaction-date">
             ${formatDate(t.date)}
-            ${t.method ? " · " + escapeHTML(t.method) : ""}
+            ${
+              t.method
+                ? " · " +
+                  escapeHTML(t.method)
+                : ""
+            }
           </div>
+
+          ${
+            hasLink
+              ? `
+                <div
+                  style="
+                    color:var(--blue);
+                    font-size:11px;
+                    margin-top:4px;
+                  "
+                >
+                  🔗 Produktlenke
+                </div>
+              `
+              : ""
+          }
+
         </div>
 
-        <div class="transaction-amount ${positive ? "green" : "red"}">
-          ${positive ? "+" : "−"}${formatMoney(Number(t.amount))}
+        <div
+          class="
+            transaction-amount
+            ${positive ? "green" : "red"}
+          "
+        >
+          ${
+            positive
+              ? "+"
+              : "−"
+          }${formatMoney(
+            Number(t.amount)
+          )}
         </div>
 
       </button>
     `;
   }
 
-  function emptyHTML() {
+  /*
+   * Etter at kortene er laget,
+   * hent signed URLs for private bilder.
+   */
 
+  async function loadTransactionImages() {
+    const images =
+      document.querySelectorAll(
+        "img[data-image-path]"
+      );
+
+    for (const img of images) {
+      const path =
+        img.dataset.imagePath;
+
+      const url =
+        await getImageUrl(path);
+
+      if (url) {
+        img.src = url;
+      } else {
+        img.style.display = "none";
+      }
+    }
+  }
+
+  function emptyHTML() {
     return `
-      <div class="glass empty" style="border-radius:22px">
+      <div
+        class="glass empty"
+        style="border-radius:22px"
+      >
         Ingen transaksjoner ennå.<br>
-        Legg til ditt første kjøp eller penger inn.
+        Legg til ditt første kjøp
+        eller penger inn.
       </div>
     `;
   }
 
-  function renderLog() {
+  /* =========================================================
+     LOG
+     ========================================================= */
 
+  function renderLog() {
     const query =
-      document.getElementById("search").value
+      document.getElementById("search")
+        .value
         .toLowerCase()
         .trim();
 
@@ -1334,154 +714,317 @@
 
     if (currentFilter !== "all") {
       list =
-        list.filter(t => t.type === currentFilter);
+        list.filter(
+          t => t.type === currentFilter
+        );
     }
 
     if (query) {
-
       list =
         list.filter(t =>
-          `${t.name} ${t.note || ""} ${t.method || ""}`
+          `${t.name} ${
+            t.note || ""
+          } ${
+            t.method || ""
+          }`
             .toLowerCase()
             .includes(query)
         );
     }
 
-    document.getElementById("logList").innerHTML =
+    document.getElementById("logList")
+      .innerHTML =
       list.length
         ? list.map(transactionHTML).join("")
         : emptyHTML();
+
+    loadTransactionImages();
   }
 
-  function setFilter(filter, element) {
-
+  function setFilter(
+    filter,
+    element
+  ) {
     currentFilter = filter;
 
     document
       .querySelectorAll(".filter")
-      .forEach(btn => btn.classList.remove("active"));
+      .forEach(
+        btn =>
+          btn.classList.remove(
+            "active"
+          )
+      );
 
     element.classList.add("active");
 
     renderLog();
   }
 
-  function showPage(page, button) {
+  function showPage(
+    page,
+    button
+  ) {
+    document
+      .getElementById("homePage")
+      .classList.toggle(
+        "hidden",
+        page !== "home"
+      );
 
-    document.getElementById("homePage")
-      .classList.toggle("hidden", page !== "home");
+    document
+      .getElementById("logPage")
+      .classList.toggle(
+        "hidden",
+        page !== "log"
+      );
 
-    document.getElementById("logPage")
-      .classList.toggle("hidden", page !== "log");
-
-    document.getElementById("morePage")
-      .classList.toggle("hidden", page !== "more");
+    document
+      .getElementById("morePage")
+      .classList.toggle(
+        "hidden",
+        page !== "more"
+      );
 
     document
       .querySelectorAll(".nav-btn")
-      .forEach(btn => btn.classList.remove("active"));
+      .forEach(
+        btn =>
+          btn.classList.remove(
+            "active"
+          )
+      );
 
     button.classList.add("active");
 
-    if (page === "home")
+    if (page === "home") {
       renderHome();
+      loadTransactionImages();
+    }
 
-    if (page === "log")
+    if (page === "log") {
       renderLog();
+    }
   }
 
   /* =========================================================
      TRANSACTION FORM
      ========================================================= */
 
-  function openTransaction(type, transaction = null) {
-
+  function openTransaction(
+    type,
+    transaction = null
+  ) {
     currentType = type;
 
-    document.getElementById("transactionOverlay")
+    document
+      .getElementById(
+        "transactionOverlay"
+      )
       .classList.remove("hidden");
 
-    document.getElementById("transactionForm").reset();
+    document
+      .getElementById(
+        "transactionForm"
+      )
+      .reset();
 
-    document.getElementById("editingId").value =
+    document
+      .getElementById(
+        "editingId"
+      )
+      .value =
       transaction?.id || "";
 
-    document.getElementById("date").value =
+    document
+      .getElementById("date")
+      .value =
       transaction?.date ||
-      new Date().toISOString().slice(0,10);
+      new Date()
+        .toISOString()
+        .slice(0, 10);
 
-    document.getElementById("formTitle").textContent =
+    document
+      .getElementById("formTitle")
+      .textContent =
       transaction
         ? "Rediger"
         : type === "out"
           ? "Nytt kjøp"
           : "Penger inn";
 
-    document.getElementById("purchaseFields")
-      .classList.toggle("hidden", type !== "out");
+    document
+      .getElementById(
+        "purchaseFields"
+      )
+      .classList.toggle(
+        "hidden",
+        type !== "out"
+      );
 
-    document.getElementById("deleteButton")
-      .classList.toggle("hidden", !transaction);
+    document
+      .getElementById(
+        "deleteButton"
+      )
+      .classList.toggle(
+        "hidden",
+        !transaction
+      );
+
+    const preview =
+      document.getElementById(
+        "imagePreview"
+      );
+
+    preview.src = "";
+    preview.style.display = "none";
 
     if (transaction) {
-
-      document.getElementById("name").value =
+      document
+        .getElementById("name")
+        .value =
         transaction.name || "";
 
-      document.getElementById("amount").value =
+      document
+        .getElementById("amount")
+        .value =
         transaction.amount || "";
 
-      document.getElementById("date").value =
+      document
+        .getElementById("date")
+        .value =
         transaction.date || "";
 
-      document.getElementById("method").value =
-        transaction.method || "Bankkort";
+      document
+        .getElementById("method")
+        .value =
+        transaction.method ||
+        "Bankkort";
 
-      document.getElementById("link").value =
+      document
+        .getElementById("link")
+        .value =
         transaction.link || "";
 
-      document.getElementById("note").value =
+      document
+        .getElementById("note")
+        .value =
         transaction.note || "";
+
+      /*
+       * Vis eksisterende bilde i redigeringsvinduet.
+       */
+
+      if (transaction.image_url) {
+        preview.style.display =
+          "block";
+
+        preview.alt =
+          "Bilde av kjøpet";
+
+        getImageUrl(
+          transaction.image_url
+        ).then(url => {
+          if (url) {
+            preview.src = url;
+          } else {
+            preview.style.display =
+              "none";
+          }
+        });
+      }
     }
   }
 
   function editTransaction(id) {
-
     const t =
-      transactions.find(item => item.id === id);
+      transactions.find(
+        item => item.id === id
+      );
 
     if (!t) return;
 
-    openTransaction(t.type, t);
+    openTransaction(
+      t.type,
+      t
+    );
   }
 
   function closeTransaction() {
-
-    document.getElementById("transactionOverlay")
+    document
+      .getElementById(
+        "transactionOverlay"
+      )
       .classList.add("hidden");
 
-    document.getElementById("transactionForm").reset();
+    document
+      .getElementById(
+        "transactionForm"
+      )
+      .reset();
+
+    document
+      .getElementById(
+        "imagePreview"
+      ).style.display = "none";
   }
 
   function overlayClose(event) {
-
-    if (event.target === event.currentTarget)
+    if (
+      event.target ===
+      event.currentTarget
+    ) {
       closeTransaction();
+    }
   }
 
   function previewImage(event) {
-
-    const file = event.target.files[0];
+    const file =
+      event.target.files[0];
 
     if (!file) return;
 
     const preview =
-      document.getElementById("imagePreview");
+      document.getElementById(
+        "imagePreview"
+      );
 
-    preview.src =
+    /*
+     * Dette viser bildet umiddelbart
+     * før det lastes opp.
+     */
+
+    if (
+      preview.dataset.objectUrl
+    ) {
+      URL.revokeObjectURL(
+        preview.dataset.objectUrl
+      );
+    }
+
+    const url =
       URL.createObjectURL(file);
 
-    preview.style.display = "block";
+    preview.dataset.objectUrl =
+      url;
+
+    preview.src = url;
+    preview.style.display =
+      "block";
+  }
+
+  /* =========================================================
+     PRODUCT LINK
+     ========================================================= */
+
+  function openProductLink(url) {
+    if (!url) return;
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   /* =========================================================
@@ -1489,7 +1032,6 @@
      ========================================================= */
 
   function openProfile() {
-
     if (!user) return;
 
     const meta =
@@ -1500,31 +1042,54 @@
       meta.picture ||
       "";
 
-    document.getElementById("profileAvatar").src =
-      avatar;
+    document
+      .getElementById(
+        "profileAvatar"
+      )
+      .src = avatar;
 
-    document.getElementById("profileName").textContent =
+    document
+      .getElementById(
+        "profileName"
+      )
+      .textContent =
       meta.full_name ||
       meta.name ||
       "Saldo-bruker";
 
-    document.getElementById("profileEmail").textContent =
+    document
+      .getElementById(
+        "profileEmail"
+      )
+      .textContent =
       user.email || "";
 
-    document.getElementById("profileOverlay")
-      .classList.remove("hidden");
+    document
+      .getElementById(
+        "profileOverlay"
+      )
+      .classList.remove(
+        "hidden"
+      );
   }
 
   function closeProfile() {
-
-    document.getElementById("profileOverlay")
+    document
+      .getElementById(
+        "profileOverlay"
+      )
       .classList.add("hidden");
   }
 
-  function profileOverlayClose(event) {
-
-    if (event.target === event.currentTarget)
+  function profileOverlayClose(
+    event
+  ) {
+    if (
+      event.target ===
+      event.currentTarget
+    ) {
       closeProfile();
+    }
   }
 
   /* =========================================================
@@ -1532,27 +1097,47 @@
      ========================================================= */
 
   function toggleTheme() {
-
-    document.body.classList.toggle("light");
+    document.body.classList.toggle(
+      "light"
+    );
 
     const light =
-      document.body.classList.contains("light");
+      document.body.classList.contains(
+        "light"
+      );
 
     localStorage.setItem(
       "saldo_theme",
-      light ? "light" : "dark"
+      light
+        ? "light"
+        : "dark"
     );
 
-    document.getElementById("themeText").textContent =
-      light ? "Lys modus" : "Mørk modus";
+    document
+      .getElementById(
+        "themeText"
+      )
+      .textContent =
+      light
+        ? "Lys modus"
+        : "Mørk modus";
   }
 
   const savedTheme =
-    localStorage.getItem("saldo_theme");
+    localStorage.getItem(
+      "saldo_theme"
+    );
 
   if (savedTheme === "light") {
-    document.body.classList.add("light");
-    document.getElementById("themeText").textContent =
+    document.body.classList.add(
+      "light"
+    );
+
+    document
+      .getElementById(
+        "themeText"
+      )
+      .textContent =
       "Lys modus";
   }
 
@@ -1561,30 +1146,46 @@
      ========================================================= */
 
   function exportData() {
-
     const backup = {
       app: "Saldo",
-      version: 2,
-      exportedAt: new Date().toISOString(),
+      version: 3,
+      exportedAt:
+        new Date().toISOString(),
       transactions
     };
 
     const blob =
       new Blob(
-        [JSON.stringify(backup, null, 2)],
-        { type: "application/json" }
+        [
+          JSON.stringify(
+            backup,
+            null,
+            2
+          )
+        ],
+        {
+          type:
+            "application/json"
+        }
       );
 
     const url =
-      URL.createObjectURL(blob);
+      URL.createObjectURL(
+        blob
+      );
 
     const a =
-      document.createElement("a");
+      document.createElement(
+        "a"
+      );
 
     a.href = url;
+
     a.download =
       "saldo-backup-" +
-      new Date().toISOString().slice(0,10) +
+      new Date()
+        .toISOString()
+        .slice(0, 10) +
       ".json";
 
     a.click();
@@ -1592,51 +1193,86 @@
     URL.revokeObjectURL(url);
   }
 
-  async function importData(event) {
-
+  async function importData(
+    event
+  ) {
     const file =
       event.target.files[0];
 
     if (!file) return;
 
     try {
-
       const text =
         await file.text();
 
       const backup =
         JSON.parse(text);
 
-      if (!Array.isArray(backup.transactions)) {
-        throw new Error("Ugyldig backup.");
+      if (
+        !Array.isArray(
+          backup.transactions
+        )
+      ) {
+        throw new Error(
+          "Ugyldig backup."
+        );
       }
 
-      for (const t of backup.transactions) {
+      for (
+        const t of
+        backup.transactions
+      ) {
+        const { error } =
+          await db
+            .from("transactions")
+            .insert({
+              user_id:
+                user.id,
+              type:
+                t.type,
+              name:
+                t.name,
+              amount:
+                Number(
+                  t.amount
+                ),
+              date:
+                t.date,
+              method:
+                t.method ||
+                null,
+              link:
+                t.link ||
+                null,
+              note:
+                t.note ||
+                null,
+              image_url:
+                t.image_url ||
+                null
+            });
 
-        await db
-          .from("transactions")
-          .insert({
-            user_id: user.id,
-            type: t.type,
-            name: t.name,
-            amount: Number(t.amount),
-            date: t.date,
-            method: t.method || null,
-            link: t.link || null,
-            note: t.note || null
-          });
+        if (error) {
+          throw error;
+        }
       }
 
       await loadTransactions();
+
       renderHome();
       renderLog();
 
-      alert("Backup importert.");
+      alert(
+        "Backup importert."
+      );
 
     } catch (error) {
-
       console.error(error);
-      alert("Kunne ikke importere backup.");
+
+      alert(
+        "Kunne ikke importere backup:\n" +
+        error.message
+      );
     }
 
     event.target.value = "";
@@ -1647,15 +1283,28 @@
      ========================================================= */
 
   function escapeHTML(value) {
-
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
   }
 </script>
-
-</body>
-</html>
