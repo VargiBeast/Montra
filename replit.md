@@ -4,6 +4,8 @@
 
 - The Replit web workflow runs `npm run dev` on port 5000.
 - Build a production bundle with `npm run build`.
+- Replit Autoscale runs the built app with `npm run start`; its static server binds to `0.0.0.0` and uses the assigned `PORT`.
+- `npm run preview` is for local inspection of the production bundle.
 - Regenerate the branded PWA PNG icons with `npm run generate:icons`.
 
 ## Supabase
