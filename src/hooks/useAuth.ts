@@ -60,19 +60,42 @@ export function useAuth() {
       await action();
     } catch (error) {
       console.error("Authentication failed.", error);
-      setAuthError(getErrorMessage(error, "We couldn’t complete that sign-in. Please try again."));
-      throw error;
+      const message = getErrorMessage(error, "We couldn’t complete that sign-in. Please try again.");
+      setAuthError(message);
+      throw new Error(message);
     }
   }, []);
 
   const signInWithProvider = useCallback(
-    (provider: "google" | "apple") =>
+    (provider: "google") =>
       runAuthAction(() => authService.signInWithProvider(provider)),
     [runAuthAction],
   );
   const signInWithEmail = useCallback(
     (email: string) => runAuthAction(() => authService.signInWithEmail(email)),
     [runAuthAction],
+  );
+  const verifyEmailCode = useCallback(
+    (email: string, token: string) => runAuthAction(() => authService.verifyEmailCode(email, token)),
+    [runAuthAction],
+  );
+  const signInWithPassword = useCallback(
+    (email: string, password: string) => runAuthAction(() => authService.signInWithPassword(email, password)),
+    [runAuthAction],
+  );
+  const signUpWithPassword = useCallback(
+    async (email: string, password: string) => {
+      setAuthError(null);
+      try {
+        return await authService.signUpWithPassword(email, password);
+      } catch (error) {
+        console.error("Authentication failed.", error);
+        const message = getErrorMessage(error, "We couldn’t complete that sign-in. Please try again.");
+        setAuthError(message);
+        throw new Error(message);
+      }
+    },
+    [],
   );
   const signOut = useCallback(
     () => runAuthAction(() => authService.signOut()),
@@ -107,6 +130,9 @@ export function useAuth() {
     isConfigured: isSupabaseConfigured,
     signInWithProvider,
     signInWithEmail,
+    verifyEmailCode,
+    signInWithPassword,
+    signUpWithPassword,
     signOut,
     retrySession,
   };

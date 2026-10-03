@@ -1,57 +1,344 @@
-import { useState, type FormEvent } from "react";
-import { Apple, ArrowRight, Mail, WalletCards } from "lucide-react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { ArrowLeft, ArrowRight, ChevronDown, KeyRound, Mail, WalletCards } from "lucide-react";
+import { loginCopy, readLanguage, writeLanguage, type AppLanguage } from "../lib/i18n";
 
 interface LoginPageProps {
   authError: string | null;
   busy: boolean;
   isConfigured: boolean;
   onGoogle: () => Promise<void>;
-  onApple: () => Promise<void>;
   onEmail: (email: string) => Promise<void>;
+  onVerifyCode: (email: string, token: string) => Promise<void>;
+  onPassword: (email: string, password: string) => Promise<void>;
+  onSignUp: (email: string, password: string) => Promise<{ needsConfirmation: boolean }>;
   onRetry: () => Promise<void>;
 }
 
-export function LoginPage({ authError, busy, isConfigured, onGoogle, onApple, onEmail, onRetry }: LoginPageProps) {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [localError, setLocalError] = useState("");
+type EmailMethod = "password" | "code" | null;
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLocalError("");
-    try { await onEmail(email.trim()); setSent(true); }
-    catch (reason) { setLocalError(reason instanceof Error ? reason.message : "We couldn’t send your sign-in link."); }
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export function LoginPage({
+  authError,
+  busy,
+  isConfigured,
+  onGoogle,
+  onEmail,
+  onVerifyCode,
+  onPassword,
+  onSignUp,
+  onRetry,
+}: LoginPageProps) {
+  const [language, setLanguage] = useState<AppLanguage>(() => readLanguage());
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
+  const [method, setMethod] = useState<EmailMethod>(null);
+  const [creating, setCreating] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [sent, setSent] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [localError, setLocalError] = useState("");
+  const languageRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
+  const copy = loginCopy[language];
+
+  useEffect(() => {
+    document.documentElement.lang = language === "no" ? "nb" : "en";
+  }, [language]);
+
+  useEffect(() => {
+    if (!languageOpen) return;
+    function onPointer(event: PointerEvent) {
+      if (!languageRef.current?.contains(event.target as Node)) setLanguageOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setLanguageOpen(false);
+    }
+    window.addEventListener("pointerdown", onPointer);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [languageOpen]);
+
+  function chooseLanguage(next: AppLanguage) {
+    setLanguage(next);
+    writeLanguage(next);
+    setLanguageOpen(false);
   }
+
+  function resetFeedback() {
+    setLocalError("");
+    setNotice("");
+  }
+
+  function backToStart() {
+    setShowEmail(false);
+    setMethod(null);
+    setCreating(false);
+    setSent(false);
+    setCode("");
+    resetFeedback();
+  }
+
+  function backToMethods() {
+    setMethod(null);
+    setCreating(false);
+    setSent(false);
+    setCode("");
+    resetFeedback();
+  }
+
+  function requireEmail() {
+    const value = email.trim();
+    if (!value) {
+      setLocalError(copy.enterEmail);
+      return null;
+    }
+    if (!isValidEmail(value)) {
+      setLocalError(copy.invalidEmail);
+      return null;
+    }
+    return value;
+  }
+
+  async function submitPassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    resetFeedback();
+    const value = requireEmail();
+    if (!value) return;
+    if (!password) {
+      setLocalError(copy.enterPassword);
+      return;
+    }
+    if (password.length < 6) {
+      setLocalError(copy.shortPassword);
+      return;
+    }
+    try {
+      if (creating) {
+        const result = await onSignUp(value, password);
+        setNotice(result.needsConfirmation ? copy.accountCreated : copy.signedUpReady);
+        setCreating(false);
+        return;
+      }
+      await onPassword(value, password);
+    } catch (reason) {
+      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSignIn);
+    }
+  }
+
+  async function submitCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    resetFeedback();
+    const value = requireEmail();
+    if (!value) return;
+    try {
+      await onEmail(value);
+      setSent(true);
+      setNotice(copy.codeSent);
+    } catch (reason) {
+      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSend);
+    }
+  }
+
+  async function submitVerify(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    resetFeedback();
+    const value = requireEmail();
+    if (!value) return;
+    const token = code.replace(/\s/g, "");
+    if (!token) {
+      setLocalError(copy.enterCode);
+      return;
+    }
+    try {
+      await onVerifyCode(value, token);
+    } catch (reason) {
+      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSignIn);
+    }
+  }
+
+  const storyLines = copy.storyTitle.split("\n");
 
   return (
     <div className="auth-page">
       <section className="auth-story">
-        <div className="brand" style={{ color: "#f5fff9" }}><span className="brand-mark" style={{ color: "var(--green)", background: "#f5fff9" }}><WalletCards size={18} /></span>saldo</div>
-        <h1>Your money,<br />in a softer focus.</h1>
-        <p>A personal journal for the things you spend on and the things that come in. Clear enough to understand, human enough to return to.</p>
+        <div className="brand" style={{ color: "#f5fff9" }}>
+          <span className="brand-mark" style={{ color: "var(--green)", background: "#f5fff9" }}><WalletCards size={18} /></span>
+          saldo
+        </div>
+        <h1>{storyLines[0]}<br />{storyLines[1]}</h1>
+        <p>{copy.storyBody}</p>
       </section>
       <section className="panel auth-panel">
-        <h2>Welcome to Saldo</h2>
-        <p>Sign in to find your money story right where you left it.</p>
-        {!isConfigured && <div className="notice" role="alert">{authError || "Saldo isn’t connected yet. Add the Supabase connection settings to continue."}</div>}
-        {authError && isConfigured && <div className="notice" role="alert">{authError}<button className="text-action" type="button" onClick={() => void onRetry()} style={{ marginLeft: 7 }}>Try again</button></div>}
-        {sent ? <div className="notice" role="status">A sign-in link is on its way to <strong>{email}</strong>. You can close this page once it arrives.</div> : <>
-          <div className="auth-buttons">
-            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => void onGoogle()}><span style={{ fontWeight: 800, color: "#477bd4" }}>G</span> Continue with Google</button>
-            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => void onApple()}><Apple size={17} /> Continue with Apple</button>
+        <div className="auth-panel-top">
+          <div>
+            <h2>{copy.welcome}</h2>
+            <p>{copy.welcomeBody}</p>
           </div>
-          <div className="auth-divider">or use email</div>
-          <form onSubmit={submit}>
+          <div className="language-picker" ref={languageRef}>
+            <button
+              className="language-button"
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded={languageOpen}
+              aria-controls={menuId}
+              onClick={() => setLanguageOpen((open) => !open)}
+            >
+              <span aria-hidden="true">🌐</span>
+              {copy.languageName}
+              <ChevronDown size={14} />
+            </button>
+            {languageOpen && (
+              <div className="language-menu" id={menuId} role="listbox" aria-label={copy.languageLabel}>
+                <button type="button" role="option" aria-selected={language === "en"} className={language === "en" ? "selected" : ""} onClick={() => chooseLanguage("en")}>English</button>
+                <button type="button" role="option" aria-selected={language === "no"} className={language === "no" ? "selected" : ""} onClick={() => chooseLanguage("no")}>Norsk</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {!isConfigured && <div className="notice" role="alert">{authError || copy.notConnected}</div>}
+        {authError && isConfigured && !localError && (
+          <div className="notice" role="alert">
+            {authError}
+            <button className="text-action" type="button" onClick={() => void onRetry()} style={{ marginLeft: 7 }}>{copy.tryAgain}</button>
+          </div>
+        )}
+
+        {!showEmail ? (
+          <div className="auth-buttons auth-step">
+            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => void onGoogle()}>
+              <GoogleMark />
+              {copy.continueGoogle}
+            </button>
+            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => { resetFeedback(); setShowEmail(true); }}>
+              <Mail size={17} />
+              {copy.continueEmail}
+            </button>
+          </div>
+        ) : (
+          <div className="auth-step">
+            <button className="text-action auth-back" type="button" onClick={method || sent ? backToMethods : backToStart}>
+              <ArrowLeft size={15} />
+              {copy.back}
+            </button>
             <div className="form-field">
-              <label htmlFor="login-email">Email address</label>
-              <input id="login-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" />
+              <label htmlFor="login-email">{copy.email}</label>
+              <input
+                id="login-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder={copy.emailPlaceholder}
+              />
             </div>
-            {localError && <p className="form-error" role="alert">{localError}</p>}
-            <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}><Mail size={16} />{busy ? "Sending…" : "Send me a sign-in link"}<ArrowRight size={15} /></button>
-          </form>
-        </>}
-        <p style={{ margin: "18px 0 0", fontSize: 11 }}>By continuing, you’re signing in to your personal Saldo space.</p>
+
+            {!method && (
+              <div className="method-chooser">
+                <p>{copy.choose}</p>
+                <div className="method-grid">
+                  <button className="method-card" type="button" onClick={() => { resetFeedback(); setMethod("password"); }}>
+                    <KeyRound size={18} />
+                    <span>{copy.password}</span>
+                  </button>
+                  <button className="method-card" type="button" onClick={() => { resetFeedback(); setMethod("code"); }}>
+                    <Mail size={18} />
+                    <span>{copy.oneTime}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {method === "password" && (
+              <form onSubmit={submitPassword}>
+                <div className="form-field">
+                  <label htmlFor="login-password">{copy.passwordLabel}</label>
+                  <input
+                    id="login-password"
+                    type="password"
+                    autoComplete={creating ? "new-password" : "current-password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder={copy.passwordPlaceholder}
+                  />
+                </div>
+                {localError && <p className="form-error" role="alert">{localError}</p>}
+                {notice && <div className="notice" role="status">{notice}</div>}
+                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
+                  {busy ? copy.continuing : creating ? copy.createAccount : copy.continue}
+                  {!busy && <ArrowRight size={15} />}
+                </button>
+                <p className="auth-switch">
+                  {creating ? copy.haveAccount : copy.needAccount}{" "}
+                  <button className="text-action" type="button" onClick={() => { setCreating((value) => !value); resetFeedback(); }}>
+                    {creating ? copy.signInInstead : copy.createAccount}
+                  </button>
+                </p>
+              </form>
+            )}
+
+            {method === "code" && !sent && (
+              <form onSubmit={submitCode}>
+                <p className="method-hint">{copy.choose} {copy.oneTime}</p>
+                {localError && <p className="form-error" role="alert">{localError}</p>}
+                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
+                  <Mail size={16} />
+                  {busy ? copy.sending : copy.sendCode}
+                </button>
+              </form>
+            )}
+
+            {method === "code" && sent && (
+              <form onSubmit={submitVerify}>
+                <div className="notice" role="status">
+                  <strong>{copy.codeSent}.</strong> {copy.codeSentBody} <strong>{email.trim()}</strong>. {copy.codeSentHint}
+                </div>
+                <div className="form-field" style={{ marginTop: 14 }}>
+                  <label htmlFor="login-code">{copy.codeLabel}</label>
+                  <input
+                    id="login-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
+                    placeholder={copy.codePlaceholder}
+                  />
+                </div>
+                {localError && <p className="form-error" role="alert">{localError}</p>}
+                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
+                  {busy ? copy.verifying : copy.verify}
+                </button>
+                <p className="auth-switch">
+                  <button className="text-action" type="button" disabled={busy || !isConfigured} onClick={() => void submitCode({ preventDefault() {} } as FormEvent<HTMLFormElement>)}>
+                    {busy ? copy.sending : copy.resend}
+                  </button>
+                </p>
+              </form>
+            )}
+          </div>
+        )}
+        <p style={{ margin: "18px 0 0", fontSize: 11 }}>{copy.legal}</p>
       </section>
     </div>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+      <path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z" />
+      <path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.6-1.9.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z" />
+      <path fill="#FBBC05" d="M3.9 10.7A5.4 5.4 0 0 1 3.6 9c0-.6.1-1.2.3-1.7V5H.9A9 9 0 0 0 0 9c0 1.4.3 2.8.9 4l3-2.3z" />
+      <path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z" />
+    </svg>
   );
 }

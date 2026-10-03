@@ -116,15 +116,33 @@ function App() {
     } finally { setSigningOut(false); }
   }
 
-  async function signIn(provider: "google" | "apple") {
+  async function signInGoogle() {
     setAuthBusy(true);
-    try { await auth.signInWithProvider(provider); } catch { /* The auth hook exposes the actionable error. */ }
+    try { await auth.signInWithProvider("google"); } catch { /* The auth hook exposes the actionable error. */ }
     finally { setAuthBusy(false); }
   }
 
   async function signInEmail(email: string) {
     setAuthBusy(true);
     try { await auth.signInWithEmail(email); }
+    finally { setAuthBusy(false); }
+  }
+
+  async function verifyEmailCode(email: string, token: string) {
+    setAuthBusy(true);
+    try { await auth.verifyEmailCode(email, token); }
+    finally { setAuthBusy(false); }
+  }
+
+  async function signInPassword(email: string, password: string) {
+    setAuthBusy(true);
+    try { await auth.signInWithPassword(email, password); }
+    finally { setAuthBusy(false); }
+  }
+
+  async function signUpPassword(email: string, password: string) {
+    setAuthBusy(true);
+    try { return await auth.signUpWithPassword(email, password); }
     finally { setAuthBusy(false); }
   }
 
@@ -138,9 +156,11 @@ function App() {
     authError={auth.authError}
     busy={authBusy}
     isConfigured={auth.isConfigured}
-    onGoogle={() => signIn("google")}
-    onApple={() => signIn("apple")}
+    onGoogle={signInGoogle}
     onEmail={signInEmail}
+    onVerifyCode={verifyEmailCode}
+    onPassword={signInPassword}
+    onSignUp={signUpPassword}
     onRetry={auth.retrySession}
   />{toast && <div className="toast" role="status">{toast}</div>}</div>;
 
