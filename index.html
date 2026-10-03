@@ -1,866 +1,1661 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="no">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="theme-color" content="#0b0c12" id="themeColorMeta">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Saldo · Din økonomi</title>
-<style>
-:root{
-  --text:#fff;
-  --muted:rgba(255,255,255,.62);
-  --glass:rgba(255,255,255,.12);
-  --glass-heavy:rgba(255,255,255,.18);
-  --glass-dark:rgba(20,22,30,.26);
-  --edge:rgba(255,255,255,.24);
-  --edge-soft:rgba(255,255,255,.12);
-  --green:#72efb7;
-  --red:#ff7b72;
-  --blue:#7db0ff;
-  --purple:#b29cff;
-  --blur:26px;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{
-  min-height:100%;
-  background:#080a12;
-  color-scheme:dark;
-}
-body{
-  margin:0;min-height:100vh;overflow-x:hidden;
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,system-ui,sans-serif;
-  background:
-    radial-gradient(circle at 50% 0%,rgba(80,100,180,.20),transparent 45%),
-    #080a12;
-}
-button,input,textarea,select{font:inherit}
-button{border:0;color:inherit}
-.app{
-  position:relative;z-index:2;
-  width:100%;max-width:760px;margin:auto;
-  padding:env(safe-area-inset-top) 16px calc(125px + env(safe-area-inset-bottom));
-}
-.liquid-backdrop{
-  position:fixed;z-index:0;inset:-12%;
-  overflow:hidden;pointer-events:none;
-  background:
-    radial-gradient(circle at 20% 20%,rgba(35,90,190,.32),transparent 28%),
-    radial-gradient(circle at 85% 25%,rgba(125,70,210,.27),transparent 30%),
-    radial-gradient(circle at 30% 80%,rgba(20,180,145,.23),transparent 30%),
-    radial-gradient(circle at 80% 80%,rgba(255,145,50,.18),transparent 27%),
-    linear-gradient(145deg,#101a35,#111426 45%,#15101f);
-  filter:saturate(125%);
-}
-.orb{
-  position:absolute;border-radius:50%;
-  filter:blur(35px);
-  opacity:.8;
-  mix-blend-mode:screen;
-  animation:float 13s ease-in-out infinite alternate;
-}
-.orb-a{width:270px;height:270px;left:-70px;top:12%;background:#1677ff}
-.orb-b{width:250px;height:250px;right:-50px;top:18%;background:#9d55ff;animation-delay:-4s}
-.orb-c{width:290px;height:290px;left:18%;top:53%;background:#00b994;animation-delay:-7s}
-.orb-d{width:230px;height:230px;right:8%;top:66%;background:#ff9b35;animation-delay:-2s}
-.orb-e{width:190px;height:190px;left:42%;top:32%;background:#ff4d9b;opacity:.32;animation-delay:-9s}
-@keyframes float{
-  from{transform:translate3d(-15px,-12px,0) scale(.96)}
-  to{transform:translate3d(20px,18px,0) scale(1.06)}
-}
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 3px 15px;
-}
-.brand{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:850;letter-spacing:-.65px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 20px rgba(114,239,183,.9)}
-.eyebrow{font-size:12px;color:var(--muted);font-weight:700}
-.screen{display:none;animation:in .25s ease}.screen.active{display:block}
-@keyframes in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Saldo">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <title>Saldo</title>
 
-.hero,
-.movement,
-.card,
-.more-card{
-  position:relative;
-  border:1px solid var(--edge);
-  background:linear-gradient(135deg,rgba(255,255,255,.17),rgba(255,255,255,.055));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.25),
-    inset 0 -1px 0 rgba(0,0,0,.16),
-    0 18px 50px rgba(0,0,0,.18);
-  backdrop-filter:blur(26px) saturate(180%) contrast(108%);
-  -webkit-backdrop-filter:blur(26px) saturate(180%) contrast(108%);
-}
-.hero:before,
-.movement:before,
-.card:before,
-.more-card:before,
-.sheet:before,
-.nav-inner:before{
-  content:"";
-  position:absolute;inset:0;border-radius:inherit;
-  pointer-events:none;
-  background:
-    linear-gradient(120deg,rgba(255,255,255,.22),transparent 18%,transparent 68%,rgba(255,255,255,.07)),
-    radial-gradient(180px 70px at 18% 0%,rgba(255,255,255,.18),transparent 75%);
-  opacity:.72;
-}
-.hero:after,
-.movement:after,
-.card:after,
-.more-card:after{
-  content:"";
-  position:absolute;inset:1px;border-radius:inherit;
-  pointer-events:none;
-  border:1px solid rgba(255,255,255,.055);
-}
-.hero{
-  overflow:hidden;margin-top:4px;padding:28px 23px 22px;border-radius:31px;
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.055) 65%),
-    rgba(255,255,255,.035);
-}
-.hero>*{position:relative;z-index:1}
-.balance{margin-top:8px;font-size:50px;line-height:1;letter-spacing:-3px;font-weight:900;text-shadow:0 2px 20px rgba(0,0,0,.18)}
-.balance.negative{color:var(--red)}.balance.positive{color:var(--green)}.balance.zero{color:#fff}
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:21px}
-.stat{
-  position:relative;overflow:hidden;padding:12px 11px;border-radius:18px;
-  background:rgba(255,255,255,.09);
-  border:1px solid rgba(255,255,255,.13);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
-  backdrop-filter:blur(18px) saturate(150%);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
-}
-.stat .label{font-size:10px;color:rgba(255,255,255,.62);margin-bottom:6px;font-weight:650}
-.stat .value{font-size:16px;font-weight:850;white-space:nowrap}
-.in{color:var(--green)!important}.out{color:var(--red)!important}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0 29px}
-.action{
-  min-height:69px;padding:13px 15px;text-align:left;border-radius:22px;
-  position:relative;overflow:hidden;font-weight:850;cursor:pointer;
-  border:1px solid rgba(255,255,255,.22);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 15px 35px rgba(0,0,0,.18);
-  backdrop-filter:blur(20px) saturate(160%);
-  -webkit-backdrop-filter:blur(20px) saturate(160%);
-  transition:transform .15s,filter .15s;
-}
-.action:before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(125deg,rgba(255,255,255,.28),transparent 35%,rgba(255,255,255,.04));
-}
-.action:after{
-  content:"";position:absolute;width:110px;height:110px;border-radius:50%;
-  right:-45px;top:-65px;background:rgba(255,255,255,.17);filter:blur(12px);
-}
-.action>*{position:relative;z-index:1}
-.action:active{transform:scale(.965);filter:brightness(.9)}
-.action small{display:block;font-size:11px;font-weight:650;opacity:.72;margin-top:4px}
-.action.buy{background:linear-gradient(135deg,rgba(255,105,99,.72),rgba(210,62,91,.45))}
-.action.add{background:linear-gradient(135deg,rgba(74,236,169,.70),rgba(15,181,124,.43));color:#fff}
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:26px 2px 11px}
-.section-title h2{font-size:17px;letter-spacing:-.45px;margin:0;font-weight:850;text-shadow:0 1px 12px rgba(0,0,0,.25)}
-.section-title span{font-size:11px;color:var(--muted)}
-.movement{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 13px;margin-bottom:7px;border-radius:20px;overflow:hidden;
-}
-.move-left{display:flex;align-items:center;gap:11px;min-width:0;position:relative;z-index:1}
-.pill-icon{
-  width:36px;height:36px;border-radius:14px;display:grid;place-items:center;
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
-}
-.move-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.move-way{font-size:10px;color:rgba(255,255,255,.55);margin-top:2px}
-.move-amount{font-size:14px;font-weight:850;white-space:nowrap;position:relative;z-index:1}
+    :root {
+      --bg: #07111f;
+      --bg2: #0b1728;
+      --card: rgba(255,255,255,.075);
+      --card-strong: rgba(255,255,255,.11);
+      --border: rgba(255,255,255,.12);
+      --text: #f5f7fb;
+      --muted: #8f9bad;
+      --green: #55e6a5;
+      --red: #ff6678;
+      --blue: #69a8ff;
+      --nav: rgba(9,17,29,.82);
+      --input: rgba(255,255,255,.075);
+    }
 
-.empty{
-  border:1px dashed rgba(255,255,255,.22);border-radius:22px;padding:31px 20px;
-  text-align:center;color:rgba(255,255,255,.56);
-  background:rgba(255,255,255,.055);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-}
-.empty strong{display:block;color:#fff;font-size:15px;margin-bottom:6px}
+    body.light {
+      --bg: #f2f5f9;
+      --bg2: #e8edf4;
+      --card: rgba(255,255,255,.66);
+      --card-strong: rgba(255,255,255,.82);
+      --border: rgba(0,0,0,.08);
+      --text: #101522;
+      --muted: #697386;
+      --nav: rgba(255,255,255,.8);
+      --input: rgba(0,0,0,.045);
+    }
 
-.log-head{margin:11px 2px 19px}.page-title{font-size:33px;letter-spacing:-1.7px;font-weight:900;margin:0}.page-sub{color:var(--muted);font-size:12px;margin-top:5px}
-.list{display:grid;gap:9px}
-.card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:23px;cursor:pointer;overflow:hidden}
-.card:active{transform:scale(.975)}
-.thumb{
-  width:57px;height:57px;border-radius:18px;flex:none;object-fit:cover;
-  display:grid;place-items:center;font-size:21px;
-  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.17);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
-  position:relative;z-index:1;
-}
-.card-main{min-width:0;flex:1;position:relative;z-index:1}
-.card-name{font-size:14px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.meta{font-size:10px;color:rgba(255,255,255,.57);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-bottom{display:flex;align-items:center;gap:5px;margin-top:7px}.tag{font-size:9px;padding:4px 7px;border-radius:8px;background:rgba(255,255,255,.10);color:rgba(255,255,255,.72)}.link{color:var(--blue)}
-.amount{font-size:14px;font-weight:900;white-space:nowrap;align-self:flex-start;margin-top:2px;position:relative;z-index:1}
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "SF Pro Text", Inter, sans-serif;
+    }
 
-.more-grid{display:grid;gap:10px;margin-top:20px}.more-card{padding:17px;border-radius:23px;overflow:hidden}
-.more-card h3{margin:0 0 6px;font-size:15px;position:relative;z-index:1}.more-card p{margin:0;color:rgba(255,255,255,.58);font-size:12px;line-height:1.55;position:relative;z-index:1}
-.tool-btn{
-  width:100%;margin-top:10px;padding:13px;border-radius:16px;
-  background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);
-  font-weight:750;text-align:left;cursor:pointer;position:relative;z-index:1;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-}
-.tool-btn.danger{color:#ffaaa3}
+    body {
+      overflow-x: hidden;
+      padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    }
 
-.bottom-nav{
-  position:fixed;z-index:30;left:50%;bottom:0;transform:translateX(-50%);
-  width:min(100%,760px);padding:9px 16px calc(10px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,rgba(5,6,10,.48),transparent);
-  border:0;backdrop-filter:none;-webkit-backdrop-filter:none;
-}
-.nav-inner{
-  position:relative;max-width:450px;margin:auto;padding:4px;
-  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
-  border-radius:23px;
-  border:1px solid rgba(255,255,255,.20);
-  background:rgba(255,255,255,.11);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 18px 45px rgba(0,0,0,.3);
-  backdrop-filter:blur(30px) saturate(180%) contrast(110%);
-  -webkit-backdrop-filter:blur(30px) saturate(180%) contrast(110%);
-  overflow:hidden;
-}
-.nav{
-  position:relative;z-index:1;background:transparent;padding:8px 6px;border-radius:18px;
-  color:rgba(255,255,255,.58);font-size:10px;font-weight:800;cursor:pointer;
-  transition:.16s;
-}
-.nav-icon{font-size:19px;display:block;margin-bottom:3px;line-height:1}
-.nav.active{
-  color:#fff;background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 15px rgba(0,0,0,.15);
-}
-.nav.active .nav-icon{color:var(--green)}
+    button, input, textarea, select {
+      font: inherit;
+    }
 
-.overlay{
-  position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.42);
-  display:none;align-items:flex-end;
-  backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);
-}
-.overlay.open{display:flex}
-.sheet{
-  position:relative;width:100%;max-width:760px;margin:auto auto 0;max-height:94vh;overflow:auto;
-  padding:8px 17px calc(22px + env(safe-area-inset-bottom));
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.20),rgba(255,255,255,.07)),
-    rgba(20,22,30,.36);
-  border:1px solid rgba(255,255,255,.24);border-bottom:0;border-radius:31px 31px 0 0;
-  box-shadow:0 -30px 90px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.30);
-  backdrop-filter:blur(32px) saturate(180%) contrast(110%);
-  -webkit-backdrop-filter:blur(32px) saturate(180%) contrast(110%);
-  animation:sheetUp .28s cubic-bezier(.2,.8,.2,1);
-}
-@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
-.handle{width:39px;height:4px;border-radius:5px;background:rgba(255,255,255,.38);margin:3px auto 17px}
-.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;position:relative;z-index:2}
-.sheet-title{font-size:21px;font-weight:900;letter-spacing:-.7px}.close{width:35px;height:35px;border-radius:14px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.14);cursor:pointer;font-size:19px}
-.form{display:grid;gap:12px;position:relative;z-index:2}
-.field label{display:block;font-size:11px;color:rgba(255,255,255,.62);font-weight:750;margin:0 0 6px 2px}
-.field input,.field textarea,.field select{
-  width:100%;border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.095);color:#fff;border-radius:17px;padding:13px;outline:none;
-  appearance:none;-webkit-appearance:none;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-}
-.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.38)}
-.field input:focus,.field textarea:focus,.field select:focus{
-  border-color:rgba(114,239,183,.55);box-shadow:0 0 0 3px rgba(114,239,183,.09),inset 0 1px 0 rgba(255,255,255,.14)
-}
-.field textarea{min-height:82px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.save{width:100%;padding:15px;border-radius:18px;font-weight:900;margin-top:4px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 12px 28px rgba(0,0,0,.18)}
-.save.buy{background:rgba(255,90,85,.80)}.save.add{background:rgba(55,220,150,.80);color:#fff}
-.preview{display:none;margin-top:7px}.preview img{width:100%;height:150px;object-fit:cover;border-radius:17px;border:1px solid rgba(255,255,255,.16)}
-.file-label{display:block;text-align:center;padding:13px;border:1px dashed rgba(255,255,255,.24);border-radius:16px;background:rgba(255,255,255,.055);cursor:pointer;font-size:12px;font-weight:800}.file-label input{display:none!important}
-.form-note{font-size:10px;color:rgba(255,255,255,.48);line-height:1.4}.edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.delete{padding:14px;border-radius:17px;background:rgba(255,100,95,.14);color:#ffaaa3;font-weight:800;cursor:pointer;border:1px solid rgba(255,255,255,.08)}
+    button {
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+    }
 
-.confirm{
-  position:fixed;z-index:80;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:22px;
-  backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
-}
-.confirm.open{display:flex}
-.confirm-box{
-  width:min(420px,100%);padding:21px;border-radius:27px;
-  background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.07));
-  border:1px solid rgba(255,255,255,.22);
-  box-shadow:0 25px 80px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.22);
-  backdrop-filter:blur(32px) saturate(180%);-webkit-backdrop-filter:blur(32px) saturate(180%);
-}
-.confirm-box h3{margin:0 0 7px;font-size:20px}.confirm-box p{color:rgba(255,255,255,.62);font-size:12px;line-height:1.5}
-.confirm input{width:100%;margin:9px 0 12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.09);color:#fff;border-radius:15px;padding:13px}
-.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.confirm-actions button{padding:13px;border-radius:16px;font-weight:800;cursor:pointer}.cancel{background:rgba(255,255,255,.11)}.wipe{background:rgba(255,90,85,.80)}
-.toast{
-  position:fixed;z-index:100;left:18px;right:18px;bottom:103px;max-width:500px;margin:auto;
-  padding:12px 14px;border-radius:17px;background:rgba(255,255,255,.82);color:#11131a;font-size:12px;font-weight:800;
-  box-shadow:0 15px 40px rgba(0,0,0,.35);transform:translateY(20px);opacity:0;pointer-events:none;transition:.2s;
-  backdrop-filter:blur(25px) saturate(150%);-webkit-backdrop-filter:blur(25px) saturate(150%);
-}
-.toast.show{transform:none;opacity:1}
-@media(max-width:380px){
-  .app{padding-left:13px;padding-right:13px}.balance{font-size:42px}.stats{gap:6px}.stat{padding:11px 8px}.stat .value{font-size:14px}.actions{gap:8px}
-}
-@media(min-width:700px){.app{padding-left:24px;padding-right:24px}.hero{padding:32px 28px 25px}.balance{font-size:55px}}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    .orb {
+      position: fixed;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      filter: blur(75px);
+      opacity: .22;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-/* Liquid Glass controls */
-:root{
-  --glass-intensity:70;
-  --glass-alpha:rgba(255,255,255,.135);
-  --glass-border:rgba(255,255,255,.19);
-  --glass-blur:31px;
-  --glass-saturation:163%;
-}
-.hero,.movement,.card,.more-card{
-  background:
-    linear-gradient(135deg,var(--glass-alpha),rgba(255,255,255,.045)),
-    rgba(255,255,255,.025);
-  border-color:var(--glass-border);
-  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation)) contrast(108%);
-  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation)) contrast(108%);
-}
+    .orb.one {
+      background: #176fff;
+      top: -90px;
+      right: -100px;
+    }
 
-.more-title-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.quick-settings{
-  width:43px;height:43px;flex:none;border-radius:15px;
-  background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.16);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
-  font-size:20px;cursor:pointer;
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-}
-html[data-theme="light"] .quick-settings{color:#15171c;background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.62)}
+    .orb.two {
+      background: #00d890;
+      bottom: 5%;
+      left: -130px;
+    }
 
-.settings-card{overflow:hidden}
-.settings-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;position:relative;z-index:2}
-.settings-head h3{margin-bottom:6px!important}
-.settings-symbol{
-  width:42px;height:42px;flex:none;border-radius:15px;display:grid;place-items:center;
-  font-size:19px;color:#fff;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.17);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
-}
-.setting-block{
-  position:relative;z-index:2;margin-top:17px;padding-top:15px;
-  border-top:1px solid rgba(255,255,255,.09);
-}
-.setting-row{display:flex;justify-content:space-between;align-items:center}
-.setting-row strong{display:block;font-size:14px}
-.setting-row span{display:block;margin-top:4px;font-size:10px;color:rgba(255,255,255,.52)}
-.setting-row>div:first-child>span:first-of-type{
-  font-size:10px;color:rgba(255,255,255,.52)
-}
-#glassValue{
-  float:right;margin-top:-19px;color:#fff;font-weight:800;
-  font-variant-numeric:tabular-nums;
-}
-.glass-scale{
-  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;
-  margin-top:13px;font-size:9px;color:rgba(255,255,255,.48)
-}
-.glass-scale input{
-  width:100%;height:5px;margin:0;accent-color:#fff;cursor:pointer;
-}
-.glass-track-labels{
-  display:flex;justify-content:space-between;margin-top:6px;
-  font-size:9px;color:rgba(255,255,255,.38)
-}
-.appearance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.appearance-choice{
-  min-width:0;padding:11px 7px 10px;border-radius:17px;
-  background:rgba(255,255,255,.075);border:1px solid rgba(255,255,255,.10);
-  color:#fff;cursor:pointer;text-align:center;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
-  transition:.15s;
-}
-.appearance-choice:active{transform:scale(.97)}
-.appearance-choice.active{
-  background:rgba(255,255,255,.17);
-  border-color:rgba(255,255,255,.28);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 7px 20px rgba(0,0,0,.12);
-}
-.appearance-icon{
-  width:32px;height:32px;margin:0 auto 7px;border-radius:11px;
-  display:grid;place-items:center;font-size:17px;
-  background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.12);
-}
-.appearance-choice>span:not(.appearance-icon){display:block;font-size:11px;font-weight:850}
-.appearance-choice small{display:block;margin-top:3px;font-size:8px;color:rgba(255,255,255,.43)}
-.settings-preview{
-  position:relative;z-index:2;height:78px;margin-top:15px;overflow:hidden;border-radius:19px;
-  background:
-    radial-gradient(circle at 15% 30%,#1578ff 0 8%,transparent 26%),
-    radial-gradient(circle at 85% 70%,#9a54ff 0 7%,transparent 28%),
-    radial-gradient(circle at 50% 100%,#16c59a 0 8%,transparent 30%),
-    #101526;
-  border:1px solid rgba(255,255,255,.14);
-}
-.preview-orb{position:absolute;width:90px;height:90px;right:20px;top:-35px;border-radius:50%;background:#ff8c42;filter:blur(20px);opacity:.7}
-.preview-glass{
-  position:absolute;left:12px;right:12px;top:12px;bottom:12px;border-radius:15px;
-  display:flex;align-items:center;justify-content:space-between;padding:0 13px;
-  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);
-  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.23);
-}
-.preview-glass span{font-size:10px;color:rgba(255,255,255,.63)}
-.preview-glass strong{font-size:11px}
-@media(max-width:380px){
-  .appearance-choice{padding-left:4px;padding-right:4px}
-  .appearance-choice small{font-size:7px}
-}
+    #app {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: auto;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        18px
+        25px;
+    }
 
-/* Light appearance */
-html[data-theme="light"]{
-  color-scheme:light;
-  --text:#15171c;
-  --muted:rgba(21,23,28,.56);
-}
-html[data-theme="light"] body{
-  color:#15171c;
-  background:
-    radial-gradient(circle at 50% 0%,rgba(90,135,220,.22),transparent 48%),
-    #eef1f7;
-}
-html[data-theme="light"] .liquid-backdrop{
-  background:
-    radial-gradient(circle at 20% 20%,rgba(40,125,255,.30),transparent 30%),
-    radial-gradient(circle at 85% 25%,rgba(180,95,255,.22),transparent 32%),
-    radial-gradient(circle at 30% 80%,rgba(40,205,160,.22),transparent 30%),
-    radial-gradient(circle at 80% 80%,rgba(255,170,65,.20),transparent 28%),
-    linear-gradient(145deg,#c9dcff,#f3eaff 48%,#dff8f0);
-  filter:saturate(115%);
-}
-html[data-theme="light"] .hero,
-html[data-theme="light"] .movement,
-html[data-theme="light"] .card,
-html[data-theme="light"] .more-card{
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.27)),
-    rgba(255,255,255,.16);
-  border-color:rgba(255,255,255,.66);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.80),inset 0 -1px 0 rgba(80,90,110,.10),0 18px 50px rgba(65,75,100,.16);
-}
-html[data-theme="light"] .stat,
-html[data-theme="light"] .appearance-choice,
-html[data-theme="light"] .tool-btn,
-html[data-theme="light"] .pill-icon,
-html[data-theme="light"] .thumb{
-  background:rgba(255,255,255,.38);
-  border-color:rgba(255,255,255,.55);
-}
-html[data-theme="light"] .nav-inner{
-  background:rgba(255,255,255,.35);
-  border-color:rgba(255,255,255,.62);
-}
-html[data-theme="light"] .nav{color:rgba(20,25,35,.55)}
-html[data-theme="light"] .nav.active{color:#101216;background:rgba(255,255,255,.54);border-color:rgba(255,255,255,.72)}
-html[data-theme="light"] .nav.active .nav-icon{color:#159b69}
-html[data-theme="light"] .action{color:#fff}
-html[data-theme="light"] .page-title,
-html[data-theme="light"] .section-title h2,
-html[data-theme="light"] .brand,
-html[data-theme="light"] .sheet-title,
-html[data-theme="light"] .more-card h3,
-html[data-theme="light"] .settings-head h3,
-html[data-theme="light"] .setting-row strong,
-html[data-theme="light"] .card-name,
-html[data-theme="light"] .move-name{color:#15171c}
-html[data-theme="light"] .eyebrow,
-html[data-theme="light"] .page-sub,
-html[data-theme="light"] .move-way,
-html[data-theme="light"] .meta,
-html[data-theme="light"] .more-card p,
-html[data-theme="light"] .setting-row span,
-html[data-theme="light"] .glass-scale,
-html[data-theme="light"] .glass-track-labels{color:rgba(21,23,28,.52)}
-html[data-theme="light"] .balance.zero{color:#15171c}
-html[data-theme="light"] .sheet{
-  background:linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.38)),rgba(255,255,255,.25);
-  border-color:rgba(255,255,255,.75);
-  box-shadow:0 -30px 90px rgba(60,70,100,.20),inset 0 1px 0 rgba(255,255,255,.9);
-}
-html[data-theme="light"] .field input,
-html[data-theme="light"] .field textarea,
-html[data-theme="light"] .field select{
-  color:#15171c;background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.62);
-}
-html[data-theme="light"] .field input::placeholder,
-html[data-theme="light"] .field textarea::placeholder{color:rgba(21,23,28,.38)}
-html[data-theme="light"] .overlay{background:rgba(40,50,70,.18)}
-html[data-theme="light"] .confirm-box{
-  background:linear-gradient(135deg,rgba(255,255,255,.74),rgba(255,255,255,.43));
-  border-color:rgba(255,255,255,.75);color:#15171c;
-}
-html[data-theme="light"] .confirm-box p{color:rgba(21,23,28,.58)}
-html[data-theme="light"] .confirm input{color:#15171c;background:rgba(255,255,255,.45)}
-html[data-theme="light"] .cancel{background:rgba(255,255,255,.48);color:#15171c}
-html[data-theme="light"] .dot{background:#19a976}
-html[data-theme="light"] .settings-symbol{color:#15171c;background:rgba(255,255,255,.40);border-color:rgba(255,255,255,.62)}
-html[data-theme="light"] .appearance-choice{color:#15171c}
-html[data-theme="light"] .appearance-choice small{color:rgba(21,23,28,.43)}
-html[data-theme="light"] .appearance-choice.active{background:rgba(255,255,255,.65);border-color:rgba(255,255,255,.82)}
-html[data-theme="light"] .appearance-icon{background:rgba(255,255,255,.42);border-color:rgba(255,255,255,.62)}
+    .hidden {
+      display: none !important;
+    }
 
-</style>
+    /* LOGIN */
+
+    #loginScreen {
+      min-height: calc(100vh - env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 25px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      padding: 34px 25px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 32px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.25);
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      font-weight: 800;
+      background: linear-gradient(145deg,#1e74ff,#36d99b);
+      box-shadow: 0 15px 45px rgba(40,130,255,.3);
+    }
+
+    .login-box h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: -.8px;
+    }
+
+    .login-box p {
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 9px 0 28px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 17px;
+      background: white;
+      color: #111;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.15);
+    }
+
+    .google-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* HEADER */
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -.8px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--card-strong);
+      border: 1px solid var(--border);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* CARDS */
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 16px 50px rgba(0,0,0,.12);
+    }
+
+    .balance {
+      border-radius: 29px;
+      padding: 25px;
+      margin-bottom: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: -80px;
+      top: -70px;
+      border-radius: 50%;
+      background: rgba(80,160,255,.16);
+      filter: blur(10px);
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    .balance-value {
+      font-size: clamp(39px, 11vw, 58px);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -2.5px;
+      margin-bottom: 20px;
+    }
+
+    .balance-meta {
+      display: flex;
+      gap: 18px;
+    }
+
+    .meta-item {
+      flex: 1;
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .meta-value {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .green {
+      color: var(--green);
+    }
+
+    .red {
+      color: var(--red);
+    }
+
+    /* ACTIONS */
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .action {
+      min-height: 62px;
+      border-radius: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      font-weight: 700;
+    }
+
+    .action.primary {
+      background: linear-gradient(135deg,#247cff,#4b9aff);
+      border: 0;
+      box-shadow: 0 12px 35px rgba(40,120,255,.23);
+    }
+
+    .action.in {
+      background: linear-gradient(135deg,#24c982,#54e4a4);
+      color: #04140d;
+      border: 0;
+    }
+
+    .action-icon {
+      font-size: 22px;
+    }
+
+    /* SECTIONS */
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 22px 2px 11px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -.3px;
+    }
+
+    .section-title span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* TRANSACTIONS */
+
+    .transactions {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .transaction {
+      padding: 15px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      transition: transform .15s;
+    }
+
+    .transaction:active {
+      transform: scale(.98);
+    }
+
+    .transaction-icon {
+      width: 45px;
+      height: 45px;
+      flex: 0 0 45px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      background: var(--input);
+    }
+
+    .transaction-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .transaction-name {
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .transaction-date {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .transaction-amount {
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 35px 15px;
+    }
+
+    /* BOTTOM NAV */
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 20;
+      left: 12px;
+      right: 12px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      max-width: 696px;
+      margin: auto;
+      padding: 8px;
+      border-radius: 25px;
+      background: var(--nav);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      box-shadow: 0 15px 45px rgba(0,0,0,.25);
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+    }
+
+    .nav-btn {
+      padding: 9px 4px;
+      border-radius: 18px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .nav-btn.active {
+      color: var(--text);
+      background: var(--card-strong);
+    }
+
+    .nav-icon {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    /* SHEET */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0,0,0,.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sheet {
+      width: 100%;
+      max-width: 720px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: var(--bg2);
+      border-radius: 30px 30px 0 0;
+      padding: 15px 18px calc(25px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+    }
+
+    .grabber {
+      width: 38px;
+      height: 4px;
+      border-radius: 4px;
+      background: var(--muted);
+      opacity: .45;
+      margin: 0 auto 18px;
+    }
+
+    .sheet-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .sheet-head h2 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .close {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--input);
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      margin: 0 0 7px 3px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--input);
+      color: var(--text);
+      outline: none;
+      border-radius: 15px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(90,160,255,.6);
+    }
+
+    .amount-input {
+      font-size: 27px;
+      font-weight: 750;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .submit {
+      width: 100%;
+      padding: 16px;
+      border-radius: 17px;
+      background: linear-gradient(135deg,#247cff,#58a1ff);
+      font-weight: 750;
+      margin-top: 4px;
+    }
+
+    .delete-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 17px;
+      background: rgba(255,80,100,.11);
+      color: var(--red);
+      font-weight: 700;
+      margin-top: 9px;
+    }
+
+    .preview {
+      display: none;
+      width: 100%;
+      max-height: 210px;
+      object-fit: cover;
+      border-radius: 18px;
+      margin: 0 0 15px;
+    }
+
+    /* LOG */
+
+    .search {
+      margin-bottom: 13px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+
+    .filter {
+      flex: 0 0 auto;
+      padding: 9px 14px;
+      border-radius: 13px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .filter.active {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    /* MORE */
+
+    .settings-card {
+      border-radius: 23px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .setting {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      padding: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting:last-child {
+      border-bottom: 0;
+    }
+
+    .setting-title {
+      font-weight: 650;
+    }
+
+    .setting-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .danger {
+      color: var(--red);
+    }
+
+    @media (min-width: 650px) {
+      #app {
+        padding-top: 35px;
+      }
+
+      .bottom-nav {
+        bottom: 18px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="liquid-backdrop" aria-hidden="true">
-  <div class="orb orb-a"></div>
-  <div class="orb orb-b"></div>
-  <div class="orb orb-c"></div>
-  <div class="orb orb-d"></div>
-  <div class="orb orb-e"></div>
-</div>
-<div class="app">
-  <div class="topbar"><div class="brand"><span class="dot"></span>Saldo</div><div class="eyebrow" id="todayLabel"></div></div>
 
-  <main id="home" class="screen active">
-    <section class="hero">
-      <div class="eyebrow">Tilgjengelig saldo</div>
-      <div id="balance" class="balance zero">0 kr</div>
-      <div class="stats">
-        <div class="stat"><div class="label">Totalt inn</div><div id="totalIn" class="value in">0 kr</div></div>
-        <div class="stat"><div class="label">Totalt ut</div><div id="totalOut" class="value out">0 kr</div></div>
-        <div class="stat"><div class="label">Antall poster</div><div id="count" class="value">0</div></div>
+<div class="orb one"></div>
+<div class="orb two"></div>
+
+<!-- LOGIN -->
+
+<section id="loginScreen">
+  <div class="login-box">
+    <div class="logo">S</div>
+    <h1>Velkommen til Saldo</h1>
+    <p>
+      Hold styr på pengene dine. Logg inn én gang,
+      så synkroniseres Saldo på tvers av enhetene dine.
+    </p>
+
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M21.35 12.23c0-.78-.07-1.53-.22-2.23H12v4.22h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.38z"/>
+        <path fill="#34A853" d="M12 21.65c2.63 0 4.84-.87 6.45-2.35l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.7-1.72-5.47-4.03H3.28v2.53A9.75 9.75 0 0 0 12 21.65z"/>
+        <path fill="#FBBC05" d="M6.53 13.74A5.86 5.86 0 0 1 6.22 12c0-.61.11-1.2.31-1.74V7.73H3.28A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.06 1.03 4.27l3.25-2.53z"/>
+        <path fill="#EA4335" d="M12 6.23c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.84 3.3 14.63 2.35 12 2.35a9.75 9.75 0 0 0-8.72 5.38l3.25 2.53C7.3 7.95 9.46 6.23 12 6.23z"/>
+      </svg>
+      Fortsett med Google
+    </button>
+  </div>
+</section>
+
+<!-- APP -->
+
+<main id="app" class="hidden">
+
+  <header>
+    <div class="brand">Saldo</div>
+    <button class="avatar" onclick="openProfile()">
+      <img id="avatar" alt="">
+    </button>
+  </header>
+
+  <!-- HOME -->
+
+  <section id="homePage">
+
+    <div class="balance glass">
+      <div class="eyebrow">Disponibel saldo</div>
+      <div id="balance" class="balance-value">0 kr</div>
+
+      <div class="balance-meta">
+        <div class="meta-item">
+          <div class="meta-label">Penger inn</div>
+          <div id="totalIn" class="meta-value green">+0 kr</div>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Brukt</div>
+          <div id="totalOut" class="meta-value red">−0 kr</div>
+        </div>
       </div>
-    </section>
+    </div>
+
     <div class="actions">
-      <button class="action buy" onclick="openForm('out')">Nytt kjøp<small>Trekk fra saldo</small></button>
-      <button class="action add" onclick="openForm('in')">Penger inn<small>Legg til saldo</small></button>
+      <button class="action primary" onclick="openTransaction('out')">
+        <span class="action-icon">−</span>
+        Nytt kjøp
+      </button>
+
+      <button class="action in" onclick="openTransaction('in')">
+        <span class="action-icon">+</span>
+        Penger inn
+      </button>
     </div>
-    <div class="section-title"><h2>Inn og ut etter måte</h2><span id="methodCount"></span></div>
-    <div id="methodList"></div>
-    <div class="section-title"><h2>Siste bevegelser</h2><button style="background:none;color:var(--blue);font-size:12px;font-weight:750;cursor:pointer" onclick="showScreen('log')">Se alle</button></div>
-    <div id="recentList"></div>
-  </main>
 
-  <main id="log" class="screen">
-    <div class="log-head"><h1 class="page-title">Logg</h1><div class="page-sub">Alle bevegelser, nyeste først</div></div>
-    <div id="allList" class="list"></div>
-  </main>
-
-  <main id="more" class="screen">
-    <div class="log-head">
-      <div class="more-title-row"><div><h1 class="page-title">Mer</h1><div class="page-sub">Tilpass appen og håndter dataene dine.</div></div><button class="quick-settings" onclick="document.querySelector('.settings-card')?.scrollIntoView({behavior:'smooth',block:'center'})">⚙︎</button></div>
+    <div class="section-title">
+      <h2>Siste aktivitet</h2>
+      <span id="homeCount"></span>
     </div>
-    <div class="more-grid">
 
-      <section class="more-card settings-card">
-        <div class="settings-head">
-          <div>
-            <h3>Utseende</h3>
-            <p>Tilpass Liquid Glass akkurat slik du vil ha den. Innstillingene lagres på denne telefonen.</p>
-          </div>
-          <div class="settings-symbol">✦</div>
-        </div>
+    <div id="recent" class="transactions"></div>
 
-        <div class="setting-block">
-          <div class="setting-row">
-            <div>
-              <strong>Liquid Glass</strong>
-              <span id="glassValue">70%</span>
-            </div>
-          </div>
-          <div class="glass-scale">
-            <span>Clear</span>
-            <input id="glassRange" type="range" min="0" max="100" value="70" step="1" oninput="updateGlassPreview(this.value)" onchange="saveAppearance()">
-            <span>Tinted</span>
-          </div>
-          <div class="glass-track-labels"><span>Mer gjennomsiktig</span><span>Mer glass / fargetone</span></div>
-        </div>
-
-        <div class="setting-block">
-          <div class="setting-row">
-            <div>
-              <strong>Utseende</strong>
-              <span>Velg hvordan appen skal se ut</span>
-            </div>
-          </div>
-          <div class="appearance-grid">
-            <button class="appearance-choice" data-theme-choice="system" onclick="setTheme('system')">
-              <span class="appearance-icon system-icon">◐</span>
-              <span>System</span>
-              <small>Følger iPhone</small>
-            </button>
-            <button class="appearance-choice" data-theme-choice="light" onclick="setTheme('light')">
-              <span class="appearance-icon light-icon">☀︎</span>
-              <span>Lys</span>
-              <small>Alltid lys</small>
-            </button>
-            <button class="appearance-choice" data-theme-choice="dark" onclick="setTheme('dark')">
-              <span class="appearance-icon dark-icon">☾</span>
-              <span>Mørk</span>
-              <small>Alltid mørk</small>
-            </button>
-          </div>
-        </div>
-
-        <div class="settings-preview" id="settingsPreview">
-          <div class="preview-orb"></div>
-          <div class="preview-glass">
-            <span>Liquid Glass</span>
-            <strong>Forhåndsvisning</strong>
-          </div>
-        </div>
-      </section>
-
-      <section class="more-card"><h3>Hvordan fungerer Saldo?</h3><p>Et kjøp trekkes fra saldoen med én gang. Penger inn legges til. Saldoen regnes alltid på nytt som totalt inn minus totalt ut. Data lagres i localStorage på denne enheten.</p></section>
-      <section class="more-card"><h3>Flytt data til en annen telefon</h3><p>Eksporter en JSON-backup fra denne telefonen og importer den på den andre. Bilder som er lastet opp følger med i backupen.</p><button class="tool-btn" onclick="exportBackup()">Eksporter backup · JSON</button><button class="tool-btn" onclick="document.getElementById('importFile').click()">Importer backup · erstatt data</button><input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)"></section>
-      <section class="more-card"><h3>Nullstill</h3><p>Fjerner alle poster, bilder og notater og setter saldoen til 0 kr. Dette gjelder bare denne telefonen.</p><button class="tool-btn danger" onclick="openReset()">Nullstill alt</button></section>
-    </div>
-  </main>
-</div>
-
-<nav class="bottom-nav"><div class="nav-inner">
-  <button class="nav active" data-screen="home" onclick="showScreen('home')"><span class="nav-icon">⌂</span>Hjem</button>
-  <button class="nav" data-screen="log" onclick="showScreen('log')"><span class="nav-icon">≡</span>Logg</button>
-  <button class="nav" data-screen="more" onclick="showScreen('more')"><span class="nav-icon">•••</span>Mer</button>
-</div></nav>
-
-<div id="formOverlay" class="overlay" onclick="if(event.target===this)closeForm()">
-  <section class="sheet">
-    <div class="handle"></div><div class="sheet-head"><div id="formTitle" class="sheet-title">Nytt kjøp</div><button class="close" onclick="closeForm()">×</button></div>
-    <form id="entryForm" class="form" onsubmit="saveEntry(event)">
-      <input id="entryId" type="hidden"><input id="entryType" type="hidden">
-      <div class="field"><label id="nameLabel">Hva jeg kjøpte</label><input id="name" required maxlength="120" autocomplete="off"></div>
-      <div class="two">
-        <div class="field"><label id="amountLabel">Pris i kr</label><input id="amount" required inputmode="decimal" type="number" min="0.01" step="0.01"></div>
-        <div class="field"><label>Dato</label><input id="date" required type="date"></div>
-      </div>
-      <div class="field"><label>Måte</label><select id="method" required></select></div>
-      <div id="linkField" class="field"><label>Lenke <span style="font-weight:500">(valgfri)</span></label><input id="link" type="url" placeholder="https://..." autocomplete="off"></div>
-      <div id="imageField" class="field">
-        <label>Bilde <span style="font-weight:500">(valgfri)</span></label>
-        <label class="file-label">＋ Velg bilde<input id="image" type="file" accept="image/*" onchange="handleImage(event)"></label>
-        <div id="preview" class="preview"><img id="previewImg" alt=""></div>
-        <div class="form-note">Bildet lagres bare når du laster det opp. Maks ca. 900 KB.</div>
-      </div>
-      <div class="field"><label>Notat <span style="font-weight:500">(valgfri)</span></label><textarea id="note" maxlength="500" placeholder="Skriv et lite notat…"></textarea></div>
-      <div id="formActions"></div>
-    </form>
   </section>
+
+  <!-- LOG -->
+
+  <section id="logPage" class="hidden">
+
+    <div class="section-title">
+      <h2>Alle transaksjoner</h2>
+      <span id="logCount"></span>
+    </div>
+
+    <input
+      id="search"
+      class="search"
+      placeholder="Søk etter kjøp eller notat..."
+      oninput="renderLog()"
+    >
+
+    <div class="filter-row">
+      <button class="filter active" data-filter="all" onclick="setFilter('all',this)">Alle</button>
+      <button class="filter" data-filter="out" onclick="setFilter('out',this)">Kjøp</button>
+      <button class="filter" data-filter="in" onclick="setFilter('in',this)">Penger inn</button>
+    </div>
+
+    <div id="logList" class="transactions"></div>
+
+  </section>
+
+  <!-- MORE -->
+
+  <section id="morePage" class="hidden">
+
+    <div class="section-title">
+      <h2>Mer</h2>
+    </div>
+
+    <div class="settings-card glass">
+
+      <button class="setting" onclick="toggleTheme()">
+        <div>
+          <div class="setting-title">Utseende</div>
+          <div id="themeText" class="setting-sub">Mørk modus</div>
+        </div>
+        <span>›</span>
+      </button>
+
+      <button class="setting" onclick="exportData()">
+        <div>
+          <div class="setting-title">Eksporter backup</div>
+          <div class="setting-sub">Last ned alle transaksjonene dine</div>
+        </div>
+        <span>↓</span>
+      </button>
+
+      <button class="setting" onclick="document.getElementById('importFile').click()">
+        <div>
+          <div class="setting-title">Importer backup</div>
+          <div class="setting-sub">Gjenopprett data fra en JSON-fil</div>
+        </div>
+        <span>↑</span>
+      </button>
+
+      <input
+        id="importFile"
+        type="file"
+        accept=".json"
+        class="hidden"
+        onchange="importData(event)"
+      >
+
+    </div>
+
+    <div class="settings-card glass">
+
+      <button class="setting" onclick="openProfile()">
+        <div>
+          <div class="setting-title">Konto</div>
+          <div id="accountEmail" class="setting-sub"></div>
+        </div>
+        <span>›</span>
+      </button>
+
+      <button class="setting danger" onclick="signOut()">
+        <div>
+          <div class="setting-title">Logg ut</div>
+          <div class="setting-sub">Logg ut av denne enheten</div>
+        </div>
+        <span>↪</span>
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+<!-- NAV -->
+
+<nav id="nav" class="bottom-nav hidden">
+
+  <button class="nav-btn active" onclick="showPage('home',this)">
+    <span class="nav-icon">⌂</span>
+    Hjem
+  </button>
+
+  <button class="nav-btn" onclick="showPage('log',this)">
+    <span class="nav-icon">☷</span>
+    Logg
+  </button>
+
+  <button class="nav-btn" onclick="showPage('more',this)">
+    <span class="nav-icon">•••</span>
+    Mer
+  </button>
+
+</nav>
+
+<!-- TRANSACTION SHEET -->
+
+<div id="transactionOverlay" class="overlay hidden" onclick="overlayClose(event)">
+  <div class="sheet">
+
+    <div class="grabber"></div>
+
+    <div class="sheet-head">
+      <h2 id="formTitle">Nytt kjøp</h2>
+      <button class="close" onclick="closeTransaction()">×</button>
+    </div>
+
+    <form id="transactionForm" onsubmit="saveTransaction(event)">
+
+      <input id="editingId" type="hidden">
+
+      <label>Navn</label>
+      <input id="name" required placeholder="Hva brukte du pengene på?">
+
+      <label>Beløp</label>
+      <input
+        id="amount"
+        class="amount-input"
+        required
+        type="number"
+        min="0"
+        step="0.01"
+        inputmode="decimal"
+        placeholder="0"
+      >
+
+      <div class="form-row">
+
+        <div>
+          <label>Dato</label>
+          <input id="date" type="date" required>
+        </div>
+
+        <div>
+          <label>Betalingsmåte</label>
+          <select id="method">
+            <option>Bankkort</option>
+            <option>Vipps</option>
+            <option>Kontant</option>
+            <option>Bank</option>
+            <option>Annet</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div id="purchaseFields">
+
+        <label>Lenke til produkt</label>
+        <input
+          id="link"
+          type="url"
+          placeholder="https://..."
+        >
+
+        <label>Bilde av kjøpet</label>
+        <input
+          id="image"
+          type="file"
+          accept="image/*"
+          onchange="previewImage(event)"
+        >
+
+        <img id="imagePreview" class="preview" alt="Forhåndsvisning">
+
+      </div>
+
+      <label>Notat</label>
+      <textarea id="note" placeholder="Valgfri informasjon..."></textarea>
+
+      <button class="submit" type="submit">
+        Lagre
+      </button>
+
+      <button
+        id="deleteButton"
+        type="button"
+        class="delete-btn hidden"
+        onclick="deleteTransaction()"
+      >
+        Slett transaksjon
+      </button>
+
+    </form>
+  </div>
 </div>
 
-<div id="resetConfirm" class="confirm">
-  <div class="confirm-box"><h3>Nullstille alt?</h3><p>Alle poster, bilder og notater slettes fra denne telefonen, og saldoen blir 0 kr. Dette kan ikke angres.</p><input id="resetInput" placeholder="Skriv NULLSTILL" autocomplete="off" autocapitalize="characters"><div class="confirm-actions"><button class="cancel" onclick="closeReset()">Avbryt</button><button class="wipe" onclick="confirmReset()">Nullstill</button></div></div>
+<!-- PROFILE -->
+
+<div id="profileOverlay" class="overlay hidden" onclick="profileOverlayClose(event)">
+  <div class="sheet">
+
+    <div class="grabber"></div>
+
+    <div class="sheet-head">
+      <h2>Konto</h2>
+      <button class="close" onclick="closeProfile()">×</button>
+    </div>
+
+    <div class="glass" style="padding:20px;border-radius:22px;text-align:center">
+
+      <div class="avatar" style="margin:auto;width:70px;height:70px">
+        <img id="profileAvatar" alt="">
+      </div>
+
+      <div id="profileName" style="font-weight:750;font-size:19px;margin-top:12px"></div>
+      <div id="profileEmail" style="color:var(--muted);font-size:13px;margin-top:4px"></div>
+
+    </div>
+
+    <button
+      class="delete-btn"
+      style="margin-top:15px"
+      onclick="signOut()"
+    >
+      Logg ut
+    </button>
+
+  </div>
 </div>
-<div id="toast" class="toast"></div>
 
 <script>
-const KEY='saldo_app_v1';
-const METHODS_OUT=['Vipps','Kort','Kontant','Nettbutikk','Butikk','Annet'];
-const METHODS_IN=['Vipps','Kontant','Kort','Månedspenger','Gave','Overføring','Annet'];
-let data=[];
-let editingImage=null;
+  /* =========================================================
+     SUPABASE
+     ========================================================= */
 
-const $=id=>document.getElementById(id);
-const SETTINGS_KEY='saldo_appearance_v1';
-const defaultAppearance={glass:70,theme:'system'};
+  const SUPABASE_URL =
+    "https://mnoyxddrywjglobashqx.supabase.co";
 
-function getAppearanceSettings(){
-  try{
-    const x=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');
-    return {...defaultAppearance,...(x||{})};
-  }catch{return {...defaultAppearance}}
-}
-function saveAppearance(){
-  const s=getAppearanceSettings();
-  s.glass=Math.max(0,Math.min(100,Number($('glassRange')?.value??s.glass)));
-  s.theme=document.querySelector('.appearance-choice.active')?.dataset.themeChoice||s.theme;
-  localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
-  applyAppearance();
-}
-function updateGlassPreview(value){
-  const v=Math.max(0,Math.min(100,Number(value)));
-  $('glassValue').textContent=v+'%';
-  const root=document.documentElement;
-  const alpha=(0.055+(v/100)*0.155).toFixed(3);
-  const border=(0.10+(v/100)*0.17).toFixed(3);
-  const blur=Math.round(11+(v/100)*31);
-  const sat=Math.round(108+(v/100)*92);
-  root.style.setProperty('--glass-alpha',`rgba(255,255,255,${alpha})`);
-  root.style.setProperty('--glass-border',`rgba(255,255,255,${border})`);
-  root.style.setProperty('--glass-blur',blur+'px');
-  root.style.setProperty('--glass-saturation',sat+'%');
-}
-function setTheme(theme){
-  const s=getAppearanceSettings();
-  s.theme=theme;
-  localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
-  applyAppearance();
-}
-function effectiveTheme(theme){
-  if(theme==='system'){
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+  const SUPABASE_KEY =
+    "sb_publishable_YzLtUjLaJn4T8tDipkfLTQ_ubpK1lQC";
+
+  const { createClient } =
+    supabase;
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  let user = null;
+  let transactions = [];
+  let currentType = "out";
+  let currentFilter = "all";
+
+  /* =========================================================
+     AUTH
+     ========================================================= */
+
+  async function loginWithGoogle() {
+
+    const { error } = await db.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + window.location.pathname
+      }
+    });
+
+    if (error) {
+      alert("Kunne ikke starte Google-innlogging:\n" + error.message);
+    }
   }
-  return theme;
-}
-function applyAppearance(){
-  const s=getAppearanceSettings();
-  const v=Math.max(0,Math.min(100,Number(s.glass)));
-  const root=document.documentElement;
-  root.dataset.theme=effectiveTheme(s.theme);
-  const meta=$('themeColorMeta');
-  if(meta)meta.setAttribute('content',root.dataset.theme==='light'?'#eef1f7':'#080a12');
-  root.dataset.themeMode=s.theme;
-  updateGlassPreview(v);
-  const range=$('glassRange');
-  if(range && Number(range.value)!==v)range.value=v;
-  if($('glassValue'))$('glassValue').textContent=v+'%';
-  document.querySelectorAll('.appearance-choice').forEach(btn=>{
-    btn.classList.toggle('active',btn.dataset.themeChoice===s.theme);
+
+  async function signOut() {
+
+    await db.auth.signOut();
+
+    user = null;
+    transactions = [];
+
+    document.getElementById("app").classList.add("hidden");
+    document.getElementById("nav").classList.add("hidden");
+    document.getElementById("loginScreen").classList.remove("hidden");
+
+    closeProfile();
+  }
+
+  db.auth.onAuthStateChange(async (event, session) => {
+
+    if (session?.user) {
+      user = session.user;
+      await startApp();
+    } else {
+      user = null;
+      document.getElementById("loginScreen").classList.remove("hidden");
+      document.getElementById("app").classList.add("hidden");
+      document.getElementById("nav").classList.add("hidden");
+    }
   });
-}
-function initAppearance(){
-  const s=getAppearanceSettings();
-  const range=$('glassRange');
-  if(range)range.value=s.glass;
-  applyAppearance();
-  if(window.matchMedia){
-    const mq=window.matchMedia('(prefers-color-scheme: light)');
-    const onChange=()=>{if(getAppearanceSettings().theme==='system')applyAppearance()};
-    if(mq.addEventListener)mq.addEventListener('change',onChange);
-    else if(mq.addListener)mq.addListener(onChange);
-  }
-}
 
-function uid(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8)}
-function money(n){return new Intl.NumberFormat('nb-NO',{maximumFractionDigits:2}).format(Number(n)||0)+' kr'}
-function dateText(s){if(!s)return ''; return new Intl.DateTimeFormat('nb-NO',{day:'numeric',month:'short',year:'numeric'}).format(new Date(s+'T12:00:00'))}
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function validUrl(s){try{const u=new URL(s); return ['http:','https:'].includes(u.protocol)?u.href:null}catch{return null}}
-function load(){
-  try{const raw=localStorage.getItem(KEY); if(raw){data=JSON.parse(raw); if(!Array.isArray(data))throw 0}else seed()}catch{seed()}
-  render();
-}
-function seed(){
-  const today=new Date().toISOString().slice(0,10);
-  data=[]; save();
-}
-function save(){localStorage.setItem(KEY,JSON.stringify(data))}
-function totals(){return data.reduce((a,x)=>{let n=Number(x.amount)||0;x.type==='in'?a.in+=n:a.out+=n;return a},{in:0,out:0})}
-function sorted(){return [...data].sort((a,b)=>((b.date||'').localeCompare(a.date||''))||(Number(b.created)||0)-(Number(a.created)||0))}
-function render(){
-  const t=totals(), bal=t.in-t.out;
-  $('balance').textContent=money(bal); $('balance').className='balance '+(bal>0?'positive':bal<0?'negative':'zero');
-  $('totalIn').textContent=money(t.in); $('totalOut').textContent=money(t.out); $('count').textContent=data.length;
-  $('todayLabel').textContent=new Intl.DateTimeFormat('nb-NO',{day:'numeric',month:'short'}).format(new Date());
-  renderMethods(); renderRecent(); renderAll();
-}
-function renderMethods(){
-  const map={}; data.forEach(x=>{const k=(x.type==='in'?'Inn':'Ut')+' · '+x.method;map[k]=(map[k]||0)+(Number(x.amount)||0)});
-  const keys=Object.keys(map).sort((a,b)=>map[b]-map[a]);
-  $('methodCount').textContent=keys.length?keys.length+' typer':'';
-  $('methodList').innerHTML=keys.length?keys.map(k=>`<div class="movement"><div class="move-left"><div class="pill-icon">${k.startsWith('Inn')?'＋':'−'}</div><div><div class="move-name">${escapeHtml(k)}</div><div class="move-way">Samlet for denne måten</div></div></div><div class="move-amount ${k.startsWith('Inn')?'in':'out'}">${money(map[k])}</div></div>`).join(''):`<div class="empty"><strong>Ingen bevegelser ennå</strong>Legg til penger eller registrer et kjøp.</div>`;
-}
-function card(x){
-  const image=x.image?`<img class="thumb" src="${x.image}" alt="">`:`<div class="thumb">${x.type==='in'?'＋':'◈'}</div>`;
-  const link=validUrl(x.link);
-  return `<div class="card" onclick="editEntry('${x.id}')">${image}<div class="card-main"><div class="card-name">${escapeHtml(x.name)}</div><div class="meta">${escapeHtml(dateText(x.date))} · ${escapeHtml(x.method)}</div><div class="card-bottom">${link?'<span class="tag link">Lenke ↗</span>':''}${x.note?'<span class="tag">Notat</span>':''}</div></div><div class="amount ${x.type==='in'?'in':'out'}">${x.type==='in'?'+':'−'}${money(x.amount)}</div></div>`
-}
-function renderRecent(){
-  const arr=sorted().slice(0,5); $('recentList').innerHTML=arr.length?`<div class="list">${arr.map(card).join('')}</div>`:`<div class="empty"><strong>Saldoen er 0 kr</strong>Ingen bevegelser er registrert ennå.</div>`;
-}
-function renderAll(){
-  const arr=sorted(); $('allList').innerHTML=arr.length?arr.map(card).join(''):`<div class="empty"><strong>Ingen poster</strong>Trykk «Nytt kjøp» eller «Penger inn» for å starte.</div>`;
-}
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===id));
-  document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function openForm(type,id=null){
-  const x=id?data.find(v=>v.id===id):null; editingImage=x?.image||null;
-  $('entryId').value=x?.id||'';$('entryType').value=x?.type||type;
-  $('formTitle').textContent=x?(type==='in'?'Rediger penger inn':'Rediger kjøp'):(type==='in'?'Penger inn':'Nytt kjøp');
-  $('nameLabel').textContent=type==='in'?'Hva det gjelder':'Hva jeg kjøpte';
-  $('amountLabel').textContent=type==='in'?'Beløp i kr':'Pris i kr';
-  $('name').value=x?.name||'';$('amount').value=x?.amount||'';$('date').value=x?.date||new Date().toISOString().slice(0,10);
-  $('link').value=x?.link||'';$('note').value=x?.note||'';$('image').value='';
-  $('method').innerHTML=(type==='in'?METHODS_IN:METHODS_OUT).map(m=>`<option>${m}</option>`).join('');
-  $('method').value=x?.method||$('method').options[0].value;
-  $('linkField').style.display=type==='in'?'none':'block';$('imageField').style.display=type==='in'?'none':'block';
-  $('preview').style.display=editingImage?'block':'none';$('previewImg').src=editingImage||'';
-  $('formActions').innerHTML=x?`<div class="edit-actions"><button type="button" class="delete" onclick="deleteEntry('${x.id}')">Slett post</button><button class="save ${type==='in'?'add':'buy'}" type="submit">Lagre endring</button></div>`:`<button class="save ${type==='in'?'add':'buy'}" type="submit">${type==='in'?'Legg til penger':'Lagre kjøp'}</button>`;
-  $('formOverlay').classList.add('open');document.body.style.overflow='hidden';
-  setTimeout(()=>$('name').focus(),150);
-}
-function closeForm(){$('formOverlay').classList.remove('open');document.body.style.overflow='';editingImage=null}
-function handleImage(e){
-  const f=e.target.files?.[0]; if(!f)return;
-  if(f.size>900*1024){toast('Bildet er for stort. Maks ca. 900 KB.');e.target.value='';return}
-  const r=new FileReader();r.onload=()=>{editingImage=r.result;$('previewImg').src=editingImage;$('preview').style.display='block'};r.readAsDataURL(f);
-}
-function saveEntry(e){
-  e.preventDefault();
-  const type=$('entryType').value, amount=Number($('amount').value);
-  if(!Number.isFinite(amount)||amount<=0){toast('Skriv inn et positivt beløp.');return}
-  const link=type==='out'?($('link').value.trim()||''):'';
-  if(link && !validUrl(link)){toast('Lenken må starte med https:// eller http://');return}
-  const id=$('entryId').value;
-  const obj={id:id||uid(),type,name:$('name').value.trim(),amount,date:$('date').value,method:$('method').value,link,note:$('note').value.trim(),image:type==='out'?editingImage:null,created:Date.now()};
-  if(!obj.name||!obj.date){toast('Fyll ut de obligatoriske feltene.');return}
-  if(id){const i=data.findIndex(x=>x.id===id);if(i>=0){obj.created=data[i].created;data[i]=obj}}
-  else data.push(obj);
-  save();render();closeForm();toast(type==='in'?'Pengene er lagt til.':'Kjøpet er lagret.');
-}
-function editEntry(id){const x=data.find(v=>v.id===id);if(x)openForm(x.type,id)}
-function deleteEntry(id){
-  const x=data.find(v=>v.id===id);if(!x)return;
-  if(!confirmDeleteInline(x))return;
-}
-function confirmDeleteInline(x){
-  const ok=window.confirm; // never used for destructive confirmation on iPhone
-  const overlay=document.createElement('div');overlay.className='confirm open';
-  overlay.innerHTML=`<div class="confirm-box"><h3>Slette posten?</h3><p>«${escapeHtml(x.name)}» fjernes fra loggen. Saldoen regnes automatisk på nytt.</p><div class="confirm-actions"><button class="cancel" id="dc">Avbryt</button><button class="wipe" id="dy">Slett</button></div></div>`;
-  document.body.appendChild(overlay);
-  overlay.querySelector('#dc').onclick=()=>overlay.remove();
-  overlay.querySelector('#dy').onclick=()=>{data=data.filter(v=>v.id!==x.id);save();render();overlay.remove();closeForm();toast('Post slettet.')};
-  return true;
-}
-function exportBackup(){
-  const payload={app:'Saldo',version:1,exportedAt:new Date().toISOString(),data};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saldo-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  toast('Backup eksportert.');
-}
-function importBackup(e){
-  const f=e.target.files?.[0];e.target.value='';if(!f)return;
-  const r=new FileReader();r.onload=()=>{
-    try{
-      const obj=JSON.parse(r.result), arr=Array.isArray(obj)?obj:obj.data;
-      if(!Array.isArray(arr))throw new Error();
-      if(arr.length>1000)throw new Error();
-      for(const x of arr){if(!x.id||!['in','out'].includes(x.type)||!x.name||!(Number(x.amount)>0)||!x.date||!x.method)throw new Error();if(x.image&&x.image.length>1200000)throw new Error()}
-      const overlay=document.createElement('div');overlay.className='confirm open';overlay.innerHTML=`<div class="confirm-box"><h3>Erstatt data?</h3><p>Dette erstatter alle poster på denne telefonen med ${arr.length} poster fra backupen.</p><div class="confirm-actions"><button class="cancel">Avbryt</button><button class="wipe">Erstatt</button></div></div>`;document.body.appendChild(overlay);
-      overlay.querySelector('.cancel').onclick=()=>overlay.remove();
-      overlay.querySelector('.wipe').onclick=()=>{data=arr;save();render();overlay.remove();toast('Backup importert.');showScreen('home')};
-    }catch{toast('Kunne ikke importere backupen. Sjekk at det er en gyldig Saldo-JSON.')}
-  };r.readAsText(f);
-}
-function openReset(){$('resetInput').value='';$('resetConfirm').classList.add('open');setTimeout(()=>$('resetInput').focus(),100)}
-function closeReset(){$('resetConfirm').classList.remove('open')}
-function confirmReset(){
-  if($('resetInput').value.trim()!=='NULLSTILL'){toast('Skriv NULLSTILL nøyaktig. Ingenting ble slettet.');return}
-  data=[];save();render();closeReset();toast('Alt er nullstilt.');showScreen('home');
-}
-let toastTimer;
-function toast(msg){clearTimeout(toastTimer);$('toast').textContent=msg;$('toast').classList.add('show');toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2600)}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeForm();closeReset()}});
-initAppearance();
-load();
+  async function startApp() {
+
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("nav").classList.remove("hidden");
+
+    const metadata = user.user_metadata || {};
+
+    const avatar =
+      metadata.avatar_url ||
+      metadata.picture ||
+      "";
+
+    document.getElementById("avatar").src = avatar;
+
+    document.getElementById("accountEmail").textContent =
+      user.email || "";
+
+    await loadTransactions();
+    renderHome();
+  }
+
+  /* =========================================================
+     DATABASE
+     ========================================================= */
+
+  async function loadTransactions() {
+
+    const { data, error } = await db
+      .from("transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      alert("Kunne ikke laste transaksjonene.");
+      return;
+    }
+
+    transactions = data || [];
+  }
+
+  async function saveTransaction(event) {
+
+    event.preventDefault();
+
+    if (!user) return;
+
+    const id =
+      document.getElementById("editingId").value;
+
+    const type = currentType;
+
+    const name =
+      document.getElementById("name").value.trim();
+
+    const amount =
+      Number(document.getElementById("amount").value);
+
+    const date =
+      document.getElementById("date").value;
+
+    const method =
+      document.getElementById("method").value;
+
+    const link =
+      document.getElementById("link").value.trim();
+
+    const note =
+      document.getElementById("note").value.trim();
+
+    const file =
+      document.getElementById("image").files[0];
+
+    if (!name || !amount || !date) return;
+
+    let imageUrl = null;
+
+    /* Upload image */
+
+    if (file && type === "out") {
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Bildet må være mindre enn 5 MB.");
+        return;
+      }
+
+      const extension =
+        file.name.split(".").pop().toLowerCase();
+
+      const path =
+        `${user.id}/${crypto.randomUUID()}.${extension}`;
+
+      const { error: uploadError } =
+        await db.storage
+          .from("purchase-images")
+          .upload(path, file, {
+            upsert: false,
+            contentType: file.type
+          });
+
+      if (uploadError) {
+        console.error(uploadError);
+        alert("Kunne ikke laste opp bildet.");
+        return;
+      }
+
+      imageUrl = path;
+    }
+
+    const payload = {
+      type,
+      name,
+      amount,
+      date,
+      method,
+      link: type === "out" ? link : null,
+      note,
+      image_url: imageUrl
+    };
+
+    let result;
+
+    if (id) {
+
+      result = await db
+        .from("transactions")
+        .update(payload)
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+    } else {
+
+      result = await db
+        .from("transactions")
+        .insert({
+          ...payload,
+          user_id: user.id
+        });
+    }
+
+    if (result.error) {
+      console.error(result.error);
+      alert("Kunne ikke lagre transaksjonen.");
+      return;
+    }
+
+    closeTransaction();
+    await loadTransactions();
+    renderHome();
+    renderLog();
+  }
+
+  async function deleteTransaction() {
+
+    const id =
+      document.getElementById("editingId").value;
+
+    if (!id || !confirm("Vil du slette denne transaksjonen?")) {
+      return;
+    }
+
+    const transaction =
+      transactions.find(t => t.id === id);
+
+    const { error } =
+      await db
+        .from("transactions")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+    if (error) {
+      alert("Kunne ikke slette transaksjonen.");
+      return;
+    }
+
+    if (transaction?.image_url) {
+      await db.storage
+        .from("purchase-images")
+        .remove([transaction.image_url]);
+    }
+
+    closeTransaction();
+    await loadTransactions();
+    renderHome();
+    renderLog();
+  }
+
+  /* =========================================================
+     UI
+     ========================================================= */
+
+  function formatMoney(value) {
+
+    return new Intl.NumberFormat("nb-NO", {
+      style: "currency",
+      currency: "NOK",
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+
+  function formatDate(value) {
+
+    return new Date(value + "T12:00:00")
+      .toLocaleDateString("nb-NO", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+  }
+
+  function renderHome() {
+
+    let totalIn = 0;
+    let totalOut = 0;
+
+    for (const t of transactions) {
+
+      if (t.type === "in")
+        totalIn += Number(t.amount);
+
+      else
+        totalOut += Number(t.amount);
+    }
+
+    const balance = totalIn - totalOut;
+
+    document.getElementById("balance").textContent =
+      formatMoney(balance);
+
+    document.getElementById("totalIn").textContent =
+      "+" + formatMoney(totalIn);
+
+    document.getElementById("totalOut").textContent =
+      "−" + formatMoney(totalOut);
+
+    const recent =
+      transactions.slice(0, 8);
+
+    document.getElementById("homeCount").textContent =
+      transactions.length + " totalt";
+
+    document.getElementById("recent").innerHTML =
+      recent.length
+        ? recent.map(transactionHTML).join("")
+        : emptyHTML();
+
+    document.getElementById("logCount").textContent =
+      transactions.length + " totalt";
+  }
+
+  function transactionHTML(t) {
+
+    const positive = t.type === "in";
+
+    return `
+      <button
+        class="transaction glass"
+        onclick="editTransaction('${t.id}')"
+      >
+
+        <div class="transaction-icon">
+          ${positive ? "＋" : "−"}
+        </div>
+
+        <div class="transaction-info">
+          <div class="transaction-name">
+            ${escapeHTML(t.name)}
+          </div>
+
+          <div class="transaction-date">
+            ${formatDate(t.date)}
+            ${t.method ? " · " + escapeHTML(t.method) : ""}
+          </div>
+        </div>
+
+        <div class="transaction-amount ${positive ? "green" : "red"}">
+          ${positive ? "+" : "−"}${formatMoney(Number(t.amount))}
+        </div>
+
+      </button>
+    `;
+  }
+
+  function emptyHTML() {
+
+    return `
+      <div class="glass empty" style="border-radius:22px">
+        Ingen transaksjoner ennå.<br>
+        Legg til ditt første kjøp eller penger inn.
+      </div>
+    `;
+  }
+
+  function renderLog() {
+
+    const query =
+      document.getElementById("search").value
+        .toLowerCase()
+        .trim();
+
+    let list = transactions;
+
+    if (currentFilter !== "all") {
+      list =
+        list.filter(t => t.type === currentFilter);
+    }
+
+    if (query) {
+
+      list =
+        list.filter(t =>
+          `${t.name} ${t.note || ""} ${t.method || ""}`
+            .toLowerCase()
+            .includes(query)
+        );
+    }
+
+    document.getElementById("logList").innerHTML =
+      list.length
+        ? list.map(transactionHTML).join("")
+        : emptyHTML();
+  }
+
+  function setFilter(filter, element) {
+
+    currentFilter = filter;
+
+    document
+      .querySelectorAll(".filter")
+      .forEach(btn => btn.classList.remove("active"));
+
+    element.classList.add("active");
+
+    renderLog();
+  }
+
+  function showPage(page, button) {
+
+    document.getElementById("homePage")
+      .classList.toggle("hidden", page !== "home");
+
+    document.getElementById("logPage")
+      .classList.toggle("hidden", page !== "log");
+
+    document.getElementById("morePage")
+      .classList.toggle("hidden", page !== "more");
+
+    document
+      .querySelectorAll(".nav-btn")
+      .forEach(btn => btn.classList.remove("active"));
+
+    button.classList.add("active");
+
+    if (page === "home")
+      renderHome();
+
+    if (page === "log")
+      renderLog();
+  }
+
+  /* =========================================================
+     TRANSACTION FORM
+     ========================================================= */
+
+  function openTransaction(type, transaction = null) {
+
+    currentType = type;
+
+    document.getElementById("transactionOverlay")
+      .classList.remove("hidden");
+
+    document.getElementById("transactionForm").reset();
+
+    document.getElementById("editingId").value =
+      transaction?.id || "";
+
+    document.getElementById("date").value =
+      transaction?.date ||
+      new Date().toISOString().slice(0,10);
+
+    document.getElementById("formTitle").textContent =
+      transaction
+        ? "Rediger"
+        : type === "out"
+          ? "Nytt kjøp"
+          : "Penger inn";
+
+    document.getElementById("purchaseFields")
+      .classList.toggle("hidden", type !== "out");
+
+    document.getElementById("deleteButton")
+      .classList.toggle("hidden", !transaction);
+
+    if (transaction) {
+
+      document.getElementById("name").value =
+        transaction.name || "";
+
+      document.getElementById("amount").value =
+        transaction.amount || "";
+
+      document.getElementById("date").value =
+        transaction.date || "";
+
+      document.getElementById("method").value =
+        transaction.method || "Bankkort";
+
+      document.getElementById("link").value =
+        transaction.link || "";
+
+      document.getElementById("note").value =
+        transaction.note || "";
+    }
+  }
+
+  function editTransaction(id) {
+
+    const t =
+      transactions.find(item => item.id === id);
+
+    if (!t) return;
+
+    openTransaction(t.type, t);
+  }
+
+  function closeTransaction() {
+
+    document.getElementById("transactionOverlay")
+      .classList.add("hidden");
+
+    document.getElementById("transactionForm").reset();
+  }
+
+  function overlayClose(event) {
+
+    if (event.target === event.currentTarget)
+      closeTransaction();
+  }
+
+  function previewImage(event) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const preview =
+      document.getElementById("imagePreview");
+
+    preview.src =
+      URL.createObjectURL(file);
+
+    preview.style.display = "block";
+  }
+
+  /* =========================================================
+     PROFILE
+     ========================================================= */
+
+  function openProfile() {
+
+    if (!user) return;
+
+    const meta =
+      user.user_metadata || {};
+
+    const avatar =
+      meta.avatar_url ||
+      meta.picture ||
+      "";
+
+    document.getElementById("profileAvatar").src =
+      avatar;
+
+    document.getElementById("profileName").textContent =
+      meta.full_name ||
+      meta.name ||
+      "Saldo-bruker";
+
+    document.getElementById("profileEmail").textContent =
+      user.email || "";
+
+    document.getElementById("profileOverlay")
+      .classList.remove("hidden");
+  }
+
+  function closeProfile() {
+
+    document.getElementById("profileOverlay")
+      .classList.add("hidden");
+  }
+
+  function profileOverlayClose(event) {
+
+    if (event.target === event.currentTarget)
+      closeProfile();
+  }
+
+  /* =========================================================
+     THEME
+     ========================================================= */
+
+  function toggleTheme() {
+
+    document.body.classList.toggle("light");
+
+    const light =
+      document.body.classList.contains("light");
+
+    localStorage.setItem(
+      "saldo_theme",
+      light ? "light" : "dark"
+    );
+
+    document.getElementById("themeText").textContent =
+      light ? "Lys modus" : "Mørk modus";
+  }
+
+  const savedTheme =
+    localStorage.getItem("saldo_theme");
+
+  if (savedTheme === "light") {
+    document.body.classList.add("light");
+    document.getElementById("themeText").textContent =
+      "Lys modus";
+  }
+
+  /* =========================================================
+     BACKUP
+     ========================================================= */
+
+  function exportData() {
+
+    const backup = {
+      app: "Saldo",
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      transactions
+    };
+
+    const blob =
+      new Blob(
+        [JSON.stringify(backup, null, 2)],
+        { type: "application/json" }
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const a =
+      document.createElement("a");
+
+    a.href = url;
+    a.download =
+      "saldo-backup-" +
+      new Date().toISOString().slice(0,10) +
+      ".json";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  async function importData(event) {
+
+    const file =
+      event.target.files[0];
+
+    if (!file) return;
+
+    try {
+
+      const text =
+        await file.text();
+
+      const backup =
+        JSON.parse(text);
+
+      if (!Array.isArray(backup.transactions)) {
+        throw new Error("Ugyldig backup.");
+      }
+
+      for (const t of backup.transactions) {
+
+        await db
+          .from("transactions")
+          .insert({
+            user_id: user.id,
+            type: t.type,
+            name: t.name,
+            amount: Number(t.amount),
+            date: t.date,
+            method: t.method || null,
+            link: t.link || null,
+            note: t.note || null
+          });
+      }
+
+      await loadTransactions();
+      renderHome();
+      renderLog();
+
+      alert("Backup importert.");
+
+    } catch (error) {
+
+      console.error(error);
+      alert("Kunne ikke importere backup.");
+    }
+
+    event.target.value = "";
+  }
+
+  /* =========================================================
+     SECURITY / HTML
+     ========================================================= */
+
+  function escapeHTML(value) {
+
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 </script>
+
 </body>
 </html>
