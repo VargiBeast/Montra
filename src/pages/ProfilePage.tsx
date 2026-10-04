@@ -1,8 +1,7 @@
 import { ArrowLeft, LogOut, UserRound } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { UserAvatar } from "../components/UserAvatar";
-import { readLanguage } from "../lib/i18n";
-import { useTranslation } from "../lib/i18n";
+import { readLanguage, useTranslation } from "../lib/i18n";
 
 interface ProfilePageProps {
   user: User;
@@ -15,6 +14,12 @@ export function ProfilePage({ user, busy, onBack, onSignOut }: ProfilePageProps)
   const t = useTranslation();
   const email = user.email ?? t("emailUnavailable");
   const initials = email.slice(0, 1).toUpperCase();
+  const provider = user.app_metadata?.provider;
+  const signInLabel =
+    provider === "google" ? "Google"
+      : provider === "apple" ? "Apple"
+        : t("email");
+
   return (
     <main className="page-content">
       <div className="page-header">
@@ -26,11 +31,11 @@ export function ProfilePage({ user, busy, onBack, onSignOut }: ProfilePageProps)
         <div className="profile-info"><h2>{user.user_metadata?.full_name || user.user_metadata?.name || t("yourMontraAccount")}</h2><p>{email}</p></div>
       </section>
       <section className="panel profile-detail">
-        <div className="detail-line"><span>{t("signInMethod")}</span><strong>{user.app_metadata?.provider === "google" ? "Google" : user.app_metadata?.provider === "apple" ? "Apple" : "Email link"}</strong></div>
-          <div className="detail-line"><span>{t("accountCreated")}</span><strong>{user.created_at ? new Intl.DateTimeFormat(readLanguage(), { dateStyle: "medium" }).format(new Date(user.created_at)) : "—"}</strong></div>
+        <div className="detail-line"><span>{t("signInMethod")}</span><strong>{signInLabel}</strong></div>
+        <div className="detail-line"><span>{t("accountCreated")}</span><strong>{user.created_at ? new Intl.DateTimeFormat(readLanguage(), { dateStyle: "medium" }).format(new Date(user.created_at)) : "—"}</strong></div>
       </section>
       <button className="danger-button" type="button" disabled={busy} onClick={() => void onSignOut()} style={{ marginTop: 20 }}><LogOut size={16} />{busy ? t("signingOut") : t("signOut")}</button>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 30, color: "var(--subtle)", fontSize: 12 }}><UserRound size={15} /> {t("accountPersonal")}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 30, marginBottom: 12, color: "var(--subtle)", fontSize: 12 }}><UserRound size={15} /> {t("accountPersonal")}</div>
     </main>
   );
 }
