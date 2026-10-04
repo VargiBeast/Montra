@@ -34,8 +34,8 @@ export function ProfilePage({ user, busy, onBack, onSignOut }: ProfilePageProps)
         <div className="detail-line"><span>{t("signInMethod")}</span><strong>{signInLabel}</strong></div>
         <div className="detail-line"><span>{t("accountCreated")}</span><strong>{user.created_at ? new Intl.DateTimeFormat(readLanguage(), { dateStyle: "medium" }).format(new Date(user.created_at)) : "—"}</strong></div>
       </section>
-      <button className="danger-button" type="button" disabled={busy} onClick={() => void onSignOut()} style={{ marginTop: 20 }}><LogOut size={16} />{busy ? t("signingOut") : t("signOut")}</button>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 30, marginBottom: 12, color: "var(--subtle)", fontSize: 12 }}><UserRound size={15} /> {t("accountPersonal")}</div>
+      <button className="danger-button stack-lg" type="button" disabled={busy} onClick={() => void onSignOut()}><LogOut size={16} />{busy ? t("signingOut") : t("signOut")}</button>
+      <div className="section-label"><UserRound size={15} /> {t("accountPersonal")}</div>
     </main>
   );
 }
