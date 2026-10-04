@@ -37,7 +37,6 @@ interface AnalyticsPageProps {
   transactions: Transaction[];
 }
 
-
 const ANALYTICS_FALLBACK: Record<string, string> = {
   analytics: "Analytics",
   analyticsGreeting: "Patterns in your money",
@@ -84,7 +83,7 @@ const ANALYTICS_FALLBACK: Record<string, string> = {
   insightUnusualPeriod: "Spending this month is about {percent}% above your typical month.",
   forecastTitle: "Month forecast",
   forecastInsufficient: "Need a bit more history to estimate this month. Keep logging entries.",
-  forecastDisclaimer: "Estimate based on your history and spending so far — not a guarantee.",
+  forecastDisclaimer: "Estimate based on your history and spending so far \u2014 not a guarantee.",
   forecastExpectedSpending: "Expected spending",
   forecastExpectedIncome: "Expected income",
   forecastExpectedNet: "Expected net",
@@ -95,9 +94,9 @@ const ANALYTICS_FALLBACK: Record<string, string> = {
   projectionAvgIncome: "Avg. monthly income",
   projectionAvgSpending: "Avg. monthly spending",
   projectionAvgNet: "Avg. monthly net",
-  projectionNext3: "If this continues — 3 months",
-  projectionNext6: "If this continues — 6 months",
-  projectionNext12: "If this continues — 12 months",
+  projectionNext3: "If this continues \u2014 3 months",
+  projectionNext6: "If this continues \u2014 6 months",
+  projectionNext12: "If this continues \u2014 12 months",
 };
 
 const PERIODS: AnalyticsPeriod[] = [
@@ -159,7 +158,6 @@ function SpendingTrendChart({
   spendingLabel: string;
 }) {
   const max = Math.max(1, ...buckets.map((b) => b.spending));
-  const height = 120;
   if (buckets.length === 0) return null;
   const points = buckets.map((b, i) => {
     const x = buckets.length === 1 ? 50 : (i / (buckets.length - 1)) * 100;
@@ -220,7 +218,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
   const translate = useTranslation();
   const t = (key: string, values?: Record<string, string | number>) => {
     const value = translate(key, values);
-    if (value !== "—" ) return value;
+    if (value !== "\u2014") return value;
     return ANALYTICS_FALLBACK[key] ?? key;
   };
   const { language } = useLanguage();
@@ -268,7 +266,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
 
   function insightText(item: InsightItem) {
     const raw = t(item.messageKey, item.values);
-    return raw === "—" ? item.messageKey : raw;
+    return raw === "\u2014" ? item.messageKey : raw;
   }
 
   const categoryOptions = useMemo(
@@ -337,7 +335,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                     onChange={(e) => setCustom((c) => ({ ...c, start: e.target.value }))}
                   />
                 </label>
-                <span className="analytics-range-sep" aria-hidden="true">–</span>
+                <span className="analytics-range-sep" aria-hidden="true">\u2013</span>
                 <label>
                   <span className="visually-hidden">{t("analyticsTo")}</span>
                   <input
@@ -380,7 +378,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
             <p className="analytics-range-note">
               <CalendarRange size={14} aria-hidden="true" />
               <span>
-                {formatDate(range.start, language)} – {formatDate(range.end, language)}
+                {formatDate(range.start, language)} \u2013 {formatDate(range.end, language)}
               </span>
             </p>
           </section>
@@ -410,7 +408,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                   <span className="analytics-stat-icon net"><Wallet size={16} /></span>
                   <span className="eyebrow">{t("analyticsNetChange")}</span>
                   <strong className={summary.netChange >= 0 ? "is-positive" : "is-negative"}>
-                    {summary.netChange >= 0 ? "+" : "−"}{money(Math.abs(summary.netChange))}
+                    {summary.netChange >= 0 ? "+" : "\u2212"}{money(Math.abs(summary.netChange))}
                   </strong>
                 </article>
                 {summary.hasEnoughForRate && summary.savingsRate != null && (
@@ -473,7 +471,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                           <strong>{tx.name}</strong>
                           <span className="analytics-expense-meta">
                             {formatDate(tx.date, language)}
-                            {" · "}
+                            {" \u00b7 "}
                             {tx.method?.trim() || uncategorized}
                           </span>
                         </div>
@@ -535,7 +533,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                           <span className="analytics-stat-icon net"><Wallet size={16} /></span>
                           <span className="eyebrow">{t("forecastExpectedNet")}</span>
                           <strong className={forecast.expectedNet >= 0 ? "is-positive" : "is-negative"}>
-                            {forecast.expectedNet >= 0 ? "+" : "−"}{money(Math.abs(forecast.expectedNet))}
+                            {forecast.expectedNet >= 0 ? "+" : "\u2212"}{money(Math.abs(forecast.expectedNet))}
                           </strong>
                         </article>
                       )}
@@ -574,7 +572,7 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                         <span className="analytics-stat-icon net"><Wallet size={16} /></span>
                         <span className="eyebrow">{t("projectionAvgNet")}</span>
                         <strong className={projection.avgMonthlyNet >= 0 ? "is-positive" : "is-negative"}>
-                          {projection.avgMonthlyNet >= 0 ? "+" : "−"}{money(Math.abs(projection.avgMonthlyNet))}
+                          {projection.avgMonthlyNet >= 0 ? "+" : "\u2212"}{money(Math.abs(projection.avgMonthlyNet))}
                         </strong>
                       </article>
                     </div>
@@ -582,19 +580,19 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                       <li>
                         <span>{t("projectionNext3")}</span>
                         <strong className={projection.projectedNet3Months >= 0 ? "is-positive" : "is-negative"}>
-                          {projection.projectedNet3Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet3Months))}
+                          {projection.projectedNet3Months >= 0 ? "+" : "\u2212"}{money(Math.abs(projection.projectedNet3Months))}
                         </strong>
                       </li>
                       <li>
                         <span>{t("projectionNext6")}</span>
                         <strong className={projection.projectedNet6Months >= 0 ? "is-positive" : "is-negative"}>
-                          {projection.projectedNet6Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet6Months))}
+                          {projection.projectedNet6Months >= 0 ? "+" : "\u2212"}{money(Math.abs(projection.projectedNet6Months))}
                         </strong>
                       </li>
                       <li>
                         <span>{t("projectionNext12")}</span>
                         <strong className={projection.projectedNet12Months >= 0 ? "is-positive" : "is-negative"}>
-                          {projection.projectedNet12Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet12Months))}
+                          {projection.projectedNet12Months >= 0 ? "+" : "\u2212"}{money(Math.abs(projection.projectedNet12Months))}
                         </strong>
                       </li>
                     </ul>
