@@ -17,7 +17,7 @@ interface TransactionDetailProps {
 export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, onDelete, deleting }: TransactionDetailProps) {
   const t = useTranslation();
   const { language } = useLanguage();
-  const { currency } = useDisplayCurrency();
+  const { currency, convertFromBase } = useDisplayCurrency();
   const { url } = useSignedImage(transaction?.image_url, getImageUrl);
   if (!transaction) return null;
   const safeLink =
@@ -39,13 +39,13 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <span className="transaction-thumb">{url ? <img src={url} alt="" /> : <Icon size={22} />}</span>
             <div>
               <div className="transaction-name">{transaction.name}</div>
-              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language)}</div>
+              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language, convertFromBase)}</div>
             </div>
           </div>
           {url && <img className="detail-image" src={url} alt={t("photoFor", { name: transaction.name })} />}
           <div className="profile-detail panel">
             <div className="detail-line"><span>{t("type")}</span><strong>{transaction.type === "out" ? t("purchase") : t("moneyIn")}</strong></div>
-            <div className="detail-line"><span>{t("date")}</span><strong>{formatDate(transaction.date)}</strong></div>
+            <div className="detail-line"><span>{t("date")}</span><strong>{formatDate(transaction.date, language)}</strong></div>
             <div className="detail-line"><span>{t("paymentMethod")}</span><strong>{transaction.method || t("notAdded")}</strong></div>
           </div>
           {transaction.note && <div className="detail-note">{transaction.note}</div>}
