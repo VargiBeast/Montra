@@ -41,6 +41,9 @@ const CURRENCY_LABELS: Record<string, string> = {
   CZK: "CZK",
   TRY: "TRY",
   KRW: "KRW",
+  CAD: "CAD",
+  AUD: "AUD",
+  INR: "INR",
 };
 
 export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
