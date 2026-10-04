@@ -26,6 +26,7 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
       : null;
   const linkIsSafe = Boolean(safeLink);
   const Icon = transaction.type === "in" ? ArrowDownLeft : ShoppingBag;
+  const amount = Number(transaction.amount);
 
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
@@ -39,7 +40,7 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <span className="transaction-thumb">{url ? <img src={url} alt="" /> : <Icon size={22} />}</span>
             <div>
               <div className="transaction-name">{transaction.name}</div>
-              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language, convertFromBase)}</div>
+              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(amount, currency, language, convertFromBase(amount, currency))}</div>
             </div>
           </div>
           {url && <img className="detail-image" src={url} alt={t("photoFor", { name: transaction.name })} />}
