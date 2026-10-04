@@ -20,7 +20,7 @@ function today() {
 
 export function TransactionForm({ open, existing, busy, onClose, onSave }: TransactionFormProps) {
   const t = useTranslation();
-  const { currency } = useDisplayCurrency();
+  const { currency, convertFromBase, convertToBase } = useDisplayCurrency();
   const [type, setType] = useState<"in" | "out">("out");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -36,7 +36,13 @@ export function TransactionForm({ open, existing, busy, onClose, onSave }: Trans
     if (!open) return;
     setType(existing?.type ?? "out");
     setName(existing?.name ?? "");
-    setAmount(existing ? String(existing.amount) : "");
+    // Show amount in the current display currency
+    if (existing) {
+      const displayAmount = convertFromBase(Number(existing.amount), currency);
+      setAmount(String(Math.round(displayAmount * 100) / 100));
+    } else {
+      setAmount("");
+    }
     setDate(existing?.date ?? today());
     setMethod(existing?.method ?? "");
     setLink(existing?.link ?? "");
@@ -44,7 +50,7 @@ export function TransactionForm({ open, existing, busy, onClose, onSave }: Trans
     setImage(null);
     setError("");
     setPreview("");
-  }, [open, existing]);
+  }, [open, existing, currency, convertFromBase]);
 
   useEffect(() => {
     if (!image) { setPreview(""); return; }
@@ -67,12 +73,14 @@ export function TransactionForm({ open, existing, busy, onClose, onSave }: Trans
       const imageError = validateImage(image);
       if (imageError) { setError(imageError); return; }
     }
+    // Convert from display currency back to base (NOK) for storage
+    const amountInBase = convertToBase(numericAmount, currency);
     const safeLink = productLink.url ?? "";
     try {
       await onSave({
         type,
         name: name.trim(),
-        amount: numericAmount,
+        amount: Math.round(amountInBase * 100) / 100,
         date,
         method: method.trim() || null,
         link: safeLink || null,
