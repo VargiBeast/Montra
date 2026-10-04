@@ -4,6 +4,7 @@ import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { TransactionRow } from "../components/TransactionRow";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
+import { fillMissingCopy } from "../lib/missingCopy";
 
 const PLUS_FALLBACK: Record<string, string> = {
   analytics: "Analytics",
@@ -33,12 +34,12 @@ interface HomePageProps {
 
 export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onViewAll, onGetPlus, hasPlus = false, onOpenAnalytics }: HomePageProps) {
   const translate = useTranslation();
+  const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
-    const value = translate(key, values);
+    const value = fillMissingCopy(key, translate(key, values), language);
     if (value !== "\u2014") return value;
     return PLUS_FALLBACK[key] ?? key;
   };
-  const { language } = useLanguage();
   const { currency, convertFromBase } = useDisplayCurrency();
   const summary = getBalanceSummary(transactions);
   const money = (value: number) => formatMoney(value, currency, language, convertFromBase(value, currency));

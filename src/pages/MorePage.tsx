@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, Log
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
+import { fillMissingCopy } from "../lib/missingCopy";
 import { useDisplayCurrency } from "../lib/currency";
 import {
   currencyChoices,
@@ -50,7 +51,8 @@ const CURRENCY_LABELS: Record<string, string> = {
 export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut, onSavingsGoals, onWishlist }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
-  const t = useTranslation();
+  const translate = useTranslation();
+  const t = (key: string, values?: Record<string, string | number>) => fillMissingCopy(key, translate(key, values), language);
   const fileInput = useRef<HTMLInputElement>(null);
   const [working, setWorking] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -253,7 +255,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <span className="setting-copy"><strong>{t("profile")}</strong><span>{t("profileHint")}</span></span>
           <ChevronRight size={18} aria-hidden="true" />
         </button>
-        <button className="setting-row" type="button" disabled={Boolean(working)} onClick={() => void signOut()}>
+        <button className="setting-row" disabled={Boolean(working)} onClick={() => void signOut()}>
           <span className="setting-icon is-danger"><LogOut size={18} /></span>
           <span className="setting-copy"><strong>{t("signOut")}</strong><span>{t("signOutHint")}</span></span>
           <ChevronRight size={18} aria-hidden="true" />
