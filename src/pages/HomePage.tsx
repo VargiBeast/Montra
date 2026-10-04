@@ -58,11 +58,11 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
         <div className="balance-split">
           <div>
             <span className="balance-split-label"><ArrowDownLeft size={14} /> {t("moneyIn")}</span>
-            <strong>{money(summary.income)}</strong>
+            <strong>{money(summary.totalIn)}</strong>
           </div>
           <div>
             <span className="balance-split-label"><ArrowUpRight size={14} /> {t("moneyOut")}</span>
-            <strong>{money(summary.spending)}</strong>
+            <strong>{money(summary.totalOut)}</strong>
           </div>
         </div>
       </section>
@@ -133,7 +133,7 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
         ) : (
           <ul className="transaction-list">
             {transactions.slice(0, 5).map((tx) => (
-              <TransactionRow key={tx.id} transaction={tx} money={money} onSelect={onSelect} getImageUrl={getImageUrl} />
+              <TransactionRow key={tx.id} transaction={tx} onClick={onSelect} getImageUrl={getImageUrl} />
             ))}
           </ul>
         )}
