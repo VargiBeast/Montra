@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
+import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop, PiggyBank } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -24,6 +24,7 @@ interface MorePageProps {
   onImport: (records: Array<{ type: "in" | "out"; name: string; amount: number; date: string; method?: string | null; link?: string | null; note?: string | null }>) => Promise<void>;
   onProfile: () => void;
   onSignOut: () => Promise<void>;
+  onSavingsGoals?: () => void;
 }
 
 /** Short native-friendly labels for currencies (avoid English-only long names). */
@@ -46,7 +47,7 @@ const CURRENCY_LABELS: Record<string, string> = {
   INR: "INR",
 };
 
-export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
+export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut, onSavingsGoals }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
   const t = useTranslation();
@@ -251,7 +252,14 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
       </section>
-      <section className="panel settings-list stack-panel-lg">
+            <section className="panel settings-list stack-panel">
+        <button className="setting-row" type="button" onClick={() => onSavingsGoals?.()}>
+          <span className="setting-icon"><PiggyBank size={18} /></span>
+          <span className="setting-copy"><strong>{t("savingsGoals")}</strong><span>{t("savingsGoalsHint")}</span></span>
+          <ChevronRight size={18} aria-hidden="true" />
+        </button>
+      </section>
+<section className="panel settings-list stack-panel-lg">
         <button className="setting-row" type="button" onClick={onProfile}>
           <span className="setting-icon"><UserRound size={18} /></span>
           <span className="setting-copy"><strong>{t("profile")}</strong><span>{t("accountDetails")}</span></span>
