@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ImagePlus, X } from "lucide-react";
 import type { Transaction, TransactionInput } from "../types/transaction";
 import { validateImage, validateProductUrl } from "../lib/utils";
+import { useDisplayCurrency } from "../lib/currency";
 import { useTranslation } from "../lib/i18n";
 
 interface TransactionFormProps {
@@ -19,6 +20,7 @@ function today() {
 
 export function TransactionForm({ open, existing, busy, onClose, onSave }: TransactionFormProps) {
   const t = useTranslation();
+  const { currency } = useDisplayCurrency();
   const [type, setType] = useState<"in" | "out">("out");
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -104,7 +106,7 @@ export function TransactionForm({ open, existing, busy, onClose, onSave }: Trans
               <input id="transaction-name" autoFocus value={name} onChange={(event) => setName(event.target.value)} placeholder={type === "out" ? t("whatDidYouBuy") : t("whereFrom")} maxLength={120} required />
             </div>
             <div className="form-field">
-              <label htmlFor="transaction-amount">{t("amountNok")}</label>
+              <label htmlFor="transaction-amount">{t("amountNok", { currency })}</label>
               <input id="transaction-amount" inputMode="decimal" type="number" min="0.01" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" required />
             </div>
             <div className="form-field">

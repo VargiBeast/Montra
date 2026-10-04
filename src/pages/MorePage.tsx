@@ -1,11 +1,23 @@
-import { useRef, useState, type ChangeEvent } from "react";
-import { Archive, ChevronRight, CloudDownload, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
-import { languageOptions, normalizeLanguage, useLanguage, useTranslation } from "../lib/i18n";
+import { useLanguage, useTranslation } from "../lib/i18n";
+import { useDisplayCurrency } from "../lib/currency";
+import {
+  currencyChoices,
+  ensureUserPreferences,
+  languageChoices,
+  normalizeDisplayCurrency,
+  normalizePreferenceLocale,
+  saveUserPreferences,
+  type DisplayCurrency,
+  type PreferenceLocale,
+} from "../lib/preferences";
 
 type Theme = "light" | "dark" | "system";
 interface MorePageProps {
+  userId: string;
   theme: Theme;
   onThemeChange: (theme: Theme) => void;
   transactions: Transaction[];
@@ -14,12 +26,68 @@ interface MorePageProps {
   onSignOut: () => Promise<void>;
 }
 
-export function MorePage({ theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
+export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
+  const { currency, setCurrency } = useDisplayCurrency();
   const t = useTranslation();
   const fileInput = useRef<HTMLInputElement>(null);
   const [working, setWorking] = useState("");
   const [message, setMessage] = useState("");
+  const [preferencesReady, setPreferencesReady] = useState(false);
+  const selectedLocale = normalizePreferenceLocale(language);
+
+  useEffect(() => {
+    let active = true;
+    setPreferencesReady(false);
+    void ensureUserPreferences(userId)
+      .then((preferences) => {
+        if (!active) return;
+        setLanguage(preferences.locale);
+        setCurrency(preferences.currency);
+        setPreferencesReady(true);
+      })
+      .catch((reason: unknown) => {
+        if (!active) return;
+        console.error("Could not load Montra preferences.", reason);
+        setMessage("preferencesLoadFailed");
+        setPreferencesReady(true);
+      });
+    return () => { active = false; };
+  }, [setCurrency, setLanguage, userId]);
+
+  async function persist(next: { locale: PreferenceLocale; currency: DisplayCurrency }) {
+    setWorking("preferences");
+    try {
+      await saveUserPreferences(userId, next);
+      setMessage(t("preferencesSaved"));
+    } catch (reason) {
+      console.error("Could not save Montra preferences.", reason);
+      setMessage(t("preferencesSaveFailed"));
+      throw reason;
+    } finally {
+      setWorking("");
+    }
+  }
+
+  async function changeLanguage(next: PreferenceLocale) {
+    const previous = selectedLocale;
+    setLanguage(next);
+    try {
+      await persist({ locale: next, currency });
+    } catch {
+      setLanguage(previous);
+    }
+  }
+
+  async function changeCurrency(next: DisplayCurrency) {
+    const previous = currency;
+    setCurrency(next);
+    try {
+      await persist({ locale: selectedLocale, currency: next });
+    } catch {
+      setCurrency(previous);
+    }
+  }
 
   function exportBackup() {
     const backup = {
@@ -98,30 +166,37 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
           <span className="setting-icon"><Languages size={18} /></span>
           <span className="setting-copy"><strong>{t("language")}</strong><span>{t("chooseLanguage")}</span></span>
         </div>
-        <div className="locale-field">
-          <input
+        <label className="preference-field">
+          <span className="visually-hidden">{t("language")}</span>
+          <select
             id="montra-language"
-            type="text"
-            list="montra-language-options"
-            autoComplete="off"
-            aria-label={t("localeCode")}
-            value={language}
-            onChange={(event) => {
-              const next = normalizeLanguage(event.target.value);
-              if (next) setLanguage(next);
-            }}
-          />
-          <datalist id="montra-language-options">
-            {languageOptions.map(([locale, name]) => <option key={locale} value={locale}>{name}</option>)}
-          </datalist>
-        </div>
+            value={selectedLocale}
+            disabled={!preferencesReady || working === "preferences"}
+            onChange={(event) => void changeLanguage(normalizePreferenceLocale(event.target.value))}
+          >
+            {languageChoices.map((option) => <option key={option.locale} value={option.locale}>{option.label}</option>)}
+          </select>
+          <ChevronDown size={16} aria-hidden="true" />
+        </label>
         <p className="settings-note">{t("languageFallback")}</p>
       </section>
       <section className="panel settings-list currency-settings">
         <div className="setting-row" style={{ cursor: "default" }}>
-          <span className="setting-icon"><span aria-hidden="true">NOK</span></span>
+          <span className="setting-icon"><Coins size={18} /></span>
           <span className="setting-copy"><strong>{t("currency")}</strong><span>{t("originalCurrency")}</span></span>
         </div>
+        <label className="preference-field">
+          <span className="visually-hidden">{t("currency")}</span>
+          <select
+            id="montra-currency"
+            value={currency}
+            disabled={!preferencesReady || working === "preferences"}
+            onChange={(event) => void changeCurrency(normalizeDisplayCurrency(event.target.value))}
+          >
+            {currencyChoices.map((option) => <option key={option.code} value={option.code}>{option.code} — {option.label}</option>)}
+          </select>
+          <ChevronDown size={16} aria-hidden="true" />
+        </label>
         <p className="settings-note">{t("currencySafety")}</p>
       </section>
       <section className="panel settings-list" style={{ marginBottom: 17 }}>
@@ -164,7 +239,7 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
       </section>
-      {message && <div className="notice" role="status" style={{ marginTop: 16 }}><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message}</div>}
+      {message && <div className="notice" role="status" style={{ marginTop: 16 }}><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message.startsWith("preferences") ? t(message) : message}</div>}
     </main>
   );
 }

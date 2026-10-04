@@ -2,7 +2,8 @@ import { ArrowDownLeft, ExternalLink, Pencil, ShoppingBag, Trash2, X } from "luc
 import type { Transaction } from "../types/transaction";
 import { formatDate, formatMoney, validateProductUrl } from "../lib/utils";
 import { useSignedImage } from "../hooks/useTransactions";
-import { useTranslation } from "../lib/i18n";
+import { useDisplayCurrency } from "../lib/currency";
+import { useLanguage, useTranslation } from "../lib/i18n";
 
 interface TransactionDetailProps {
   transaction: Transaction | null;
@@ -15,6 +16,8 @@ interface TransactionDetailProps {
 
 export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, onDelete, deleting }: TransactionDetailProps) {
   const t = useTranslation();
+  const { language } = useLanguage();
+  const { currency } = useDisplayCurrency();
   const { url } = useSignedImage(transaction?.image_url, getImageUrl);
   if (!transaction) return null;
   const safeLink =
@@ -36,7 +39,7 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <span className="transaction-thumb">{url ? <img src={url} alt="" /> : <Icon size={22} />}</span>
             <div>
               <div className="transaction-name">{transaction.name}</div>
-              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount))}</div>
+              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language)}</div>
             </div>
           </div>
           {url && <img className="detail-image" src={url} alt={t("photoFor", { name: transaction.name })} />}

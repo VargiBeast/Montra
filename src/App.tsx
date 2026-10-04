@@ -11,7 +11,9 @@ import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
 import { UserAvatar } from "./components/UserAvatar";
-import { useTranslation } from "./lib/i18n";
+import { useDisplayCurrency } from "./lib/currency";
+import { useLanguage, useTranslation } from "./lib/i18n";
+import { fetchUserPreferences } from "./lib/preferences";
 
 type Page = "home" | "transactions" | "more" | "profile";
 type Theme = "light" | "dark" | "system";
@@ -39,6 +41,8 @@ function LoadingView() {
 
 function App() {
   const t = useTranslation();
+  const { setLanguage } = useLanguage();
+  const { setCurrency } = useDisplayCurrency();
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
   const [page, setPage] = useState<Page>("home");
@@ -72,6 +76,22 @@ function App() {
   useEffect(() => {
     try { window.localStorage.setItem("saldo-theme", theme); } catch { /* Theme still works for this session. */ }
   }, [theme]);
+
+  useEffect(() => {
+    const userId = auth.user?.id;
+    if (!userId) return;
+    let active = true;
+    void fetchUserPreferences(userId)
+      .then((preferences) => {
+        if (!active || !preferences) return;
+        setLanguage(preferences.locale);
+        setCurrency(preferences.currency);
+      })
+      .catch((reason: unknown) => {
+        console.error("Could not load Montra preferences.", reason);
+      });
+    return () => { active = false; };
+  }, [auth.user?.id, setCurrency, setLanguage]);
 
   useEffect(() => {
     if (!toast) return;
@@ -204,6 +224,7 @@ function App() {
           {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} />}
           {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
           {page === "more" && <MorePage
+            userId={auth.user.id}
             theme={theme}
             onThemeChange={changeTheme}
             transactions={data.transactions}

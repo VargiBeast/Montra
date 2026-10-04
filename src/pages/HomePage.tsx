@@ -2,7 +2,8 @@ import { ArrowDownLeft, ArrowUpRight, ChevronRight, Plus, Sparkles } from "lucid
 import type { Transaction } from "../types/transaction";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { TransactionRow } from "../components/TransactionRow";
-import { useTranslation } from "../lib/i18n";
+import { useDisplayCurrency } from "../lib/currency";
+import { useLanguage, useTranslation } from "../lib/i18n";
 
 interface HomePageProps {
   transactions: Transaction[];
@@ -15,7 +16,10 @@ interface HomePageProps {
 
 export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onViewAll }: HomePageProps) {
   const t = useTranslation();
+  const { language } = useLanguage();
+  const { currency } = useDisplayCurrency();
   const summary = getBalanceSummary(transactions);
+  const money = (value: number) => formatMoney(value, currency, language);
   const latest = [...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at)).slice(0, 5);
   const firstName = name.trim().split(/\s+/)[0] || "there";
 
@@ -32,10 +36,10 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
           <section className="balance-panel" aria-label={t("balanceSummary")}>
             <div className="balance-content">
               <span className="eyebrow">{t("yourBalance")}</span>
-              <div className="balance-amount">{formatMoney(summary.balance)}</div>
+              <div className="balance-amount">{money(summary.balance)}</div>
               <div className="balance-meta">
-                <div className="balance-meta-item"><span className="balance-meta-icon"><ArrowDownLeft size={15} /></span><span>{t("moneyIn")}<strong>{formatMoney(summary.totalIn)}</strong></span></div>
-                <div className="balance-meta-item"><span className="balance-meta-icon"><ArrowUpRight size={15} /></span><span>{t("moneyOut")}<strong>{formatMoney(summary.totalOut)}</strong></span></div>
+                <div className="balance-meta-item"><span className="balance-meta-icon"><ArrowDownLeft size={15} /></span><span>{t("moneyIn")}<strong>{money(summary.totalIn)}</strong></span></div>
+                <div className="balance-meta-item"><span className="balance-meta-icon"><ArrowUpRight size={15} /></span><span>{t("moneyOut")}<strong>{money(summary.totalOut)}</strong></span></div>
               </div>
             </div>
           </section>

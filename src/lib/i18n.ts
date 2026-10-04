@@ -1,4 +1,4 @@
-import { createContext, createElement, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 export type AppLanguage = string;
 type LoginLanguage = "en" | "no";
@@ -75,19 +75,21 @@ const LanguageContext = createContext<LanguageContextValue>({
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(readLanguage);
 
-  function setLanguage(next: AppLanguage) {
+  const setLanguage = useCallback((next: AppLanguage) => {
     const normalized = normalizeLanguage(next);
     if (!normalized) return;
     writeLanguage(normalized);
     setLanguageState(normalized);
-  }
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
 
+  const value = useMemo(() => ({ language, setLanguage }), [language, setLanguage]);
+
   return createElement(LanguageContext.Provider, {
-    value: { language, setLanguage },
+    value,
     children,
   });
 }
@@ -242,11 +244,11 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     firstEntryWillAppear: "When you add an entry, it will find a home here.",
     yourSpace: "Your space, your way",
     language: "Language",
-    chooseLanguage: "Choose a language or enter a locale code",
-    languageFallback: "Languages without a complete translation use English. Dates and number formatting follow your selected locale.",
+    chooseLanguage: "English or Norsk (Bokmål)",
+    languageFallback: "Dates and numbers follow the language you choose.",
     currency: "Currency",
-    originalCurrency: "Original transaction currency: NOK",
-    currencySafety: "Your existing transaction records do not store a currency per entry. Montra keeps their NOK display rather than relabeling values or inventing exchange rates.",
+    originalCurrency: "Display currency",
+    currencySafety: "This only changes how amounts are formatted. Stored amounts are not converted.",
     appearance: "Appearance",
     appearanceHint: "Choose the light that feels right",
     light: "Light",
@@ -286,7 +288,7 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     name: "Name",
     whatDidYouBuy: "What did you buy?",
     whereFrom: "Where did it come from?",
-    amountNok: "Amount (NOK)",
+    amountNok: "Amount ({currency})",
     date: "Date",
     paymentMethod: "Payment method",
     paymentMethodHint: "Card, payment app, salary…",
@@ -316,6 +318,9 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     transactionDeleted: "Transaction deleted.",
     deleteFailed: "We couldn’t delete that transaction. Check your connection and try again.",
     signOutFailed: "We couldn’t sign out. Check your connection and try again.",
+    preferencesSaved: "Saved.",
+    preferencesSaveFailed: "We couldn’t save that setting. Check your connection and try again.",
+    preferencesLoadFailed: "We couldn’t load your saved settings.",
     appearanceSelected: "{appearance} appearance selected.",
     lightTheme: "Light",
     darkTheme: "Dark",
@@ -359,11 +364,11 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     firstEntryWillAppear: "Når du legger til en post, vises den her.",
     yourSpace: "Ditt rom, på din måte",
     language: "Språk",
-    chooseLanguage: "Velg språk eller skriv inn en lokalitetskode",
-    languageFallback: "Språk uten full oversettelse bruker engelsk. Datoer og tall følger valgt lokalitet.",
+    chooseLanguage: "Engelsk eller norsk (bokmål)",
+    languageFallback: "Datoer og tall følger språket du velger.",
     currency: "Valuta",
-    originalCurrency: "Opprinnelig transaksjonsvaluta: NOK",
-    currencySafety: "Transaksjonene dine lagrer ikke valuta per post. Montra beholder NOK-visningen i stedet for å endre merkelapp eller finne på valutakurser.",
+    originalCurrency: "Visningsvaluta",
+    currencySafety: "Dette endrer bare hvordan beløp vises. Lagrede beløp blir ikke omregnet.",
     appearance: "Utseende",
     appearanceHint: "Velg lyset som passer deg",
     light: "Lyst",
@@ -403,7 +408,7 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     name: "Navn",
     whatDidYouBuy: "Hva kjøpte du?",
     whereFrom: "Hvor kom det fra?",
-    amountNok: "Beløp (NOK)",
+    amountNok: "Beløp ({currency})",
     date: "Dato",
     paymentMethod: "Betalingsmåte",
     paymentMethodHint: "Kort, betalingsapp, lønn…",
@@ -433,6 +438,9 @@ const uiCopy: Record<LoginLanguage, Record<string, string>> = {
     transactionDeleted: "Transaksjonen er slettet.",
     deleteFailed: "Vi kunne ikke slette transaksjonen. Sjekk tilkoblingen og prøv igjen.",
     signOutFailed: "Vi kunne ikke logge deg ut. Sjekk tilkoblingen og prøv igjen.",
+    preferencesSaved: "Lagret.",
+    preferencesSaveFailed: "Vi kunne ikke lagre innstillingen. Sjekk tilkoblingen og prøv igjen.",
+    preferencesLoadFailed: "Vi kunne ikke laste de lagrede innstillingene.",
     appearanceSelected: "Valgte {appearance} utseende.",
     lightTheme: "Lyst",
     darkTheme: "Mørkt",
