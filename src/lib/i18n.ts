@@ -243,6 +243,9 @@ const enUi: Record<string, string> = {
   reviewReceipt: "Review receipt", receiptReadyToReview: "Check the detected details before confirming. Empty fields were not certain enough to fill in.",
   confirmReceipt: "Confirm receipt", receiptConfirmed: "Receipt confirmed.",
   merchantPlaceholder: "Store name", receiptSaveFailed: "We couldn’t save this receipt. Try again.",
+  cameraStarting: "Starting camera…",
+  deductFromBalance: "Deduct {amount} {currency} from balance",
+  deductFromBalanceHint: "Creates an expense in Activity. Confirming again will not create a duplicate.",
 
   invalidProductLink: "Enter a product link that starts with http:// or https://.",
   productLinkNoCredentials: "Remove sign-in details from the product link.",
@@ -326,6 +329,9 @@ const nbUi: Record<string, string> = {
   ocrFailed: "Vi klarte ikke å lese kvitteringen automatisk. Fyll inn detaljene selv.",
   reviewReceipt: "Se gjennom kvittering", receiptReadyToReview: "Sjekk det som ble funnet før du bekrefter. Tomme felt var ikke sikre nok.",
   confirmReceipt: "Bekreft kvittering", receiptConfirmed: "Kvittering bekreftet.",
+  cameraStarting: "Starter kamera…",
+  deductFromBalance: "Trekk {amount} {currency} fra saldo",
+  deductFromBalanceHint: "Oppretter en utgift i Aktivitet. Bekrefter du på nytt, opprettes det ikke en duplikat.",
   merchantPlaceholder: "Butikknavn", receiptSaveFailed: "Vi kunne ikke lagre kvitteringen. Prøv igjen.",
 
   invalidProductLink: "Skriv inn en produktlenke som starter med http:// eller https://.",
