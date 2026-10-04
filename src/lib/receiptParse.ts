@@ -10,7 +10,7 @@ const TOTAL_LABEL =
 const SKIP_LINE =
   /\b(org\.?\s*nr|mva|vat|subtotal|kontant|visa|mastercard|kort|kvittering|receipt|takk|orgnr)\b/i;
 const AMOUNT = /(?:^|[^\d])(\d{1,6}(?:[ .]\d{3})*[.,]\d{2})(?!\d)/;
-const CURRENCY = /\b(NOK|SEK|DKK|EUR|USD|GBP|CHF|PLN)\b|kr\b|€|£|\$/i;
+const CURRENCY = /\b(NOK|SEK|DKK|EUR|USD|GBP|CHF|PLN|CZK|TRY|CAD|AUD|JPY|CNY|INR|KRW)\b|kr\b|€|£|\$/i;
 
 function normalizeAmount(raw: string): number | null {
   const compact = raw.replace(/\s/g, "").replace(/\.(?=\d{3}\b)/g, "");
@@ -44,9 +44,9 @@ function toIsoDate(year: number, month: number, day: number): string {
 
 function findDate(text: string): string {
   const patterns = [
-    /\b(\d{2})[./-](\d{2})[./-](\d{4})\b/g,
+    /\b(\d{2})[.\/-](\d{2})[.\/-](\d{4})\b/g,
     /\b(\d{4})-(\d{2})-(\d{2})\b/g,
-    /\b(\d{2})[./-](\d{2})[./-](\d{2})\b/g,
+    /\b(\d{2})[.\/-](\d{2})[.\/-](\d{2})\b/g,
   ];
   for (const pattern of patterns) {
     for (const match of text.matchAll(pattern)) {
