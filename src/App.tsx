@@ -4,6 +4,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
 import { useReceipts } from "./hooks/useReceipts";
 import { useSavingsGoals } from "./hooks/useSavingsGoals";
+import { useWishlist } from "./hooks/useWishlist";
 import type { Transaction, TransactionInput } from "./types/transaction";
 import { HomePage } from "./pages/HomePage";
 import { TransactionsPage } from "./pages/TransactionsPage";
@@ -12,6 +13,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { ReceiptsPage } from "./pages/ReceiptsPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SavingsGoalsPage } from "./pages/SavingsGoalsPage";
+import { WishlistPage } from "./pages/WishlistPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
@@ -23,7 +25,7 @@ import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
 import { hasPlusAccess } from "./lib/plus";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -54,6 +56,7 @@ function App() {
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
   const savings = useSavingsGoals(auth.user?.id);
+  const wishlist = useWishlist(auth.user?.id);
   const plusUnlocked = hasPlusAccess(auth.user?.email);
   const receipts = useReceipts(auth.user?.id);
   const [page, setPage] = useState<Page>("home");
@@ -263,6 +266,7 @@ function App() {
             onProfile={() => setPage("profile")}
             onSignOut={doSignOut}
             onSavingsGoals={() => setPage("savings")}
+            onWishlist={() => setPage("wishlist")}
           />}
           {page === "receipts" && (
             receipts.error ? (
@@ -294,6 +298,18 @@ function App() {
               onDelete={savings.remove}
             />
           )}
+          {page === "wishlist" && (
+            <WishlistPage
+              items={wishlist.items}
+              goals={savings.goals}
+              isLoading={wishlist.isLoading}
+              error={wishlist.error}
+              onBack={() => setPage("more")}
+              onSave={wishlist.save}
+              onDelete={wishlist.remove}
+              getImageUrl={wishlist.getImageUrl}
+            />
+          )}
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
         </>}
       </div>
@@ -302,7 +318,7 @@ function App() {
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
         <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" || page === "wishlist" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
