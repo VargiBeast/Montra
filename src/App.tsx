@@ -3,6 +3,7 @@ import { ArrowDownUp, Home, Moon, Plus, Receipt, UserRound } from "lucide-react"
 import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
 import { useReceipts } from "./hooks/useReceipts";
+import { useSavingsGoals } from "./hooks/useSavingsGoals";
 import type { Transaction, TransactionInput } from "./types/transaction";
 import { HomePage } from "./pages/HomePage";
 import { TransactionsPage } from "./pages/TransactionsPage";
@@ -10,6 +11,7 @@ import { MorePage } from "./pages/MorePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ReceiptsPage } from "./pages/ReceiptsPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { SavingsGoalsPage } from "./pages/SavingsGoalsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
@@ -19,8 +21,9 @@ import { UserAvatar } from "./components/UserAvatar";
 import { useDisplayCurrency } from "./lib/currency";
 import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
+import { hasPlusAccess } from "./lib/plus";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -50,6 +53,8 @@ function App() {
   const { currency, setCurrency, convertToBase } = useDisplayCurrency();
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
+  const savings = useSavingsGoals(auth.user?.id);
+  const plusUnlocked = hasPlusAccess(auth.user?.email);
   const receipts = useReceipts(auth.user?.id);
   const [page, setPage] = useState<Page>("home");
   const [formOpen, setFormOpen] = useState(false);
@@ -247,7 +252,7 @@ function App() {
             <button className="primary-button" type="button" onClick={() => void data.refresh()}>{t("tryAgain")}</button>
           </section>
         </div> : <>
-          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} onGetPlus={() => setToast(t("analyticsPlusComingSoon"))} />}
+          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} onGetPlus={() => setToast(t("analyticsPlusComingSoon"))} hasPlus={plusUnlocked} onOpenAnalytics={() => setPage("analytics")} />}
           {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
           {page === "more" && <MorePage
             userId={auth.user.id}
@@ -257,6 +262,7 @@ function App() {
             onImport={data.importBackup}
             onProfile={() => setPage("profile")}
             onSignOut={doSignOut}
+            onSavingsGoals={() => setPage("savings")}
           />}
           {page === "receipts" && (
             receipts.error ? (
@@ -278,6 +284,16 @@ function App() {
             )
           )}
           {page === "analytics" && <AnalyticsPage transactions={data.transactions} />}
+          {page === "savings" && (
+            <SavingsGoalsPage
+              goals={savings.goals}
+              isLoading={savings.isLoading}
+              error={savings.error}
+              onBack={() => setPage("more")}
+              onSave={savings.save}
+              onDelete={savings.remove}
+            />
+          )}
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
         </>}
       </div>
@@ -286,7 +302,7 @@ function App() {
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
         <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
