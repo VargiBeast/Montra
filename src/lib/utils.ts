@@ -1,18 +1,25 @@
 import type { Transaction } from "../types/transaction";
 import { readLanguage } from "./i18n";
 
-export function formatMoney(value: number, currency = "NOK", locale = readLanguage()): string {
+/** Format a monetary value that is stored in base currency (NOK). */
+export function formatMoney(
+  valueInBase: number,
+  currency = "NOK",
+  locale = readLanguage(),
+  convertFn?: (amount: number, to?: string) => number,
+): string {
+  const displayValue = convertFn ? convertFn(valueInBase, currency) : valueInBase;
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     maximumFractionDigits: 2,
-  }).format(value);
+  }).format(displayValue);
 }
 
-export function formatDate(value: string): string {
+export function formatDate(value: string, locale = readLanguage()): string {
   const date = new Date(`${value}T12:00:00`);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(readLanguage(), {
+  return new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
