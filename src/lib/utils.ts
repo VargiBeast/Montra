@@ -6,9 +6,9 @@ export function formatMoney(
   valueInBase: number,
   currency = "NOK",
   locale = readLanguage(),
-  convertFn?: (amount: number, to?: string) => number,
+  convertedValue?: number,
 ): string {
-  const displayValue = convertFn ? convertFn(valueInBase, currency) : valueInBase;
+  const displayValue = convertedValue !== undefined ? convertedValue : valueInBase;
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
