@@ -27,7 +27,6 @@
   pointer-events: none;
 }
 
-/* Deduct checkbox */
 .receipt-deduct {
   grid-column: 1 / -1;
   display: flex;
@@ -287,7 +286,7 @@ a:focus-visible {
 .analytics-category-head strong { color: var(--ink); font-weight: 650; }
 .analytics-category-head span { color: var(--ink); font-weight: 600; }
 .analytics-category-track { height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--line) 70%, transparent); overflow: hidden; margin: 6px 0 4px; }
-.analytics-category-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--green)) 75%, #8fd4c2), var(--accent, var(--green))); }
+.analytics-category-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--green)) 75%, #8fd4c2), var(--accent, var(--green)); }
 .analytics-category-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-weight: 600; }
 .analytics-category-meta .is-up { color: var(--coral, #c45c4a); }
 .analytics-category-meta .is-down { color: var(--green); }
@@ -461,3 +460,75 @@ a:focus-visible {
   .analytics-plus-benefits { max-width: none; }
   .analytics-plus-cta { max-width: none; }
 }
+
+/* === Insights + Forecast === */
+.insights-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.insights-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+}
+.insights-item p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 550;
+  color: var(--ink);
+}
+.insights-item-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.insights-item.is-positive .insights-item-icon {
+  color: var(--green);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 14%, transparent));
+  border-color: color-mix(in srgb, var(--green) 25%, transparent);
+}
+.insights-item.is-warning .insights-item-icon {
+  color: var(--coral, #c45c4a);
+  background: var(--coral-soft, color-mix(in srgb, #c45c4a 14%, transparent));
+  border-color: color-mix(in srgb, #c45c4a 25%, transparent);
+}
+.forecast-overview {
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+.projection-horizon {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+.projection-horizon li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ink);
+}
+.projection-horizon li:last-child { border-bottom: 0; }
+.projection-horizon strong.is-positive { color: var(--green); }
+.projection-horizon strong.is-negative { color: var(--coral, #c45c4a); }
