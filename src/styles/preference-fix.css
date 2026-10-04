@@ -1,0 +1,51 @@
+/* Preference dropdown spacing — keeps selects inside the panel, away from borders */
+.language-settings .preference-field,
+.currency-settings .preference-field {
+  position: relative;
+  display: block;
+  margin: 0 16px 10px;
+  max-width: calc(100% - 32px);
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.language-settings .preference-field select,
+.currency-settings .preference-field select {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--ink);
+  background: var(--surface-raised);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font-weight: 650;
+  box-sizing: border-box;
+}
+
+.language-settings .preference-field svg,
+.currency-settings .preference-field svg {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+@media (max-width: 759px) {
+  .language-settings .preference-field,
+  .currency-settings .preference-field {
+    margin: 0 13px 10px;
+    max-width: calc(100% - 26px);
+  }
+
+  .language-settings .settings-note,
+  .currency-settings .settings-note {
+    margin-inline: 13px;
+  }
+}
