@@ -5,6 +5,18 @@ import { TransactionRow } from "../components/TransactionRow";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 
+const PLUS_FALLBACK: Record<string, string> = {
+  analytics: "Analytics",
+  analyticsPlusBadge: "Montra Plus",
+  analyticsPlusTitle: "Unlock Advanced Analytics",
+  analyticsPlusBody: "See spending trends, category breakdowns, and clearer patterns in your money \u2014 included with Montra Plus.",
+  analyticsPlusBenefitTrends: "Spending trends & income vs expenses",
+  analyticsPlusBenefitCategories: "Category breakdowns & comparisons",
+  analyticsPlusBenefitInsights: "Insights and future forecasting",
+  analyticsPlusCta: "Get Montra Plus",
+  analyticsPlusComingSoon: "Montra Plus is coming soon.",
+};
+
 interface HomePageProps {
   transactions: Transaction[];
   getImageUrl: (path: string) => Promise<string>;
@@ -16,7 +28,12 @@ interface HomePageProps {
 }
 
 export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onViewAll, onGetPlus }: HomePageProps) {
-  const t = useTranslation();
+  const translate = useTranslation();
+  const t = (key: string, values?: Record<string, string | number>) => {
+    const value = translate(key, values);
+    if (value !== "\u2014") return value;
+    return PLUS_FALLBACK[key] ?? key;
+  };
   const { language } = useLanguage();
   const { currency, convertFromBase } = useDisplayCurrency();
   const summary = getBalanceSummary(transactions);
