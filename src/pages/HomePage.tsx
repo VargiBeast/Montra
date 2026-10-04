@@ -43,7 +43,7 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
               </div>
             </div>
           </section>
-          <section className="panel section-panel" style={{ marginTop: 18 }}>
+          <section className="panel section-panel stack-md">
             <div className="section-heading">
               <h2>{t("recentTransactions")}</h2>
               {transactions.length > 0 && <button className="text-action" type="button" onClick={onViewAll}>{t("viewAll")} <ChevronRight size={15} /></button>}
@@ -59,7 +59,7 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
         </div>
         <aside className="panel quick-card">
           <span className="quick-orb" aria-hidden="true" />
-          <span className="eyebrow" style={{ color: "var(--green)" }}>{t("littleAtATime")}</span>
+          <span className="eyebrow accent-green">{t("littleAtATime")}</span>
           <h2>{t("intentionalSpending")}</h2>
           <p>{t("keepWhatWhenWhy")}</p>
           <button className="secondary-button" type="button" onClick={onAdd}><Plus size={16} /> {t("addEntry")}</button>
