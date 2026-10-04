@@ -9,6 +9,7 @@ import { TransactionsPage } from "./pages/TransactionsPage";
 import { MorePage } from "./pages/MorePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ReceiptsPage } from "./pages/ReceiptsPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
@@ -19,7 +20,7 @@ import { useDisplayCurrency } from "./lib/currency";
 import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -255,6 +256,7 @@ function App() {
             transactions={data.transactions}
             onImport={data.importBackup}
             onProfile={() => setPage("profile")}
+            onAnalytics={() => setPage("analytics")}
             onSignOut={doSignOut}
           />}
           {page === "receipts" && (
@@ -276,6 +278,7 @@ function App() {
               />
             )
           )}
+          {page === "analytics" && <AnalyticsPage transactions={data.transactions} />}
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
         </>}
       </div>
@@ -284,7 +287,7 @@ function App() {
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
         <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "analytics" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
