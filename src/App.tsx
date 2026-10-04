@@ -46,7 +46,7 @@ function LoadingView() {
 function App() {
   const t = useTranslation();
   const { setLanguage } = useLanguage();
-  const { setCurrency, convertToBase } = useDisplayCurrency();
+  const { currency, setCurrency, convertToBase } = useDisplayCurrency();
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
   const receipts = useReceipts(auth.user?.id);
@@ -124,21 +124,24 @@ function App() {
     setSaving(true);
     try {
       await data.save(input, existing);
+      setFormOpen(false);
       setToast(existing ? t("transactionUpdated") : t("transactionSaved"));
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function deleteTransaction(transaction: Transaction) {
-    if (!window.confirm(t("deleteConfirm", { name: transaction.name }))) return;
+    if (!window.confirm(t("deleteConfirm"))) return;
     setDeleting(true);
     try {
       await data.remove(transaction);
       setSelected(null);
-      setToast(t("transactionDeleted"));
     } catch (reason) {
-      console.error("Could not delete a transaction.", reason);
-      setToast(t("deleteFailed"));
-    } finally { setDeleting(false); }
+      setToast(reason instanceof Error ? reason.message : t("deleteFailed"));
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function deleteReceipt(receipt: import("./types/receipt").Receipt) {
@@ -149,79 +152,38 @@ function App() {
       setSelectedReceipt(null);
       setToast(t("receiptDeleted"));
     } catch (reason) {
-      console.error("Could not delete a receipt.", reason);
-      setToast(t("receiptDeleteFailed"));
+      setToast(reason instanceof Error ? reason.message : t("receiptDeleteFailed"));
     } finally {
       setDeletingReceipt(false);
     }
   }
 
-  async function doSignOut() {
-    setSigningOut(true);
-    try {
-      await auth.signOut();
-      setPage("home");
-    } catch (reason) {
-      console.error("Could not sign out.", reason);
-      setToast(t("signOutFailed"));
-    } finally { setSigningOut(false); }
+  if (auth.loading) return <LoadingView />;
+  if (!auth.user) {
+    return (
+      <LoginPage
+        busy={authBusy}
+        onGoogle={async () => { setAuthBusy(true); try { await auth.signInWithGoogle(); } finally { setAuthBusy(false); } }}
+        onApple={async () => { setAuthBusy(true); try { await auth.signInWithApple(); } finally { setAuthBusy(false); } }}
+        onEmail={async (email) => { setAuthBusy(true); try { await auth.signInWithEmail(email); } finally { setAuthBusy(false); } }}
+        onVerify={async (email, token) => { setAuthBusy(true); try { await auth.verifyEmailOtp(email, token); } finally { setAuthBusy(false); } }}
+      />
+    );
   }
 
-  async function signInGoogle() {
-    setAuthBusy(true);
-    try { await auth.signInWithProvider("google"); } catch { /* The auth hook exposes the actionable error. */ }
-    finally { setAuthBusy(false); }
+  if (data.error) {
+    return (
+      <main className="app-shell">
+        <div className="app-frame error-screen">
+          <div className="error-card panel">
+            <h1>{t("entriesDidNotLoad")}</h1>
+            <p>{data.error.message || t("transactionError")}</p>
+            <button className="primary-button" type="button" onClick={() => window.location.reload()}>{t("tryAgain")}</button>
+          </div>
+        </div>
+      </main>
+    );
   }
-
-  async function signInEmail(email: string) {
-    setAuthBusy(true);
-    try { await auth.signInWithEmail(email); }
-    finally { setAuthBusy(false); }
-  }
-
-  async function verifyEmailCode(email: string, token: string) {
-    setAuthBusy(true);
-    try { await auth.verifyEmailCode(email, token); }
-    finally { setAuthBusy(false); }
-  }
-
-  async function signInPassword(email: string, password: string) {
-    setAuthBusy(true);
-    try { await auth.signInWithPassword(email, password); }
-    finally { setAuthBusy(false); }
-  }
-
-  async function signUpPassword(email: string, password: string) {
-    setAuthBusy(true);
-    try { return await auth.signUpWithPassword(email, password); }
-    finally { setAuthBusy(false); }
-  }
-
-  function changeTheme(next: Theme) {
-    setTheme(next);
-    const appearance = t(next === "system" ? "systemTheme" : next === "dark" ? "darkTheme" : "lightTheme");
-    setToast(t("appearanceSelected", { appearance }));
-  }
-
-  if (auth.isLoading) return <LoadingView />;
-  if (!auth.user) return <div className="app-shell"><LoginPage
-    authError={auth.authError}
-    busy={authBusy}
-    isConfigured={auth.isConfigured}
-    onGoogle={signInGoogle}
-    onEmail={signInEmail}
-    onVerifyCode={verifyEmailCode}
-    onPassword={signInPassword}
-    onSignUp={signUpPassword}
-    onRetry={auth.retrySession}
-  />{toast && <div className="toast" role="status">{toast}</div>}</div>;
-
-  const accountName = typeof auth.user.user_metadata?.full_name === "string"
-    ? auth.user.user_metadata.full_name
-    : typeof auth.user.user_metadata?.name === "string"
-      ? auth.user.user_metadata.name
-      : auth.user.email?.split("@")[0] || t("nameFallback");
-  const initials = accountName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   return (
     <div className="app-shell">
@@ -229,54 +191,52 @@ function App() {
         <header className="topbar">
           <div className="brand"><span className="brand-mark" aria-hidden="true"><img className="mark-light" src="/branding/mark-light.png" alt="" /><img className="mark-dark" src="/branding/mark-dark.png" alt="" /></span>MONTRA</div>
           <div className="top-actions">
-            <button className="icon-button" type="button" aria-label={t("openAppearance")} onClick={() => setPage("more")}><Moon size={17} /></button>
-          <button className="avatar" type="button" aria-label={t("openProfile")} onClick={() => setPage("profile")}><UserAvatar user={auth.user} fallback={initials || <UserRound size={17} />} /></button>
+            <button className="icon-button" type="button" aria-label={t("openAppearance")} onClick={() => setPage("more")}><Moon size={18} /></button>
+            <button className="avatar" type="button" aria-label={t("openProfile")} onClick={() => setPage("profile")}><UserAvatar user={auth.user} fallback={(auth.user.email ?? "M").slice(0, 1).toUpperCase()} /></button>
           </div>
         </header>
-        {data.isLoading ? <section aria-label={t("loadingTransactions")} role="status">
-          <span className="visually-hidden">{t("loadingTransactions")}</span>
-          <div className="loading-block" style={{ height: 250, borderRadius: 28 }} />
-          <div className="loading-block" style={{ height: 180, borderRadius: 24 }} />
-        </section> : data.error ? <div className="error-screen">
-          <section className="panel error-card">
-            <span className="empty-art" style={{ margin: "0 auto 16px" }}><ArrowDownUp size={22} /></span>
-            <h2>{t("entriesDidNotLoad")}</h2>
-            <p>{t("transactionError")}</p>
-            <button className="primary-button" type="button" onClick={() => void data.refresh()}>{t("tryAgain")}</button>
-          </section>
-        </div> : <>
-          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} />}
-          {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
-          {page === "more" && <MorePage
+
+        {page === "home" && (
+          <HomePage
+            transactions={data.transactions}
+            getImageUrl={data.getImageUrl}
+            name={auth.user.user_metadata?.full_name || auth.user.user_metadata?.name || auth.user.email || t("nameFallback")}
+            onAdd={startAdd}
+            onSelect={setSelected}
+            onViewAll={() => setPage("transactions")}
+          />
+        )}
+        {page === "transactions" && (
+          <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />
+        )}
+        {page === "receipts" && (
+          <ReceiptsPage
+            receipts={receipts.receipts}
+            getImageUrl={receipts.getImageUrl}
+            uploading={uploadingReceipt}
+            onAdd={() => setCaptureOpen(true)}
+            onSelect={setSelectedReceipt}
+          />
+        )}
+        {page === "more" && (
+          <MorePage
             userId={auth.user.id}
             theme={theme}
-            onThemeChange={changeTheme}
+            onThemeChange={setTheme}
             transactions={data.transactions}
-            onImport={data.importBackup}
+            onImport={async (records) => { await data.importRecords(records); }}
             onProfile={() => setPage("profile")}
-            onSignOut={doSignOut}
-          />}
-          {page === "receipts" && (
-            receipts.error ? (
-              <div className="error-screen">
-                <section className="panel error-card">
-                  <h2>{t("receiptsDidNotLoad")}</h2>
-                  <p>{t("receiptError")}</p>
-                  <button className="primary-button" type="button" onClick={() => void receipts.refresh()}>{t("tryAgain")}</button>
-                </section>
-              </div>
-            ) : (
-              <ReceiptsPage
-                receipts={receipts.receipts}
-                getImageUrl={receipts.getImageUrl}
-                uploading={uploadingReceipt}
-                onAdd={() => setCaptureOpen(true)}
-                onSelect={setSelectedReceipt}
-              />
-            )
-          )}
-          {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
-        </>}
+            onSignOut={async () => { setSigningOut(true); try { await auth.signOut(); } finally { setSigningOut(false); } }}
+          />
+        )}
+        {page === "profile" && (
+          <ProfilePage
+            user={auth.user}
+            busy={signingOut}
+            onBack={() => setPage("more")}
+            onSignOut={async () => { setSigningOut(true); try { await auth.signOut(); } finally { setSigningOut(false); } }}
+          />
+        )}
       </div>
       <nav className="bottom-nav" aria-label={t("mainNavigation")}>
         <button type="button" className={`nav-item ${page === "home" ? "active" : ""}`} aria-current={page === "home" ? "page" : undefined} onClick={() => setPage("home")}><Home size={19} /><span>{t("home")}</span></button>
@@ -290,7 +250,7 @@ function App() {
       {toast && <div className="toast" role="status">{toast}</div>}
       <ReceiptCapture
         open={captureOpen}
-        currency="NOK"
+        currency={currency}
         onClose={() => setCaptureOpen(false)}
         onUpload={async (file) => {
           setUploadingReceipt(true);
