@@ -85,7 +85,6 @@
 
 /* === UI polish layer (spacing, touch, consistency) === */
 
-/* Prevent horizontal scroll on mobile */
 html, body {
   max-width: 100%;
   overflow-x: hidden;
@@ -95,7 +94,6 @@ html, body {
   min-width: 0;
 }
 
-/* Consistent interactive focus */
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
@@ -105,7 +103,6 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-/* Touch-friendly icon buttons */
 .icon-button {
   min-width: 44px;
   min-height: 44px;
@@ -118,7 +115,6 @@ a:focus-visible {
   min-height: 52px;
 }
 
-/* Unified button rhythm */
 .primary-button,
 .secondary-button,
 .danger-button {
@@ -135,32 +131,58 @@ a:focus-visible {
   transform: scale(0.98);
 }
 
-/* Form controls — equal height & radius */
+/* Form controls — equal height & radius (no dual chevrons) */
 .form-field input,
 .form-field textarea,
 .form-field select,
 .search-field,
-.preference-field select,
 .locale-field input {
   min-height: 46px;
   border-radius: 13px;
 }
-.form-field select,
-.preference-field select {
+
+/* Receipt / transaction form selects: native arrow, solid surface */
+.form-field select {
   cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2373736e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 36px;
-}
-:root[data-theme="dark"] .form-field select,
-:root[data-theme="dark"] .preference-field select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa9a3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  background-color: var(--surface-raised);
+  background-image: none;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  font-size: 13px;
 }
 
-/* Panel / card spacing consistency */
+/* More-page preference selects: Lucide ChevronDown only — no CSS chevron */
+.preference-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  background-color: var(--surface-raised) !important;
+  background-image: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.preference-field svg {
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .panel + .panel,
 .section-panel + .section-panel,
 .settings-list + .settings-list,
@@ -175,7 +197,6 @@ a:focus-visible {
   margin: 4px 0 22px;
 }
 
-/* Transaction rows */
 .transaction-list .transaction-row:first-child {
   border-top: 0;
   padding-top: 4px;
@@ -187,7 +208,6 @@ a:focus-visible {
   transform: scale(0.995);
 }
 
-/* Empty states */
 .empty-state {
   padding: 36px 18px;
 }
@@ -198,7 +218,6 @@ a:focus-visible {
   margin-top: 4px;
 }
 
-/* Modal polish */
 .modal-sheet {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -211,24 +230,20 @@ a:focus-visible {
   min-width: 0;
 }
 
-/* Loading skeleton */
 .loading-block {
   border-radius: 16px;
 }
 
-/* Toast above bottom nav */
 .toast {
   bottom: calc(88px + env(safe-area-inset-bottom));
   border-radius: 14px;
 }
 
-/* Filter pills */
 .filter-pill {
   min-height: 36px;
   min-width: 44px;
 }
 
-/* Settings rows */
 .setting-row {
   min-height: 72px;
 }
@@ -238,7 +253,6 @@ a:focus-visible {
   border-radius: 13px;
 }
 
-/* Desktop content balance */
 @media (min-width: 900px) {
   .app-frame {
     max-width: 1080px;
@@ -251,7 +265,6 @@ a:focus-visible {
   }
 }
 
-/* Mobile refinements */
 @media (max-width: 760px) {
   .app-shell {
     overflow-x: hidden;
@@ -299,7 +312,6 @@ a:focus-visible {
   }
 }
 
-/* Utility spacing / semantic modifiers */
 .stack-md { margin-top: 16px; }
 .stack-lg { margin-top: 20px; }
 .stack-panel { margin-bottom: 14px; }
