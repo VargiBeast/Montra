@@ -3,6 +3,22 @@ import { supabase } from "./supabase";
 export const languageChoices = [
   { locale: "en", label: "English" },
   { locale: "nb", label: "Norsk (Bokmål)" },
+  { locale: "sv", label: "Svenska" },
+  { locale: "da", label: "Dansk" },
+  { locale: "de", label: "Deutsch" },
+  { locale: "fr", label: "Français" },
+  { locale: "es", label: "Español" },
+  { locale: "it", label: "Italiano" },
+  { locale: "pt", label: "Português" },
+  { locale: "nl", label: "Nederlands" },
+  { locale: "fi", label: "Suomi" },
+  { locale: "pl", label: "Polski" },
+  { locale: "cs", label: "Čeština" },
+  { locale: "tr", label: "Türkçe" },
+  { locale: "ar", label: "العربية" },
+  { locale: "ja", label: "日本語" },
+  { locale: "ko", label: "한국어" },
+  { locale: "zh-Hans", label: "简体中文" },
 ] as const;
 
 export const currencyChoices = [
@@ -12,6 +28,13 @@ export const currencyChoices = [
   { code: "GBP", label: "British Pound" },
   { code: "SEK", label: "Swedish Krona" },
   { code: "DKK", label: "Danish Krone" },
+  { code: "CHF", label: "Swiss Franc" },
+  { code: "JPY", label: "Japanese Yen" },
+  { code: "CNY", label: "Chinese Yuan" },
+  { code: "PLN", label: "Polish Złoty" },
+  { code: "CZK", label: "Czech Koruna" },
+  { code: "TRY", label: "Turkish Lira" },
+  { code: "KRW", label: "South Korean Won" },
 ] as const;
 
 export type PreferenceLocale = (typeof languageChoices)[number]["locale"];
@@ -25,9 +48,36 @@ export interface UserPreferences {
 const TABLE = "user_preferences";
 const DEFAULT_PREFERENCES: UserPreferences = { locale: "en", currency: "NOK" };
 
+const LOCALE_ALIASES: Record<string, PreferenceLocale> = {
+  en: "en",
+  nb: "nb",
+  no: "nb",
+  nn: "nb",
+  sv: "sv",
+  da: "da",
+  de: "de",
+  fr: "fr",
+  es: "es",
+  it: "it",
+  pt: "pt",
+  nl: "nl",
+  fi: "fi",
+  pl: "pl",
+  cs: "cs",
+  tr: "tr",
+  ar: "ar",
+  ja: "ja",
+  ko: "ko",
+  zh: "zh-Hans",
+  "zh-hans": "zh-Hans",
+  "zh-cn": "zh-Hans",
+};
+
 export function normalizePreferenceLocale(value: string | null | undefined): PreferenceLocale {
-  const base = value?.trim().toLowerCase().split("-")[0];
-  return base === "nb" || base === "no" || base === "nn" ? "nb" : "en";
+  if (!value) return "en";
+  const base = value.trim().toLowerCase().replace("_", "-");
+  const primary = base.split("-")[0];
+  return LOCALE_ALIASES[base] ?? LOCALE_ALIASES[primary] ?? "en";
 }
 
 export function normalizeDisplayCurrency(value: string | null | undefined): DisplayCurrency {
