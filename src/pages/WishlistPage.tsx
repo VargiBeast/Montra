@@ -14,7 +14,7 @@ import type { SavingsGoal } from "../types/savingsGoal";
 import { formatMoney, validateProductUrl } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
-import { currencyChoices } from "../lib/preferences";
+import { currencyChoices, normalizeDisplayCurrency, type DisplayCurrency } from "../lib/preferences";
 
 interface WishlistPageProps {
   items: WishlistItem[];
@@ -99,7 +99,7 @@ export function WishlistPage({
 
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [itemCurrency, setItemCurrency] = useState(displayCurrency);
+  const [itemCurrency, setItemCurrency] = useState<DisplayCurrency>(displayCurrency);
   const [url, setUrl] = useState("");
   const [details, setDetails] = useState("");
   const [purchased, setPurchased] = useState(false);
@@ -158,7 +158,7 @@ export function WishlistPage({
     setEditing(item);
     setName(item.name);
     setPrice(String(item.price));
-    setItemCurrency(item.currency || "NOK");
+    setItemCurrency(normalizeDisplayCurrency(item.currency || "NOK"));
     setUrl(item.url ?? "");
     setDetails(item.details ?? "");
     setPurchased(item.purchased);
@@ -356,7 +356,7 @@ export function WishlistPage({
                 </label>
                 <label className="form-field">
                   <span>{t("wishlistCurrency")}</span>
-                  <select value={itemCurrency} onChange={(e) => setItemCurrency(e.target.value)}>
+                  <select value={itemCurrency} onChange={(e) => setItemCurrency(normalizeDisplayCurrency(e.target.value))}>
                     {currencyChoices.map((c) => (
                       <option key={c.code} value={c.code}>
                         {c.code}
