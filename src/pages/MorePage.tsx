@@ -26,6 +26,23 @@ interface MorePageProps {
   onSignOut: () => Promise<void>;
 }
 
+/** Short native-friendly labels for currencies (avoid English-only long names). */
+const CURRENCY_LABELS: Record<string, string> = {
+  NOK: "NOK",
+  USD: "USD",
+  EUR: "EUR",
+  GBP: "GBP",
+  SEK: "SEK",
+  DKK: "DKK",
+  CHF: "CHF",
+  JPY: "JPY",
+  CNY: "CNY",
+  PLN: "PLN",
+  CZK: "CZK",
+  TRY: "TRY",
+  KRW: "KRW",
+};
+
 export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
@@ -193,7 +210,11 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
             disabled={!preferencesReady || working === "preferences"}
             onChange={(event) => void changeCurrency(normalizeDisplayCurrency(event.target.value))}
           >
-            {currencyChoices.map((option) => <option key={option.code} value={option.code}>{option.code} — {option.label}</option>)}
+            {currencyChoices.map((option) => (
+              <option key={option.code} value={option.code}>
+                {CURRENCY_LABELS[option.code] ?? option.code}
+              </option>
+            ))}
           </select>
           <ChevronDown size={16} aria-hidden="true" />
         </label>
@@ -227,7 +248,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
       </section>
-      <section className="panel settings-list">
+      <section className="panel settings-list" style={{ marginBottom: 28 }}>
         <button className="setting-row" type="button" onClick={onProfile}>
           <span className="setting-icon"><UserRound size={18} /></span>
           <span className="setting-copy"><strong>{t("profile")}</strong><span>{t("accountDetails")}</span></span>
@@ -239,7 +260,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
       </section>
-      {message && <div className="notice" role="status" style={{ marginTop: 16 }}><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message.startsWith("preferences") ? t(message) : message}</div>}
+      {message && <div className="notice" role="status" style={{ marginTop: 8, marginBottom: 12 }}><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message.startsWith("preferences") ? t(message) : message}</div>}
     </main>
   );
 }
