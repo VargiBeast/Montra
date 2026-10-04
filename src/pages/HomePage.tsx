@@ -17,9 +17,9 @@ interface HomePageProps {
 export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onViewAll }: HomePageProps) {
   const t = useTranslation();
   const { language } = useLanguage();
-  const { currency } = useDisplayCurrency();
+  const { currency, convertFromBase } = useDisplayCurrency();
   const summary = getBalanceSummary(transactions);
-  const money = (value: number) => formatMoney(value, currency, language);
+  const money = (value: number) => formatMoney(value, currency, language, convertFromBase);
   const latest = [...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at)).slice(0, 5);
   const firstName = name.trim().split(/\s+/)[0] || "there";
 
@@ -59,9 +59,9 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
         </div>
         <aside className="panel quick-card">
           <span className="quick-orb" aria-hidden="true" />
-          <span className="eyebrow" style={{ color: "var(--green)" }}>A little at a time</span>
+          <span className="eyebrow" style={{ color: "var(--green)" }}>{t("littleAtATime")}</span>
           <h2>{t("intentionalSpending")}</h2>
-          <p>Keep the what, when, and why of each purchase in one personal place.</p>
+          <p>{t("keepWhatWhenWhy")}</p>
           <button className="secondary-button" type="button" onClick={onAdd}><Plus size={16} /> {t("addEntry")}</button>
         </aside>
       </div>
