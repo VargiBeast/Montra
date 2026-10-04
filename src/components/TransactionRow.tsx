@@ -2,6 +2,7 @@ import { ArrowDownLeft, ShoppingBag } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { formatDate, formatMoney } from "../lib/utils";
 import { useSignedImage } from "../hooks/useTransactions";
+import { useTranslation } from "../lib/i18n";
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -10,6 +11,7 @@ interface TransactionRowProps {
 }
 
 export function TransactionRow({ transaction, getImageUrl, onClick }: TransactionRowProps) {
+  const t = useTranslation();
   const { url } = useSignedImage(transaction.image_url, getImageUrl);
   const Icon = transaction.image_url ? null : transaction.type === "in" ? ArrowDownLeft : ShoppingBag;
 
@@ -21,7 +23,7 @@ export function TransactionRow({ transaction, getImageUrl, onClick }: Transactio
       <span className="transaction-main">
         <span className="transaction-name">{transaction.name}</span>
         <span className="transaction-sub">
-          {transaction.method || (transaction.type === "in" ? "Money in" : "Purchase")} · {formatDate(transaction.date)}
+          {transaction.method || (transaction.type === "in" ? t("moneyIn") : t("purchase"))} · {formatDate(transaction.date)}
         </span>
       </span>
       <span className={`transaction-value ${transaction.type}`}>

@@ -1,0 +1,281 @@
+Jeg laster opp en ZIP med den nye Montra-brandingen og logoen.
+
+Bruk ZIP-en som utgangspunkt og jobb videre på det eksisterende Montra-prosjektet. IKKE bygg prosjektet helt på nytt.
+
+MÅLET MED DENNE FASEN:
+Gjør Montra så polished, gjennomført og profesjonell som mulig. Det skal føles som en ekte premium-app, ikke som en enkel nettside eller et AI-generert prosjekt.
+
+1. BRANDING + LOGO
+
+Logoen og brandingen i ZIP-en skal være utgangspunktet for hele designsystemet.
+
+Ikke bare plasser logoen på den eksisterende siden.
+
+Hele UI-et skal visuelt matche logoen:
+
+* farger
+* typography
+* spacing
+* buttons
+* cards
+* borders
+* shadows
+* icons
+* backgrounds
+* navigation
+* animations
+* overall visual language
+
+Alt skal føles som samme merkevare.
+
+Ikke bruk tilfeldige standardfarger eller komponenter som ikke passer brandingen.
+
+2. DESIGN SYSTEM
+
+Lag en konsekvent visuell stil for hele Montra.
+
+Sørg for konsistente:
+
+* fonts
+* font sizes
+* font weights
+* spacing
+* border radius
+* shadows
+* buttons
+* inputs
+* cards
+* dropdowns
+* modals
+* tabs
+* navigation
+* icons
+* badges
+* alerts
+* toast notifications
+
+Hvis samme type komponent finnes flere steder, skal den se og oppføre seg likt overalt.
+
+3. UI/UX POLISH
+
+Gå gjennom ALLE eksisterende sider og gjør dem mer gjennomførte.
+
+Forbedre:
+
+* layout
+* hierarchy
+* spacing
+* readability
+* navigation
+* visual feedback
+* interaction
+* consistency
+
+Ikke fjern fungerende funksjonalitet bare for å endre designet.
+
+4. MICRO-INTERACTIONS
+
+Legg til subtile og profesjonelle animations/transitions der det gir mening:
+
+* button press
+* hover/focus
+* cards
+* modals
+* dropdowns
+* navigation
+* success states
+* page transitions
+
+Animasjonene skal være raske og subtile, ikke overdrevne.
+
+5. STATES
+
+Alle viktige funksjoner skal ha gode states:
+
+* loading
+* skeleton/loading state
+* empty state
+* success
+* error
+* saving
+* saved
+* offline/network error
+
+Empty states skal være visuelt gjennomførte og forklare brukeren hva de kan gjøre.
+
+6. MOBILE-FIRST
+
+Montra skal fungere ekstremt bra på mobil.
+
+Sjekk spesielt:
+
+* små iPhones
+* store iPhones
+* iPad
+* desktop
+
+Sørg for:
+
+* ingen horizontal scrolling
+* gode touch targets
+* keyboard fungerer med forms
+* safe-area håndtering
+* riktig spacing på små skjermer
+* navigation fungerer godt på mobil
+
+7. DARK/LIGHT MODE
+
+Hvis den nye brandingen fungerer med begge, implementer:
+
+* Light mode
+* Dark mode
+* System default
+
+Begge skal være ordentlig designet, ikke bare inverterte farger.
+
+8. ACCESSIBILITY
+
+Sørg for:
+
+* god kontrast
+* tydelige focus states
+* tilgjengelige labels
+* riktig semantikk
+* screen-reader-friendly controls
+* knapper/inputs som er enkle å bruke
+
+Ikke bruk farge alene for å kommunisere viktig informasjon.
+
+9. SPRÅK / INTERNATIONALIZATION
+
+Bygg et ordentlig og skalerbart i18n-system.
+
+Start med:
+
+Norsk bokmål
+English
+Svenska
+Dansk
+Deutsch
+Français
+Español
+Italiano
+Português
+Nederlands
+Polski
+Čeština
+Slovenčina
+Magyar
+Română
+Українська
+Русский
+Türkçe
+Ελληνικά
+العربية
+עברית
+हिन्दी
+中文简体
+中文繁體
+日本語
+한국어
+
+Krav:
+
+* all Montra UI-tekst skal bruke i18n
+* ingen hardkodet synlig UI-tekst
+* språkvelger i Settings
+* lagre valgt språk
+* språket skal beholdes etter refresh/restart
+* riktige dato-/tall-/valutaformater
+* lange oversettelser skal ikke ødelegge layout
+* arabisk og hebraisk skal støtte RTL
+* brukerens egne data skal IKKE automatisk oversettes
+
+Systemet skal være enkelt å utvide med flere språk senere.
+
+10. ONBOARDING
+
+Hvis prosjektet allerede har onboarding, polish den.
+
+Hvis det ikke finnes onboarding, lag en enkel og elegant førstegangsopplevelse som ikke føles tvungen.
+
+Den kan introdusere:
+
+* Montra
+* de viktigste funksjonene
+* språk
+* relevante grunninnstillinger
+
+Ikke gjør onboarding unødvendig lang.
+
+11. PERFORMANCE
+
+Sørg for at Montra føles rask.
+
+Se etter:
+
+* unødvendige renders
+* tunge komponenter
+* unødvendig store bilder
+* unødvendige animations
+* dårlig loading
+* unødvendige requests
+
+Optimaliser bare der det faktisk gir mening.
+
+12. BEHOLD EKSISTERENDE FUNKSJONALITET
+
+Veldig viktig:
+
+Ikke fjern eller ødelegg eksisterende funksjoner.
+
+Ikke legg tilbake «Saldo» dersom den ikke finnes i ZIP-en.
+
+Ikke endre database-strukturen uten at det er nødvendig for denne fasen.
+
+Ikke opprett masse nye features bare fordi du kan.
+
+13. FINAL CONSISTENCY PASS
+
+Når alt over er gjort, gå gjennom hele Montra én gang til.
+
+Se etter ting som føles:
+
+* basic
+* inconsistent
+* unfinished
+* misplaced
+* too large
+* too small
+* poorly spaced
+* visually disconnected from the logo
+
+Rett opp dette slik at hele Montra føles som ett komplett produkt.
+
+VIKTIG OM DENNE FASEN:
+
+IKKE jobb med:
+
+* Vercel
+* Capacitor
+* Expo
+* Xcode
+* App Store
+* Google Play
+* deployment/publishing
+
+Dette kommer senere.
+
+Ikke bruk Replit-agenten på unødvendige omskrivinger. Prioriter eksisterende kode og gjør målrettede forbedringer.
+
+Når du er ferdig:
+
+* prosjektet skal starte uten errors
+* eksisterende funksjonalitet skal fortsatt fungere
+* språkbytte skal fungere
+* valgt språk skal beholdes
+* mobile layout skal fungere
+* branding skal være konsistent
+* UI skal føles ferdig og polished
+
+Arbeid kun med denne polish-fasen.

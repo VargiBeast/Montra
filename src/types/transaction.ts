@@ -26,7 +26,7 @@ export interface TransactionInput {
 }
 
 export interface BackupFile {
-  app: "Saldo";
+  app: "Saldo" | "Montra";
   version: number;
   exportedAt: string;
   transactions: Transaction[];

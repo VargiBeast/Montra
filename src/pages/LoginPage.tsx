@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, ChevronDown, KeyRound, Mail, WalletCards } from "lucide-react";
-import { loginCopy, readLanguage, writeLanguage, type AppLanguage } from "../lib/i18n";
+import { ArrowLeft, ArrowRight, ChevronDown, Globe2, KeyRound, Mail } from "lucide-react";
+import { getLoginCopy, languageOptions, useLanguage } from "../lib/i18n";
 
 interface LoginPageProps {
   authError: string | null;
@@ -31,7 +31,7 @@ export function LoginPage({
   onSignUp,
   onRetry,
 }: LoginPageProps) {
-  const [language, setLanguage] = useState<AppLanguage>(() => readLanguage());
+  const { language, setLanguage } = useLanguage();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [method, setMethod] = useState<EmailMethod>(null);
@@ -44,11 +44,7 @@ export function LoginPage({
   const [localError, setLocalError] = useState("");
   const languageRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
-  const copy = loginCopy[language];
-
-  useEffect(() => {
-    document.documentElement.lang = language === "no" ? "nb" : "en";
-  }, [language]);
+  const copy = getLoginCopy(language);
 
   useEffect(() => {
     if (!languageOpen) return;
@@ -66,9 +62,8 @@ export function LoginPage({
     };
   }, [languageOpen]);
 
-  function chooseLanguage(next: AppLanguage) {
+  function chooseLanguage(next: string) {
     setLanguage(next);
-    writeLanguage(next);
     setLanguageOpen(false);
   }
 
@@ -170,8 +165,8 @@ export function LoginPage({
     <div className="auth-page">
       <section className="auth-story">
         <div className="brand" style={{ color: "#f5fff9" }}>
-          <span className="brand-mark" style={{ color: "var(--green)", background: "#f5fff9" }}><WalletCards size={18} /></span>
-          saldo
+          <span className="brand-mark" aria-hidden="true" style={{ color: "var(--green)", background: "#f5fff9" }}><img className="mark-dark" src="/branding/mark-dark.png" alt="" /></span>
+          MONTRA
         </div>
         <h1>{storyLines[0]}<br />{storyLines[1]}</h1>
         <p>{copy.storyBody}</p>
@@ -191,14 +186,18 @@ export function LoginPage({
               aria-controls={menuId}
               onClick={() => setLanguageOpen((open) => !open)}
             >
-              <span aria-hidden="true">🌐</span>
-              {copy.languageName}
+              <Globe2 size={14} aria-hidden="true" />
+              {new Intl.DisplayNames([language], { type: "language" }).of(language) ?? language}
               <ChevronDown size={14} />
             </button>
             {languageOpen && (
               <div className="language-menu" id={menuId} role="listbox" aria-label={copy.languageLabel}>
-                <button type="button" role="option" aria-selected={language === "en"} className={language === "en" ? "selected" : ""} onClick={() => chooseLanguage("en")}>English</button>
-                <button type="button" role="option" aria-selected={language === "no"} className={language === "no" ? "selected" : ""} onClick={() => chooseLanguage("no")}>Norsk</button>
+                {languageOptions.map(([locale, name]) => {
+                  const languageBase = language.toLowerCase().split("-")[0];
+                  const localeBase = locale.toLowerCase().split("-")[0];
+                  const selected = languageBase === localeBase || (languageBase === "no" && localeBase === "nb");
+                  return <button key={locale} type="button" role="option" aria-selected={selected} className={selected ? "selected" : ""} onClick={() => chooseLanguage(locale)}>{name}</button>;
+                })}
               </div>
             )}
           </div>

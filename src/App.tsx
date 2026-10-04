@@ -11,6 +11,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
 import { UserAvatar } from "./components/UserAvatar";
+import { useTranslation } from "./lib/i18n";
 
 type Page = "home" | "transactions" | "more" | "profile";
 type Theme = "light" | "dark" | "system";
@@ -23,11 +24,12 @@ function initialTheme(): Theme {
 }
 
 function LoadingView() {
+  const t = useTranslation();
   return (
     <main className="app-shell">
-      <div className="app-frame" role="status" aria-label="Loading your Saldo account">
-        <span className="visually-hidden">Loading your account and transactions…</span>
-        <div className="topbar"><div className="brand"><span className="brand-mark"><WalletCards size={18} /></span>saldo</div><span className="loading-block" style={{ width: 42, height: 42, margin: 0, borderRadius: 15 }} /></div>
+      <div className="app-frame" role="status" aria-label={t("loadingAccount")}>
+        <span className="visually-hidden">{t("loadingTransactions")}</span>
+        <div className="topbar"><div className="brand"><span className="brand-mark" aria-hidden="true"><img className="mark-light" src="/branding/mark-light.png" alt="" /><img className="mark-dark" src="/branding/mark-dark.png" alt="" /></span>MONTRA</div><span className="loading-block" style={{ width: 42, height: 42, margin: 0, borderRadius: 15 }} /></div>
         <div className="loading-block" style={{ height: 250, borderRadius: 28 }} />
         <div className="loading-block" style={{ height: 180, borderRadius: 24 }} />
       </div>
@@ -36,6 +38,7 @@ function LoadingView() {
 }
 
 function App() {
+  const t = useTranslation();
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
   const [page, setPage] = useState<Page>("home");
@@ -53,9 +56,13 @@ function App() {
     let isDark = theme === "dark";
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     if (theme === "system") isDark = media.matches;
-    document.documentElement.dataset.theme = isDark ? "dark" : "light";
+    function applyColorScheme(dark: boolean) {
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#111214" : "#f2f0eb");
+    }
+    applyColorScheme(isDark);
     if (theme === "system") {
-      const update = (event: MediaQueryListEvent) => { document.documentElement.dataset.theme = event.matches ? "dark" : "light"; };
+      const update = (event: MediaQueryListEvent) => applyColorScheme(event.matches);
       media.addEventListener("change", update);
       return () => media.removeEventListener("change", update);
     }
@@ -88,20 +95,20 @@ function App() {
     setSaving(true);
     try {
       await data.save(input, existing);
-      setToast(existing ? "Transaction updated." : "Transaction saved.");
+      setToast(existing ? t("transactionUpdated") : t("transactionSaved"));
     } finally { setSaving(false); }
   }
 
   async function deleteTransaction(transaction: Transaction) {
-    if (!window.confirm(`Delete “${transaction.name}”? This cannot be undone.`)) return;
+    if (!window.confirm(t("deleteConfirm", { name: transaction.name }))) return;
     setDeleting(true);
     try {
       await data.remove(transaction);
       setSelected(null);
-      setToast("Transaction deleted.");
+      setToast(t("transactionDeleted"));
     } catch (reason) {
       console.error("Could not delete a transaction.", reason);
-      setToast("We couldn’t delete that transaction. Check your connection and try again.");
+      setToast(t("deleteFailed"));
     } finally { setDeleting(false); }
   }
 
@@ -112,7 +119,7 @@ function App() {
       setPage("home");
     } catch (reason) {
       console.error("Could not sign out.", reason);
-      setToast("We couldn’t sign out. Check your connection and try again.");
+      setToast(t("signOutFailed"));
     } finally { setSigningOut(false); }
   }
 
@@ -148,7 +155,8 @@ function App() {
 
   function changeTheme(next: Theme) {
     setTheme(next);
-    setToast(`${next === "system" ? "System" : next === "dark" ? "Dark" : "Light"} appearance selected.`);
+    const appearance = t(next === "system" ? "systemTheme" : next === "dark" ? "darkTheme" : "lightTheme");
+    setToast(t("appearanceSelected", { appearance }));
   }
 
   if (auth.isLoading) return <LoadingView />;
@@ -168,29 +176,29 @@ function App() {
     ? auth.user.user_metadata.full_name
     : typeof auth.user.user_metadata?.name === "string"
       ? auth.user.user_metadata.name
-      : auth.user.email?.split("@")[0] || "there";
+      : auth.user.email?.split("@")[0] || (t("home") === "Home" ? "there" : "der");
   const initials = accountName.split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 
   return (
     <div className="app-shell">
       <div className="app-frame">
         <header className="topbar">
-          <div className="brand"><span className="brand-mark"><WalletCards size={18} /></span>saldo</div>
+          <div className="brand"><span className="brand-mark" aria-hidden="true"><img className="mark-light" src="/branding/mark-light.png" alt="" /><img className="mark-dark" src="/branding/mark-dark.png" alt="" /></span>MONTRA</div>
           <div className="top-actions">
-            <button className="icon-button" type="button" aria-label="Open appearance settings" onClick={() => setPage("more")}><Moon size={17} /></button>
-          <button className="avatar" type="button" aria-label="Open profile" onClick={() => setPage("profile")}><UserAvatar user={auth.user} fallback={initials || <UserRound size={17} />} /></button>
+            <button className="icon-button" type="button" aria-label={t("openAppearance")} onClick={() => setPage("more")}><Moon size={17} /></button>
+          <button className="avatar" type="button" aria-label={t("openProfile")} onClick={() => setPage("profile")}><UserAvatar user={auth.user} fallback={initials || <UserRound size={17} />} /></button>
           </div>
         </header>
-        {data.isLoading ? <section aria-label="Loading transactions" role="status">
-          <span className="visually-hidden">Loading your transactions…</span>
+        {data.isLoading ? <section aria-label={t("loadingTransactions")} role="status">
+          <span className="visually-hidden">{t("loadingTransactions")}</span>
           <div className="loading-block" style={{ height: 250, borderRadius: 28 }} />
           <div className="loading-block" style={{ height: 180, borderRadius: 24 }} />
         </section> : data.error ? <div className="error-screen">
           <section className="panel error-card">
             <span className="empty-art" style={{ margin: "0 auto 16px" }}><ArrowDownUp size={22} /></span>
-            <h2>Your entries didn’t come through</h2>
-            <p>{data.error}</p>
-            <button className="primary-button" type="button" onClick={() => void data.refresh()}>Try again</button>
+            <h2>{t("entriesDidNotLoad")}</h2>
+            <p>{t("transactionError")}</p>
+            <button className="primary-button" type="button" onClick={() => void data.refresh()}>{t("tryAgain")}</button>
           </section>
         </div> : <>
           {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} />}
@@ -206,11 +214,11 @@ function App() {
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
         </>}
       </div>
-      <nav className="bottom-nav" aria-label="Main navigation">
-        <button type="button" className={`nav-item ${page === "home" ? "active" : ""}`} aria-current={page === "home" ? "page" : undefined} onClick={() => setPage("home")}><Home size={19} /><span>Home</span></button>
-        <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>Transactions</span></button>
-        <button type="button" className="nav-add" aria-label="Add transaction" onClick={startAdd}><Plus size={23} /></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><WalletCards size={19} /><span>More</span></button>
+      <nav className="bottom-nav" aria-label={t("mainNavigation")}>
+        <button type="button" className={`nav-item ${page === "home" ? "active" : ""}`} aria-current={page === "home" ? "page" : undefined} onClick={() => setPage("home")}><Home size={19} /><span>{t("home")}</span></button>
+        <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
+        <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><WalletCards size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />

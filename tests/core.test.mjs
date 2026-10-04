@@ -1,11 +1,25 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  formatMoney,
   getBalanceSummary,
   isImportableTransaction,
   isValidCalendarDate,
   validateProductUrl,
 } from "../src/lib/utils.ts";
+import { languageForCopy, normalizeLanguage, translate } from "../src/lib/i18n.ts";
+
+test("language preferences normalize locale codes and localize money without changing its currency", () => {
+  assert.equal(normalizeLanguage("pt-br"), "pt-BR");
+  assert.equal(normalizeLanguage("not_a_locale"), null);
+  assert.equal(languageForCopy("nb-NO"), "no");
+  assert.equal(translate("activity", "nb-NO"), "Aktivitet");
+  assert.equal(translate("activity", "fr-FR"), "Activity");
+
+  const formatted = formatMoney(1234.5, "NOK", "de-DE");
+  assert.match(formatted, /1\.234,50/);
+  assert.match(formatted, /NOK/);
+});
 
 test("balance totals include real income and spending amounts", () => {
   const totals = getBalanceSummary([

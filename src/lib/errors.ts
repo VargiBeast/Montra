@@ -22,8 +22,8 @@ export function getErrorMessage(error: unknown, fallback: string): string {
     (normalized.includes("not enabled") || normalized.includes("unsupported"))
   ) {
     return phrase(
-      "That sign-in option isn’t enabled on this Saldo account yet. Try Google or email.",
-      "Den innloggingsmåten er ikke aktivert på denne Saldo-kontoen ennå. Prøv Google eller e-post.",
+      "That sign-in option isn’t enabled on this Montra account yet. Try Google or email.",
+      "Den innloggingsmåten er ikke aktivert på denne Montra-kontoen ennå. Prøv Google eller e-post.",
     );
   }
 
@@ -53,8 +53,8 @@ export function getErrorMessage(error: unknown, fallback: string): string {
     normalized.includes("connection")
   ) {
     return phrase(
-      "We couldn’t reach Saldo. Check your internet connection and try again.",
-      "Vi fikk ikke kontakt med Saldo. Sjekk internett og prøv igjen.",
+      "We couldn’t reach Montra. Check your internet connection and try again.",
+      "Vi fikk ikke kontakt med Montra. Sjekk internett og prøv igjen.",
     );
   }
 

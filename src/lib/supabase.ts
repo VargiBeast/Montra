@@ -6,7 +6,7 @@ const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.tr
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 export const configurationError = isSupabaseConfigured
   ? null
-  : "Saldo is missing its Supabase connection settings. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to the app environment.";
+  : "Montra is missing its Supabase connection settings. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY to the app environment.";
 
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl!, supabasePublishableKey!, {

@@ -1,0 +1,733 @@
+I have uploaded a ZIP containing the latest Montra project and branding assets.
+
+IMPORTANT:
+
+* Do NOT start a completely new app.
+* Do NOT rebuild the project from scratch.
+* Use the existing Replit project as the base.
+* Use the uploaded ZIP as the latest project/assets to integrate.
+* Preserve existing working functionality.
+* Preserve the existing Supabase project, authentication, transactions, storage and database.
+* Do NOT delete or recreate the Supabase database.
+* Do NOT rename database tables just for branding.
+* Do NOT remove working features.
+* Do NOT add Apple login.
+* Do NOT hardcode localhost URLs.
+* GitHub and Replit are already connected and synced. Keep the existing Git setup intact.
+* Do not create an unnecessary new architecture or replace the entire stack.
+* Do not use placeholder branding when the uploaded Montra assets are available.
+* Work incrementally and carefully.
+
+The goal is to transform the existing app into a polished international product called MONTRA.
+
+==================================================
+
+1. MONTRA BRANDING
+    ==================================================
+
+Replace all user-facing “Saldo” branding with “Montra”.
+
+Use the uploaded Montra branding assets wherever appropriate.
+
+Use:
+
+* Montra M/mark
+* Montra wordmark
+* Montra lockup
+* light variants
+* dark variants
+* monochrome variants
+* appropriate app icons
+* favicon
+* PWA icons
+* Apple touch icon
+
+Make sure:
+
+* Montra is the visible product name everywhere.
+* Internal database/localStorage compatibility can remain where necessary.
+* Do not unnecessarily rename internal variables, database tables or storage identifiers if doing so could break existing data.
+
+Update:
+
+* page titles
+* metadata
+* favicon
+* PWA manifest
+* app icons
+* loading states
+* login/auth screens
+* settings/about
+* empty states
+* navigation
+* user-facing messages
+
+==================================================
+2. MONTRA DESIGN SYSTEM
+
+Create a consistent premium Montra design system.
+
+Design direction:
+
+* premium
+* minimal
+* futuristic
+* calm
+* intelligent
+* youthful
+* international
+* iOS-quality
+* mobile-first
+* refined Liquid Glass
+
+Use:
+
+* near-black/deep charcoal dark mode
+* clean neutral light mode
+* soft white text in dark mode
+* strong readable dark text in light mode
+* restrained distinctive accent color
+* subtle glass surfaces
+* subtle borders
+* controlled blur
+* elegant shadows
+* excellent spacing
+* modern typography
+* polished money/value typography
+* subtle animations
+
+Do NOT create:
+
+* generic banking UI
+* spreadsheet-looking UI
+* crypto aesthetics
+* excessive neon
+* excessive gradients
+* generic fintech templates
+* piggy banks
+* coins
+* dollar signs as branding
+* credit-card imagery as branding
+* bank-building imagery
+* cheesy financial illustrations
+
+The M logo should remain recognizable and should be used consistently.
+
+Create/reuse a component system for:
+
+* buttons
+* icon buttons
+* cards
+* glass cards
+* inputs
+* search
+* segmented controls
+* tabs
+* bottom navigation
+* sheets
+* modals
+* dialogs
+* dropdowns
+* currency selectors
+* language selectors
+* transaction rows
+* wishlist cards
+* goal cards
+* charts
+* badges
+* empty states
+* loading states
+* error states
+
+Make the system responsive and consistent.
+
+Respect:
+
+* iOS safe areas
+* touch targets
+* keyboard behavior
+* reduced motion
+* accessibility
+* mobile Safari
+
+==================================================
+3. NAVIGATION
+
+Move the main app toward:
+
+Home
+Activity
+Wishlist
+Goals
+More
+
+Keep the navigation clean and excellent on mobile.
+
+Do not remove existing functionality that does not yet have a dedicated navigation item.
+
+Make the active navigation state clear.
+
+==================================================
+4. HOME
+
+Improve Home toward the Montra product vision.
+
+Home should contain, where data exists:
+
+* current balance
+* money in
+* money out
+* recent activity
+* spending overview
+* goals
+* useful financial overview
+
+Do not invent financial data.
+
+Create polished:
+
+* loading states
+* empty states
+* error states
+
+Keep the existing transaction calculations correct.
+
+==================================================
+5. ACTIVITY / TRANSACTIONS
+
+Preserve all existing transaction functionality.
+
+Transactions must support:
+
+* money in
+* money out
+* name
+* amount
+* date
+* payment method
+* product/link
+* note
+* image/receipt
+* edit
+* delete
+
+Improve Activity with:
+
+* search
+* filtering
+* sorting
+* clean transaction rows
+* polished transaction details
+
+Keep Supabase as the source of truth.
+
+Do not replace the existing working transaction system with localStorage.
+
+==================================================
+6. WISHLIST
+
+Implement a complete Wishlist.
+
+Use the existing Supabase wishlist table if it exists.
+
+Do NOT create a duplicate localStorage-only Wishlist if Supabase is available.
+
+Wishlist items should support:
+
+* name
+* price
+* currency
+* product URL
+* store
+* image
+* category
+* priority
+* note
+* target date
+* created date
+* edit
+* delete
+* search
+* filtering
+* sorting
+
+Priority:
+
+* low
+* medium
+* high
+
+The Wishlist should look visually polished and fit the Montra design system.
+
+When an item is marked as purchased:
+
+* allow it to become a transaction
+* avoid duplicate data where possible
+* preserve the wishlist item’s information where useful
+
+==================================================
+7. GOALS
+
+Prepare the app for a Goals section.
+
+Goals should support the architecture for:
+
+* goal name
+* target amount
+* current amount
+* currency
+* deadline
+* image
+* description
+* progress
+* edit
+* delete
+
+If the existing database does not yet support Goals, do not make destructive database changes.
+
+If implementing the database is necessary, explain exactly what schema changes are required before making destructive changes.
+
+The UI should still have a polished Goals section.
+
+==================================================
+8. GLOBAL LANGUAGE SYSTEM — ALL LANGUAGES
+
+Montra must be fully international.
+
+Do NOT limit the application to English and Norwegian.
+
+Keep the existing i18n architecture and make it capable of supporting all languages that the translation system can reasonably support.
+
+Requirements:
+
+* Language selector must be available globally under Settings.
+* Language selection must work throughout the entire app.
+* Montra remains “Montra” in every language.
+* Never hardcode newly added user-facing text in English.
+* Never hardcode newly added user-facing text in Norwegian.
+* Every user-facing string must use translation keys.
+
+Translate all user-facing UI, including:
+
+* navigation
+* buttons
+* forms
+* settings
+* authentication
+* errors
+* empty states
+* loading states
+* transactions
+* Wishlist
+* Goals
+* Analytics
+* notifications
+* confirmations
+* onboarding
+* accessibility labels
+* validation messages
+* dialogs
+* menus
+
+If a translation does not exist for a selected language:
+
+* use the existing fallback language
+* never display raw translation keys such as wishlist.addItem
+
+Language should:
+
+* persist across sessions
+* work globally
+* respect device/browser language when appropriate for first-time users
+* support longer translated text without breaking layouts
+
+Use locale-aware:
+
+* dates
+* numbers
+* currencies
+
+Do not create a separate translation system for each feature.
+
+The architecture must make adding future languages easy without changing individual components.
+
+==================================================
+9. GLOBAL CURRENCY
+
+Add a global Currency setting under Settings.
+
+At minimum support:
+
+NOK
+USD
+EUR
+GBP
+SEK
+DKK
+CHF
+CAD
+AUD
+JPY
+CNY
+
+The architecture should allow additional currencies to be added easily.
+
+Use locale-aware formatting.
+
+Do not assume NOK everywhere.
+
+Transactions, Wishlist, Goals and financial displays should respect the selected currency where appropriate.
+
+Do not perform fake exchange-rate conversions.
+
+If multi-currency conversion is not implemented, display the correct original currency rather than pretending to convert it.
+
+==================================================
+10. SEARCH / FILTERING
+
+Prepare a unified search experience.
+
+Search should eventually be able to find:
+
+* transactions
+* Wishlist items
+* goals
+* categories
+
+Activity should support:
+
+* search
+* type filter
+* date filter
+* category filter
+* sorting
+
+Wishlist should support:
+
+* search
+* category
+* priority
+* price
+* sorting
+
+Keep the UI fast and mobile-friendly.
+
+==================================================
+11. CATEGORIES
+
+Prepare a category system.
+
+Initial categories can include:
+
+* Shopping
+* Food
+* Transport
+* Entertainment
+* Technology
+* Clothing
+* Travel
+* Subscriptions
+* Other
+
+Categories must use translation keys.
+
+Do not hardcode category labels directly into components.
+
+Allow architecture for custom categories later.
+
+==================================================
+12. ANALYTICS
+
+Prepare the architecture for financial analytics.
+
+Future analytics should support:
+
+* income
+* spending
+* net change
+* spending by category
+* spending over time
+* monthly comparison
+* transaction trends
+
+Charts should fit the Montra design system.
+
+Do not create fake data.
+
+Only display analytics based on actual user data.
+
+==================================================
+13. BUDGETS
+
+Prepare architecture for budgets.
+
+Future budget functionality should support:
+
+* category
+* limit
+* amount used
+* remaining amount
+* progress
+* gentle warnings
+
+Do not create aggressive or stressful financial messaging.
+
+Do not create fake budget data.
+
+==================================================
+14. RECEIPTS / IMAGES
+
+Preserve the existing private image/receipt system.
+
+Purchase images should remain private.
+
+Use Supabase Storage where already configured.
+
+Do not expose private image files publicly.
+
+Images should be associated with the correct authenticated user.
+
+Support:
+
+* upload
+* preview
+* replace
+* delete
+
+Do not break existing transaction image functionality.
+
+==================================================
+15. AUTHENTICATION
+
+Preserve the existing Supabase authentication.
+
+Support the existing:
+
+* Google login
+* email/password
+* one-time code
+
+Do NOT add Apple login.
+
+Do not hardcode:
+
+* localhost
+* development callback URLs
+* Supabase secrets
+
+Use the correct dynamic production origin for OAuth redirects.
+
+Do not expose private keys or secrets in frontend code.
+
+==================================================
+16. SECURITY
+
+Preserve Supabase Row Level Security.
+
+Users must only be able to access their own:
+
+* transactions
+* Wishlist items
+* images
+* goals
+* other private data
+
+Do not weaken existing RLS policies.
+
+Do not disable security policies to make the app work.
+
+Do not put secrets in:
+
+* source code
+* GitHub
+* frontend environment variables that should remain private
+
+==================================================
+17. SETTINGS
+
+Create a polished Settings/More section containing:
+
+* Account
+* Language
+* Currency
+* Appearance
+* Data & Backup
+* Security
+* About Montra
+
+Keep existing backup/import/export functionality.
+
+Do not remove existing user data tools.
+
+Add:
+
+* dark mode
+* light mode
+* system appearance where supported
+
+==================================================
+18. PWA
+
+Make Montra a polished PWA.
+
+Verify:
+
+* manifest
+* icons
+* favicon
+* Apple touch icon
+* theme color
+* app name
+* standalone behavior
+* mobile safe areas
+
+Use the uploaded Montra assets.
+
+Make sure there are no remaining Saldo names in the visible PWA metadata.
+
+==================================================
+19. ACCESSIBILITY
+
+Improve accessibility without changing the visual identity.
+
+Check:
+
+* semantic buttons
+* labels
+* keyboard navigation
+* focus states
+* contrast
+* touch targets
+* screen-reader labels
+* reduced motion
+* form errors
+
+Do not sacrifice accessibility for visual effects.
+
+==================================================
+20. PERFORMANCE
+
+Keep the app lightweight.
+
+Avoid unnecessary dependencies.
+
+Avoid huge client-side libraries unless already used.
+
+Do not duplicate state-management systems.
+
+Do not introduce unnecessary API calls.
+
+Use existing architecture where possible.
+
+Optimize images appropriately.
+
+==================================================
+21. CODE QUALITY
+
+Before finishing:
+
+* inspect the existing project architecture
+* reuse existing components where appropriate
+* reuse existing Supabase client
+* reuse existing authentication
+* reuse existing transaction services
+* reuse existing i18n architecture
+* avoid duplicate implementations
+* keep TypeScript clean
+* fix imports
+* fix obvious type errors
+* remove dead code only when safe
+* keep the existing build configuration
+* keep existing environment variables
+* do not replace the entire architecture
+
+Do not make unrelated changes.
+
+==================================================
+22. IMPORTANT DATABASE RULE
+
+The existing Supabase database is important.
+
+Do NOT:
+
+* reset the database
+* drop existing tables
+* delete existing user data
+* disable RLS
+* recreate the project
+* change credentials
+
+If a new feature requires a database table or column:
+
+* inspect the existing schema first
+* reuse existing tables if possible
+* make only additive changes
+* clearly tell me what database change is required
+
+==================================================
+23. IMPORTANT GIT / REPLIT RULE
+
+GitHub and Replit are already connected and synced.
+
+Do not change the Git remote.
+
+Do not create a new repository.
+
+Do not create a second project.
+
+Do not overwrite the repository with a completely unrelated project.
+
+Keep the existing project structure.
+
+==================================================
+24. BUILD / VERIFICATION
+
+After making the changes:
+
+1. Install dependencies only if necessary.
+2. Run the existing build command.
+3. Fix TypeScript/import/build errors caused by your changes.
+4. Verify the app starts.
+5. Verify authentication still works.
+6. Verify transactions still work.
+7. Verify Wishlist works.
+8. Verify Supabase integration.
+9. Verify the Montra branding.
+10. Verify language switching.
+11. Verify currency selection.
+12. Verify light/dark mode.
+13. Verify mobile layout.
+
+Do NOT claim something was tested if it was not actually tested.
+
+If something cannot be tested, explicitly tell me.
+
+==================================================
+25. MOST IMPORTANT RULE
+
+This is an existing working application being transformed into MONTRA.
+
+Do NOT turn this into a giant rewrite.
+
+Do NOT throw away working code.
+
+Do NOT rebuild the backend.
+
+Do NOT create a fake demo.
+
+Do NOT replace real Supabase functionality with mock data.
+
+Make the changes incrementally and safely.
+
+The final result should feel like a real polished product, not a prototype.
+
+At the end, give me a concise report containing:
+
+* what you changed
+* what you preserved
+* what database changes, if any, were made
+* whether the build succeeded
+* what tests were actually run
+* any remaining issues
+
+Do not stop halfway through because one feature is difficult. Finish the safe parts and clearly report anything remaining.

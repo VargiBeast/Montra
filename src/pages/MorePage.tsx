@@ -1,7 +1,8 @@
 import { useRef, useState, type ChangeEvent } from "react";
-import { Archive, ChevronRight, CloudDownload, FileUp, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
+import { Archive, ChevronRight, CloudDownload, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
+import { languageOptions, normalizeLanguage, useLanguage, useTranslation } from "../lib/i18n";
 
 type Theme = "light" | "dark" | "system";
 interface MorePageProps {
@@ -14,14 +15,16 @@ interface MorePageProps {
 }
 
 export function MorePage({ theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
+  const { language, setLanguage } = useLanguage();
+  const t = useTranslation();
   const fileInput = useRef<HTMLInputElement>(null);
   const [working, setWorking] = useState("");
   const [message, setMessage] = useState("");
 
   function exportBackup() {
     const backup = {
-      app: "Saldo",
-      version: 4,
+      app: "Montra",
+      version: 5,
       exportedAt: new Date().toISOString(),
       transactions: transactions.map(({ type, name, amount, date, method, link, note }) => ({ type, name, amount, date, method, link, note })),
     };
@@ -29,10 +32,10 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `saldo-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.download = `montra-backup-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setMessage(`${transactions.length} ${transactions.length === 1 ? "transaction" : "transactions"} exported.`);
+    setMessage(t("backupExported", { count: transactions.length }));
   }
 
   async function importFile(event: ChangeEvent<HTMLInputElement>) {
@@ -44,14 +47,14 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
     try {
       const parsed: unknown = JSON.parse(await file.text());
       if (!parsed || typeof parsed !== "object" || !("transactions" in parsed) || !Array.isArray(parsed.transactions)) {
-        throw new Error("This file does not look like a Saldo backup.");
+        throw new Error(t("backupNotRecognized"));
       }
-      if (!("app" in parsed) || parsed.app !== "Saldo" || !("version" in parsed) || ![1, 3, 4].includes(Number(parsed.version))) {
-        throw new Error("This Saldo backup version isn’t supported.");
+      if (!("app" in parsed) || !["Saldo", "Montra"].includes(String(parsed.app)) || !("version" in parsed) || ![1, 3, 4, 5].includes(Number(parsed.version))) {
+        throw new Error(t("backupUnsupported"));
       }
       const source = parsed.transactions as unknown[];
-      if (!source.length) throw new Error("This backup has no transactions to import.");
-      if (!source.every(isImportableTransaction)) throw new Error("Some records are incomplete or invalid. Nothing was imported.");
+      if (!source.length) throw new Error(t("backupEmpty"));
+      if (!source.every(isImportableTransaction)) throw new Error(t("backupInvalid"));
       const records = source.map((item) => {
         const record = item as Record<string, unknown>;
         const rawLink = typeof record.link === "string" ? record.link : "";
@@ -60,7 +63,7 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
           ? validateProductUrl(rawLink)
           : { url: null, error: null };
         if (productLink.error) {
-          throw new Error(`A product link in this backup is invalid. ${productLink.error}`);
+          throw new Error(t("backupBadLink"));
         }
         return {
           type,
@@ -73,9 +76,9 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
         };
       });
       await onImport(records);
-      setMessage(`${records.length} ${records.length === 1 ? "transaction" : "transactions"} imported.`);
+      setMessage(t("backupImported", { count: records.length }));
     } catch (reason) {
-      setMessage(reason instanceof Error ? reason.message : "We couldn’t read this backup.");
+      setMessage(reason instanceof Error ? reason.message : t("backupReadFailed"));
     } finally {
       setWorking("");
     }
@@ -83,37 +86,68 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
 
   async function signOut() {
     setWorking("signout");
-    try { await onSignOut(); } catch (reason) { setMessage(reason instanceof Error ? reason.message : "We couldn’t sign out."); }
+    try { await onSignOut(); } catch (reason) { setMessage(reason instanceof Error ? reason.message : t("signOutFailed")); }
     finally { setWorking(""); }
   }
 
   return (
     <main className="page-content">
-      <div className="page-header"><div><p className="greeting">Your space, your way</p><h1 className="page-title">More</h1></div></div>
+      <div className="page-header"><div><p className="greeting">{t("yourSpace")}</p><h1 className="page-title">{t("more")}</h1></div></div>
+      <section className="panel settings-list language-settings">
+        <div className="setting-row" style={{ cursor: "default" }}>
+          <span className="setting-icon"><Languages size={18} /></span>
+          <span className="setting-copy"><strong>{t("language")}</strong><span>{t("chooseLanguage")}</span></span>
+        </div>
+        <div className="locale-field">
+          <input
+            id="montra-language"
+            type="text"
+            list="montra-language-options"
+            autoComplete="off"
+            aria-label={t("localeCode")}
+            value={language}
+            onChange={(event) => {
+              const next = normalizeLanguage(event.target.value);
+              if (next) setLanguage(next);
+            }}
+          />
+          <datalist id="montra-language-options">
+            {languageOptions.map(([locale, name]) => <option key={locale} value={locale}>{name}</option>)}
+          </datalist>
+        </div>
+        <p className="settings-note">{t("languageFallback")}</p>
+      </section>
+      <section className="panel settings-list currency-settings">
+        <div className="setting-row" style={{ cursor: "default" }}>
+          <span className="setting-icon"><span aria-hidden="true">NOK</span></span>
+          <span className="setting-copy"><strong>{t("currency")}</strong><span>{t("originalCurrency")}</span></span>
+        </div>
+        <p className="settings-note">{t("currencySafety")}</p>
+      </section>
       <section className="panel settings-list" style={{ marginBottom: 17 }}>
         <div className="setting-row" style={{ cursor: "default" }}>
           <span className="setting-icon"><Sun size={18} /></span>
-          <span className="setting-copy"><strong>Appearance</strong><span>Choose the light that feels right</span></span>
+          <span className="setting-copy"><strong>{t("appearance")}</strong><span>{t("appearanceHint")}</span></span>
         </div>
         <div className="theme-choices">
           {([
-            ["light", "Light", Sun],
-            ["dark", "Dark", Moon],
-            ["system", "System", Laptop],
+            ["light", "light", Sun],
+            ["dark", "dark", Moon],
+            ["system", "system", Laptop],
           ] as const).map(([value, label, Icon]) => <button key={value} type="button" className={`theme-choice ${theme === value ? "active" : ""}`} aria-pressed={theme === value} onClick={() => onThemeChange(value)}>
-            <span className="theme-swatch"><i /><i /></span><span>{label}</span><Icon size={14} />
+            <span className="theme-swatch"><i /><i /></span><span>{t(label)}</span><Icon size={14} />
           </button>)}
         </div>
       </section>
       <section className="panel settings-list" style={{ marginBottom: 17 }}>
         <button className="setting-row" type="button" onClick={exportBackup}>
           <span className="setting-icon"><CloudDownload size={18} /></span>
-          <span className="setting-copy"><strong>Export backup</strong><span>Save a copy of your transaction details</span></span>
+          <span className="setting-copy"><strong>{t("exportBackup")}</strong><span>{t("saveCopy")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
         <button className="setting-row" type="button" onClick={() => fileInput.current?.click()} disabled={Boolean(working)}>
           <span className="setting-icon"><FileUp size={18} /></span>
-          <span className="setting-copy"><strong>{working === "import" ? "Importing backup…" : "Import backup"}</strong><span>Restore transaction details from JSON</span></span>
+          <span className="setting-copy"><strong>{working === "import" ? t("importingBackup") : t("importBackup")}</strong><span>{t("restoreCopy")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
@@ -121,12 +155,12 @@ export function MorePage({ theme, onThemeChange, transactions, onImport, onProfi
       <section className="panel settings-list">
         <button className="setting-row" type="button" onClick={onProfile}>
           <span className="setting-icon"><UserRound size={18} /></span>
-          <span className="setting-copy"><strong>Profile</strong><span>Account details and sign out</span></span>
+          <span className="setting-copy"><strong>{t("profile")}</strong><span>{t("accountDetails")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
         <button className="setting-row" type="button" disabled={Boolean(working)} onClick={() => void signOut()}>
           <span className="setting-icon" style={{ color: "var(--coral)", background: "var(--coral-soft)" }}><LogOut size={18} /></span>
-          <span className="setting-copy"><strong>{working === "signout" ? "Signing out…" : "Sign out"}</strong><span>Sign out of your Saldo account</span></span>
+          <span className="setting-copy"><strong>{working === "signout" ? t("signingOut") : t("signOut")}</strong><span>{t("signOutMontra")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
       </section>

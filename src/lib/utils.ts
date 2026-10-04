@@ -1,9 +1,10 @@
 import type { Transaction } from "../types/transaction";
+import { readLanguage } from "./i18n";
 
-export function formatMoney(value: number): string {
-  return new Intl.NumberFormat("en-NO", {
+export function formatMoney(value: number, currency = "NOK", locale = readLanguage()): string {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: "NOK",
+    currency,
     maximumFractionDigits: 2,
   }).format(value);
 }
@@ -11,7 +12,7 @@ export function formatMoney(value: number): string {
 export function formatDate(value: string): string {
   const date = new Date(`${value}T12:00:00`);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat(readLanguage(), {
     day: "numeric",
     month: "short",
     year: "numeric",

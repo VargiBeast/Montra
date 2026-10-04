@@ -1,11 +1,14 @@
-const CACHE_NAME = "saldo-shell-v1";
+const CACHE_NAME = "montra-shell-v2";
 const APP_SHELL = [
   "/",
   "/manifest.json",
-  "/icons/saldo.svg",
-  "/icons/icon-192.png",
+  "/icons/favicon.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
+  "/branding/mark-light.png",
+  "/branding/mark-dark.png",
+  "/branding/wordmark-dark.png",
+  "/branding/wordmark-light.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -16,7 +19,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key.startsWith("saldo-shell-") && key !== CACHE_NAME).map((key) => caches.delete(key))),
+      Promise.all(keys.filter((key) => (key.startsWith("saldo-shell-") || key.startsWith("montra-shell-")) && key !== CACHE_NAME).map((key) => caches.delete(key))),
     ),
   );
   self.clients.claim();

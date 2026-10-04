@@ -1,0 +1,107 @@
+Jeg laster opp en ZIP med den nye Montra-brandingen, inkludert logo/design.
+
+Bruk ZIP-en som utgangspunkt og integrer den nye designen i det eksisterende Montra-prosjektet. Ikke bygg prosjektet helt på nytt.
+
+FOKUS NÅ:
+
+* Gjør Montra virkelig polished, moderne og premium.
+* Den nye logoen skal være selve utgangspunktet for designet.
+* Hele nettsiden skal visuelt matche logoen og brandingen.
+* Ikke bare plasser logoen på eksisterende UI. Tilpass hele designsystemet til logoens stil.
+* Bruk logoens former, uttrykk, typografi og visuelle identitet som inspirasjon for farger, knapper, cards, bakgrunner, ikoner, borders, shadows og generell styling.
+* Designet skal føles som én komplett merkevare.
+* Behold fungerende funksjonalitet.
+* Ikke legg tilbake «Saldo» dersom den ikke finnes i ZIP-en.
+
+DESIGN:
+Tenk på Montra som et ekte ferdig produkt med et komplett designsystem.
+
+Prioriter:
+
+* logo-matching
+* moderne/premium følelse
+* clean og gjennomført UI
+* god typography
+* riktig spacing
+* konsistente cards
+* knapper som passer brandingen
+* passende ikoner
+* subtile og smooth animasjoner
+* gode hover/pressed/focus states
+* mobile-first
+* responsive layout
+* gode loading/error/empty states
+
+Ikke bruk tilfeldige farger eller standard styling som ikke passer logoen.
+
+SPRÅK:
+Bygg et ordentlig, skalerbart i18n-system.
+
+Start med:
+
+* Norsk bokmål
+* English
+* Svenska
+* Dansk
+* Deutsch
+* Français
+* Español
+* Italiano
+* Português
+* Nederlands
+* Polski
+* Čeština
+* Slovak
+* Magyar
+* Română
+* Українська
+* Русский
+* Türkçe
+* Ελληνικά
+* العربية
+* עברית
+* हिन्दी
+* 中文简体
+* 中文繁體
+* 日本語
+* 한국어
+
+Systemet skal være laget slik at flere språk enkelt kan legges til senere.
+
+Krav:
+
+* All Montra UI-tekst skal bruke i18n.
+* Ikke hardkod synlig UI-tekst.
+* Oversett knapper, menyer, navigasjon, innstillinger, dialoger, errors, empty states, tooltips osv.
+* Ha språkvelger i innstillingene.
+* Lagre språkvalget.
+* Ikke oversett brukerens egne data automatisk.
+* Ta hensyn til RTL for arabisk og hebraisk.
+* UI-et må fungere med lange oversettelser.
+* Bruk riktige locale-regler for datoer, tall og valuta der det er relevant.
+
+VIKTIG:
+Ikke start med:
+
+* Vercel
+* Capacitor
+* Expo
+* Xcode
+* App Store
+* Google Play
+
+Dette kommer senere.
+
+Ikke bruk masse Replit-agent quota på unødvendige endringer. Hold arbeidet fokusert på branding, UI polish og internasjonalisering.
+
+Når du er ferdig:
+
+1. Sørg for at prosjektet starter uten errors.
+2. Test de viktigste sidene.
+3. Test språkbytte.
+4. Test at språkvalget beholdes etter refresh.
+5. Sjekk lange oversettelser.
+6. Sjekk RTL-layout.
+7. Sørg for at hele siden visuelt henger sammen med logoen.
+
+Målet er at Montra skal føles som en ferdig, profesjonelt designet app der man umiddelbart ser at logoen og hele UI-et tilhører samme merkevare.
