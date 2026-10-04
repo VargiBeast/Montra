@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
+import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop, Receipt } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -23,6 +23,7 @@ interface MorePageProps {
   transactions: Transaction[];
   onImport: (records: Array<{ type: "in" | "out"; name: string; amount: number; date: string; method?: string | null; link?: string | null; note?: string | null }>) => Promise<void>;
   onProfile: () => void;
+  onReceipts: () => void;
   onSignOut: () => Promise<void>;
 }
 
@@ -43,7 +44,7 @@ const CURRENCY_LABELS: Record<string, string> = {
   KRW: "KRW",
 };
 
-export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
+export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onReceipts, onSignOut }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
   const t = useTranslation();
@@ -247,6 +248,13 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
+      </section>
+      <section className="panel settings-list" style={{ marginBottom: 17 }}>
+        <button className="setting-row" type="button" onClick={onReceipts}>
+          <span className="setting-icon"><Receipt size={18} /></span>
+          <span className="setting-copy"><strong>{t("receipts")}</strong><span>{t("receiptsHint")}</span></span>
+          <span className="setting-end"><ChevronRight size={17} /></span>
+        </button>
       </section>
       <section className="panel settings-list" style={{ marginBottom: 28 }}>
         <button className="setting-row" type="button" onClick={onProfile}>
