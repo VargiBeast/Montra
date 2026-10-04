@@ -49,7 +49,7 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <div className="detail-line"><span>{t("date")}</span><strong>{formatDate(transaction.date, language)}</strong></div>
             <div className="detail-line"><span>{t("paymentMethod")}</span><strong>{transaction.method || t("notAdded")}</strong></div>
           </div>
-          {transaction.note && !transaction.note.startsWith("montra:receipt:") && (
+          {transaction.note && !transaction.note.includes("montra:receipt:") && (
             <div className="detail-note">{transaction.note}</div>
           )}
           <div className="detail-actions">
