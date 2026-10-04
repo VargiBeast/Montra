@@ -240,9 +240,6 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <span className="setting-copy"><strong>{t("savingsGoals")}</strong><span>{t("savingsGoalsHint")}</span></span>
           <ChevronRight size={18} aria-hidden="true" />
         </button>
-      </section>
-
-      <section className="panel settings-list stack-panel">
         <button className="setting-row" type="button" onClick={() => onWishlist?.()}>
           <span className="setting-icon"><Gift size={18} /></span>
           <span className="setting-copy"><strong>{t("wishlist")}</strong><span>{t("wishlistHint")}</span></span>
