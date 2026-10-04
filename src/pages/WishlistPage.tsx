@@ -162,7 +162,9 @@ export function WishlistPage({
     setUrl(item.url ?? "");
     setDetails(item.details ?? "");
     setPurchased(item.purchased);
-    setGoalId(item.savings_goal_id ?? "");
+    // Keep link only if the savings goal still exists; deleted goals leave items valid
+    const linkedId = item.savings_goal_id ?? "";
+    setGoalId(linkedId && goals.some((g) => g.id === linkedId) ? linkedId : "");
     setImageFile(null);
     setRemoveImage(false);
     setImagePreview(null);
