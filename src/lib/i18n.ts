@@ -283,6 +283,14 @@ const enUi: Record<string, string> = {
   analyticsNoSpending: "No spending in this period.",
   openAnalytics: "Open analytics",
   analyticsHint: "Income, spending and categories",
+  analyticsPlusBadge: "Montra Plus",
+  analyticsPlusTitle: "Unlock Advanced Analytics",
+  analyticsPlusBody: "See spending trends, category breakdowns, and clearer patterns in your money — included with Montra Plus.",
+  analyticsPlusBenefitTrends: "Spending trends & income vs expenses",
+  analyticsPlusBenefitCategories: "Category breakdowns & comparisons",
+  analyticsPlusBenefitInsights: "Insights and future forecasting",
+  analyticsPlusCta: "Get Montra Plus",
+  analyticsPlusComingSoon: "Montra Plus is coming soon.",
   nameFallback: "there",
 };
 
@@ -403,6 +411,14 @@ const nbUi: Record<string, string> = {
   analyticsNoSpending: "Ingen utgifter i denne perioden.",
   openAnalytics: "Åpne analyse",
   analyticsHint: "Inntekt, forbruk og kategorier",
+  analyticsPlusBadge: "Montra Plus",
+  analyticsPlusTitle: "Lås opp avansert analyse",
+  analyticsPlusBody: "Se forbrukstrender, kategorier og tydeligere mønstre i pengene dine — inkludert i Montra Plus.",
+  analyticsPlusBenefitTrends: "Forbrukstrender og inntekt vs utgifter",
+  analyticsPlusBenefitCategories: "Kategorier og sammenligninger",
+  analyticsPlusBenefitInsights: "Innsikt og fremtidig prognose",
+  analyticsPlusCta: "Skaff Montra Plus",
+  analyticsPlusComingSoon: "Montra Plus kommer snart.",
   nameFallback: "der",
 };
 
