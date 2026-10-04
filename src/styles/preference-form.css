@@ -1,0 +1,60 @@
+/* Preference fields (language / currency selects on More) */
+.preference-field {
+  position: relative;
+  display: block;
+  padding: 0 18px 8px;
+}
+
+.preference-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  background-color: var(--surface-raised);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.preference-field select:focus {
+  border-color: color-mix(in srgb, var(--accent, var(--green)), transparent 35%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--green)), transparent 91%);
+  outline: none;
+}
+
+.preference-field select:disabled {
+  opacity: 0.62;
+  cursor: progress;
+}
+
+.preference-field svg {
+  position: absolute;
+  top: 50%;
+  right: 32px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.settings-note {
+  margin: 8px 18px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.language-settings,
+.currency-settings {
+  margin-bottom: 14px;
+}
+
+@media (min-width: 760px) {
+  .preference-field {
+    max-width: 460px;
+  }
+}
