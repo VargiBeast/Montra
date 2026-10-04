@@ -18,7 +18,7 @@ export function ProfilePage({ user, busy, onBack, onSignOut }: ProfilePageProps)
   const signInLabel =
     provider === "google" ? "Google"
       : provider === "apple" ? "Apple"
-        : t("continueEmail").replace(/^Continue with |^Fortsett med /i, "") || "Email";
+        : "Email";
 
   return (
     <main className="page-content">
