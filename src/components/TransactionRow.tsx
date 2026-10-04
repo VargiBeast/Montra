@@ -17,6 +17,7 @@ export function TransactionRow({ transaction, getImageUrl, onClick }: Transactio
   const { currency, convertFromBase } = useDisplayCurrency();
   const { url } = useSignedImage(transaction.image_url, getImageUrl);
   const Icon = transaction.image_url ? null : transaction.type === "in" ? ArrowDownLeft : ShoppingBag;
+  const amount = Number(transaction.amount);
 
   return (
     <button className="transaction-row" type="button" onClick={() => onClick(transaction)}>
@@ -30,7 +31,7 @@ export function TransactionRow({ transaction, getImageUrl, onClick }: Transactio
         </span>
       </span>
       <span className={`transaction-value ${transaction.type}`}>
-        {transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language, convertFromBase)}
+        {transaction.type === "in" ? "+" : "−"}{formatMoney(amount, currency, language, convertFromBase(amount, currency))}
       </span>
     </button>
   );
