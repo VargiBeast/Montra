@@ -21,7 +21,7 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
   const summary = getBalanceSummary(transactions);
   const money = (value: number) => formatMoney(value, currency, language, convertFromBase(value, currency));
   const latest = [...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at)).slice(0, 5);
-  const firstName = name.trim().split(/\s+/)[0] || "there";
+  const firstName = name.trim().split(/\s+/)[0] || t("nameFallback");
 
   return (
     <main className="page-content">
