@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { Archive, ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop, PiggyBank, Gift } from "lucide-react";
+import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop, PiggyBank, Gift } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -167,7 +167,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
             onChange={(e) => void persistLocale(normalizePreferenceLocale(e.target.value))}
           >
             {languageChoices.map((option) => (
-              <option key={option.code} value={option.code}>{option.label}</option>
+              <option key={option.locale} value={option.locale}>{option.label}</option>
             ))}
           </select>
           <ChevronDown size={16} aria-hidden="true" />
