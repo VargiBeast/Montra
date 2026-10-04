@@ -33,8 +33,10 @@ interface CurrencyContextValue {
   setCurrency: (currency: DisplayCurrency) => void;
   rates: Record<string, number>;
   ratesReady: boolean;
-  convertFromBase: (amountInBase: number, toCurrency?: DisplayCurrency) => number;
-  convertToBase: (amount: number, fromCurrency: DisplayCurrency) => number;
+  /** Convert an amount stored in NOK to the given display currency. */
+  convertFromBase: (amountInBase: number, toCurrency?: string) => number;
+  /** Convert an amount in the given currency back to NOK for storage. */
+  convertToBase: (amount: number, fromCurrency: string) => number;
 }
 
 const CurrencyContext = createContext<CurrencyContextValue>({
@@ -106,7 +108,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const convertFromBase = useCallback(
-    (amountInBase: number, toCurrency: DisplayCurrency = currency) => {
+    (amountInBase: number, toCurrency: string = currency) => {
       if (!Number.isFinite(amountInBase)) return 0;
       const rate = rates[toCurrency] ?? FALLBACK_RATES[toCurrency] ?? 1;
       return amountInBase * rate;
@@ -115,7 +117,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   );
 
   const convertToBase = useCallback(
-    (amount: number, fromCurrency: DisplayCurrency) => {
+    (amount: number, fromCurrency: string) => {
       if (!Number.isFinite(amount)) return 0;
       const rate = rates[fromCurrency] ?? FALLBACK_RATES[fromCurrency] ?? 1;
       if (rate === 0) return amount;
