@@ -179,7 +179,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
     <main className="page-content">
       <div className="page-header"><div><p className="greeting">{t("yourSpace")}</p><h1 className="page-title">{t("more")}</h1></div></div>
       <section className="panel settings-list language-settings">
-        <div className="setting-row" style={{ cursor: "default" }}>
+        <div className="setting-row is-static">
           <span className="setting-icon"><Languages size={18} /></span>
           <span className="setting-copy"><strong>{t("language")}</strong><span>{t("chooseLanguage")}</span></span>
         </div>
@@ -198,7 +198,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         <p className="settings-note">{t("languageFallback")}</p>
       </section>
       <section className="panel settings-list currency-settings">
-        <div className="setting-row" style={{ cursor: "default" }}>
+        <div className="setting-row is-static">
           <span className="setting-icon"><Coins size={18} /></span>
           <span className="setting-copy"><strong>{t("currency")}</strong><span>{t("originalCurrency")}</span></span>
         </div>
@@ -220,8 +220,8 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         </label>
         <p className="settings-note">{t("currencySafety")}</p>
       </section>
-      <section className="panel settings-list" style={{ marginBottom: 17 }}>
-        <div className="setting-row" style={{ cursor: "default" }}>
+      <section className="panel settings-list stack-panel">
+        <div className="setting-row is-static">
           <span className="setting-icon"><Sun size={18} /></span>
           <span className="setting-copy"><strong>{t("appearance")}</strong><span>{t("appearanceHint")}</span></span>
         </div>
@@ -235,7 +235,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           </button>)}
         </div>
       </section>
-      <section className="panel settings-list" style={{ marginBottom: 17 }}>
+      <section className="panel settings-list stack-panel">
         <button className="setting-row" type="button" onClick={exportBackup}>
           <span className="setting-icon"><CloudDownload size={18} /></span>
           <span className="setting-copy"><strong>{t("exportBackup")}</strong><span>{t("saveCopy")}</span></span>
@@ -248,19 +248,19 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
       </section>
-      <section className="panel settings-list" style={{ marginBottom: 28 }}>
+      <section className="panel settings-list stack-panel-lg">
         <button className="setting-row" type="button" onClick={onProfile}>
           <span className="setting-icon"><UserRound size={18} /></span>
           <span className="setting-copy"><strong>{t("profile")}</strong><span>{t("accountDetails")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
         <button className="setting-row" type="button" disabled={Boolean(working)} onClick={() => void signOut()}>
-          <span className="setting-icon" style={{ color: "var(--coral)", background: "var(--coral-soft)" }}><LogOut size={18} /></span>
+          <span className="setting-icon is-danger"><LogOut size={18} /></span>
           <span className="setting-copy"><strong>{working === "signout" ? t("signingOut") : t("signOut")}</strong><span>{t("signOutMontra")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
       </section>
-      {message && <div className="notice" role="status" style={{ marginTop: 8, marginBottom: 12 }}><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message.startsWith("preferences") ? t(message) : message}</div>}
+      {message && <div className="notice stack-notice" role="status"><Archive size={14} style={{ verticalAlign: "middle", marginRight: 7 }} />{message.startsWith("preferences") ? t(message) : message}</div>}
     </main>
   );
 }
