@@ -23,17 +23,20 @@ export const languageChoices = [
 
 export const currencyChoices = [
   { code: "NOK", label: "Norwegian Krone" },
-  { code: "USD", label: "US Dollar" },
-  { code: "EUR", label: "Euro" },
-  { code: "GBP", label: "British Pound" },
   { code: "SEK", label: "Swedish Krona" },
   { code: "DKK", label: "Danish Krone" },
+  { code: "EUR", label: "Euro" },
+  { code: "USD", label: "US Dollar" },
+  { code: "GBP", label: "British Pound" },
   { code: "CHF", label: "Swiss Franc" },
-  { code: "JPY", label: "Japanese Yen" },
-  { code: "CNY", label: "Chinese Yuan" },
   { code: "PLN", label: "Polish Złoty" },
   { code: "CZK", label: "Czech Koruna" },
   { code: "TRY", label: "Turkish Lira" },
+  { code: "CAD", label: "Canadian Dollar" },
+  { code: "AUD", label: "Australian Dollar" },
+  { code: "JPY", label: "Japanese Yen" },
+  { code: "CNY", label: "Chinese Yuan" },
+  { code: "INR", label: "Indian Rupee" },
   { code: "KRW", label: "South Korean Won" },
 ] as const;
 

@@ -20,6 +20,9 @@ const FALLBACK_RATES: Record<string, number> = {
   PLN: 0.4042,
   CZK: 2.259,
   TRY: 5.093,
+  CAD: 0.142,
+  AUD: 0.156,
+  INR: 8.65,
   KRW: 139.73,
 };
 
