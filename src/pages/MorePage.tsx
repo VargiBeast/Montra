@@ -255,7 +255,7 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
       <section className="panel settings-list stack-panel">
         <button className="setting-row" type="button" onClick={onAnalytics}>
           <span className="setting-icon"><BarChart3 size={18} /></span>
-          <span className="setting-copy"><strong>{t("analytics")}</strong><span>{t("analyticsHint")}</span></span>
+          <span className="setting-copy"><strong>{t("analytics") === "—" ? "Analytics" : t("analytics")}</strong><span>{t("analyticsHint") === "—" ? "Income, spending and categories" : t("analyticsHint")}</span></span>
           <span className="setting-end"><ChevronRight size={17} /></span>
         </button>
       </section>
