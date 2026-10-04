@@ -57,10 +57,34 @@ export function useReceipts(userId: string | undefined) {
     async (image: File, currency = "NOK") => {
       if (!userId || !supabase) throw new Error("Sign in before uploading receipts.");
       try {
-        await receiptService.uploadReceipt(supabase, userId, image, currency);
+        const created = await receiptService.uploadReceipt(supabase, userId, image, currency);
+        await refresh();
+        return created;
       } catch (error) {
         console.error("Could not upload a receipt.", error);
         throw new Error("We couldn’t upload this receipt. Check your connection and try again.");
+      }
+    },
+    [refresh, userId],
+  );
+
+  const update = useCallback(
+    async (
+      receipt: Receipt,
+      fields: {
+        merchant: string | null;
+        total_amount: number | null;
+        currency: string;
+        receipt_date: string | null;
+        status: Receipt["status"];
+      },
+    ) => {
+      if (!userId || !supabase) throw new Error("Sign in before updating receipts.");
+      try {
+        await receiptService.updateReceipt(supabase, userId, receipt.id, fields);
+      } catch (error) {
+        console.error("Could not update a receipt.", error);
+        throw new Error("We couldn’t save this receipt. Check your connection and try again.");
       }
       await refresh();
     },
@@ -95,6 +119,7 @@ export function useReceipts(userId: string | undefined) {
     error,
     refresh,
     upload,
+    update,
     remove,
     getImageUrl,
   };

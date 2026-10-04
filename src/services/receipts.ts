@@ -82,6 +82,35 @@ export async function uploadReceipt(
   }
 }
 
+export async function updateReceipt(
+  client: SupabaseClient,
+  userId: string,
+  receiptId: string,
+  fields: {
+    merchant: string | null;
+    total_amount: number | null;
+    currency: string;
+    receipt_date: string | null;
+    status: Receipt["status"];
+  },
+): Promise<Receipt> {
+  const { data, error } = await client
+    .from(TABLE)
+    .update({
+      merchant: fields.merchant,
+      total_amount: fields.total_amount,
+      currency: fields.currency,
+      receipt_date: fields.receipt_date,
+      status: fields.status,
+    })
+    .eq("id", receiptId)
+    .eq("user_id", userId)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as Receipt;
+}
+
 export async function deleteReceipt(
   client: SupabaseClient,
   userId: string,

@@ -1,5 +1,5 @@
-import { useRef, useState, type ChangeEvent } from "react";
-import { ImagePlus, Receipt, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Receipt, Sparkles } from "lucide-react";
 import type { Receipt as ReceiptRecord } from "../types/receipt";
 import { formatDate } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -8,7 +8,7 @@ interface ReceiptsPageProps {
   receipts: ReceiptRecord[];
   getImageUrl: (path: string) => Promise<string>;
   uploading: boolean;
-  onUpload: (file: File) => Promise<void>;
+  onAdd: () => void;
   onSelect: (receipt: ReceiptRecord) => void;
 }
 
@@ -27,11 +27,9 @@ function statusLabel(status: string, t: (key: string) => string) {
   }
 }
 
-export function ReceiptsPage({ receipts, getImageUrl, uploading, onUpload, onSelect }: ReceiptsPageProps) {
+export function ReceiptsPage({ receipts, getImageUrl, uploading, onAdd, onSelect }: ReceiptsPageProps) {
   const t = useTranslation();
   const { language } = useLanguage();
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [uploadError, setUploadError] = useState("");
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
 
   async function ensureThumb(receipt: ReceiptRecord) {
@@ -41,18 +39,6 @@ export function ReceiptsPage({ receipts, getImageUrl, uploading, onUpload, onSel
       setThumbs((prev) => ({ ...prev, [receipt.id]: url }));
     } catch {
       /* signed URL failures surface when opening detail */
-    }
-  }
-
-  async function handleFile(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    setUploadError("");
-    try {
-      await onUpload(file);
-    } catch (reason) {
-      setUploadError(reason instanceof Error ? reason.message : t("receiptUploadFailed"));
     }
   }
 
@@ -67,25 +53,12 @@ export function ReceiptsPage({ receipts, getImageUrl, uploading, onUpload, onSel
           className="primary-button"
           type="button"
           disabled={uploading}
-          onClick={() => fileInput.current?.click()}
+          onClick={onAdd}
         >
-          <ImagePlus size={17} />
+          <Receipt size={17} />
           {uploading ? t("receiptUploading") : t("addReceipt")}
         </button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          hidden
-          onChange={(event) => void handleFile(event)}
-        />
       </div>
-
-      {uploadError && (
-        <p className="form-error" role="alert" style={{ marginBottom: 14 }}>
-          {uploadError}
-        </p>
-      )}
 
       <section className="panel section-panel">
         {receipts.length === 0 ? (
@@ -99,9 +72,9 @@ export function ReceiptsPage({ receipts, getImageUrl, uploading, onUpload, onSel
               className="primary-button"
               type="button"
               disabled={uploading}
-              onClick={() => fileInput.current?.click()}
+              onClick={onAdd}
             >
-              <ImagePlus size={17} /> {t("addReceipt")}
+              <Receipt size={17} /> {t("addReceipt")}
             </button>
           </div>
         ) : (
@@ -136,7 +109,7 @@ export function ReceiptsPage({ receipts, getImageUrl, uploading, onUpload, onSel
                   </span>
                   <span className="transaction-main">
                     <span className="transaction-name">{title}</span>
-                    <span className="transaction-sub">{metaParts.join(" · ")}</span>
+                    <span className={`transaction-sub receipt-status receipt-status-${receipt.status}`}>{metaParts.join(" · ")}</span>
                   </span>
                 </button>
               );

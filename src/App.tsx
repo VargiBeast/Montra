@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDownUp, Home, Moon, Plus, UserRound, WalletCards } from "lucide-react";
+import { ArrowDownUp, Home, Moon, Plus, Receipt, UserRound } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
 import { useReceipts } from "./hooks/useReceipts";
@@ -13,6 +13,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
 import { ReceiptDetail } from "./components/ReceiptDetail";
+import { ReceiptCapture } from "./components/ReceiptCapture";
 import { UserAvatar } from "./components/UserAvatar";
 import { useDisplayCurrency } from "./lib/currency";
 import { useLanguage, useTranslation } from "./lib/i18n";
@@ -57,6 +58,7 @@ function App() {
   const [deleting, setDeleting] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<import("./types/receipt").Receipt | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [captureOpen, setCaptureOpen] = useState(false);
   const [deletingReceipt, setDeletingReceipt] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [theme, setTheme] = useState<Theme>(initialTheme);
@@ -137,16 +139,6 @@ function App() {
       console.error("Could not delete a transaction.", reason);
       setToast(t("deleteFailed"));
     } finally { setDeleting(false); }
-  }
-
-  async function uploadReceipt(file: File) {
-    setUploadingReceipt(true);
-    try {
-      await receipts.upload(file);
-      setToast(t("receiptUploaded"));
-    } finally {
-      setUploadingReceipt(false);
-    }
   }
 
   async function deleteReceipt(receipt: import("./types/receipt").Receipt) {
@@ -262,7 +254,6 @@ function App() {
             transactions={data.transactions}
             onImport={data.importBackup}
             onProfile={() => setPage("profile")}
-            onReceipts={() => setPage("receipts")}
             onSignOut={doSignOut}
           />}
           {page === "receipts" && (
@@ -279,7 +270,7 @@ function App() {
                 receipts={receipts.receipts}
                 getImageUrl={receipts.getImageUrl}
                 uploading={uploadingReceipt}
-                onUpload={uploadReceipt}
+                onAdd={() => setCaptureOpen(true)}
                 onSelect={setSelectedReceipt}
               />
             )
@@ -291,11 +282,35 @@ function App() {
         <button type="button" className={`nav-item ${page === "home" ? "active" : ""}`} aria-current={page === "home" ? "page" : undefined} onClick={() => setPage("home")}><Home size={19} /><span>{t("home")}</span></button>
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "receipts" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><WalletCards size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
       {toast && <div className="toast" role="status">{toast}</div>}
+      <ReceiptCapture
+        open={captureOpen}
+        currency="NOK"
+        onClose={() => setCaptureOpen(false)}
+        onUpload={async (file) => {
+          setUploadingReceipt(true);
+          try {
+            return await receipts.upload(file);
+          } finally {
+            setUploadingReceipt(false);
+          }
+        }}
+        onSave={async (receipt, fields) => {
+          await receipts.update(receipt, {
+            merchant: fields.merchant || null,
+            total_amount: fields.totalAmount,
+            currency: fields.currency,
+            receipt_date: fields.receiptDate || null,
+            status: fields.status,
+          });
+          setToast(fields.status === "confirmed" ? t("receiptConfirmed") : t("receiptUploaded"));
+        }}
+      />
       <ReceiptDetail
         receipt={selectedReceipt}
         getImageUrl={receipts.getImageUrl}
