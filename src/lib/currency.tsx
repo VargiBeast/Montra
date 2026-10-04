@@ -2,6 +2,7 @@ import { createContext, createElement, useCallback, useContext, useEffect, useMe
 import { normalizeDisplayCurrency, type DisplayCurrency } from "./preferences";
 
 const RATES_STORAGE_KEY = "montra.exchangeRates";
+const CURRENCY_STORAGE_KEY = "montra.displayCurrency";
 const RATES_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 const BASE_CURRENCY = "NOK";
 
@@ -70,7 +71,13 @@ function saveCachedRates(cache: RatesCache) {
 }
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrencyState] = useState<DisplayCurrency>("NOK");
+  const [currency, setCurrencyState] = useState<DisplayCurrency>(() => {
+    try {
+      const saved = window.localStorage.getItem(CURRENCY_STORAGE_KEY);
+      if (saved) return normalizeDisplayCurrency(saved);
+    } catch { /* ignore */ }
+    return "NOK";
+  });
   const [rates, setRates] = useState<Record<string, number>>(FALLBACK_RATES);
   const [ratesReady, setRatesReady] = useState(false);
 
@@ -104,7 +111,11 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setCurrency = useCallback((next: DisplayCurrency) => {
-    setCurrencyState(normalizeDisplayCurrency(next));
+    const normalized = normalizeDisplayCurrency(next);
+    setCurrencyState(normalized);
+    try {
+      window.localStorage.setItem(CURRENCY_STORAGE_KEY, normalized);
+    } catch { /* still applies for this session */ }
   }, []);
 
   const convertFromBase = useCallback(
