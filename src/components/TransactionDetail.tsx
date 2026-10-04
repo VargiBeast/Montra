@@ -40,7 +40,7 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <span className="transaction-thumb">{url ? <img src={url} alt="" /> : <Icon size={22} />}</span>
             <div>
               <div className="transaction-name">{transaction.name}</div>
-              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "−"}{formatMoney(amount, currency, language, convertFromBase(amount, currency))}</div>
+              <div className={`detail-amount transaction-value ${transaction.type}`}>{transaction.type === "in" ? "+" : "\u2212"}{formatMoney(amount, currency, language, convertFromBase(amount, currency))}</div>
             </div>
           </div>
           {url && <img className="detail-image" src={url} alt={t("photoFor", { name: transaction.name })} />}
@@ -49,7 +49,9 @@ export function TransactionDetail({ transaction, getImageUrl, onClose, onEdit, o
             <div className="detail-line"><span>{t("date")}</span><strong>{formatDate(transaction.date, language)}</strong></div>
             <div className="detail-line"><span>{t("paymentMethod")}</span><strong>{transaction.method || t("notAdded")}</strong></div>
           </div>
-          {transaction.note && <div className="detail-note">{transaction.note}</div>}
+          {transaction.note && !transaction.note.startsWith("montra:receipt:") && (
+            <div className="detail-note">{transaction.note}</div>
+          )}
           <div className="detail-actions">
             {linkIsSafe && <a className="secondary-button" href={safeLink!} target="_blank" rel="noopener noreferrer"><ExternalLink size={16} /> {t("productLink")}</a>}
             <button className="secondary-button" type="button" onClick={() => onEdit(transaction)}><Pencil size={16} /> {t("edit")}</button>
