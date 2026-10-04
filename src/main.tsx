@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/globals.css";
@@ -15,10 +15,32 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
   });
 }
 
+function RepairLiteralEscapes() {
+  useEffect(() => {
+    const repair = () => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+      while (node) {
+        const value = node.nodeValue ?? "";
+        if (value.includes("\\u2013") || value.includes("\\u2014")) {
+          node.nodeValue = value.replaceAll("\\u2013", "\u2013").replaceAll("\\u2014", "\u2014");
+        }
+        node = walker.nextNode();
+      }
+    };
+    repair();
+    const observer = new MutationObserver(repair);
+    observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+    return () => observer.disconnect();
+  }, []);
+  return null;
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <LanguageProvider>
       <CurrencyProvider>
+        <RepairLiteralEscapes />
         <App />
       </CurrencyProvider>
     </LanguageProvider>
