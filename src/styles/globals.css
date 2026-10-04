@@ -1,1 +1,331 @@
-PLACEHOLDER
+/* Montra globals — base + UI polish */
+@import url("https://cdn.jsdelivr.net/gh/VargiBeast/Montra@a481be4409a8b10a75da264c7997e4715bdc3aac/src/styles/globals.css");
+
+/* Receipt scanner */
+.scanner-stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+  z-index: 0;
+}
+.scanner-frame { z-index: 1; }
+.scanner-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(8, 8, 8, 0.45);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Deduct checkbox — never inherit form-field input sizing */
+.receipt-deduct {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-raised);
+}
+.receipt-deduct-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
+}
+.receipt-deduct-row input[type="checkbox"],
+.receipt-deduct input[type="checkbox"] {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  border-radius: 6px !important;
+  border: 1.5px solid var(--line) !important;
+  background: var(--canvas) !important;
+  accent-color: var(--green);
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  box-shadow: none !important;
+}
+.receipt-deduct-label { flex: 1; min-width: 0; }
+.receipt-deduct-hint {
+  display: block;
+  margin: 0 0 0 32px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.receipt-choice { display: grid; gap: 10px; }
+.receipt-choice .primary-button,
+.receipt-choice .secondary-button { width: 100%; }
+
+/* === UI polish layer (spacing, touch, consistency) === */
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.app-shell, .app-frame, .page-content, .modal-sheet {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Consistent interactive focus */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent, var(--green)), transparent 55%);
+  outline-offset: 2px;
+}
+
+/* Touch-friendly icon buttons */
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.nav-item {
+  min-height: 48px;
+}
+.nav-add {
+  min-width: 52px;
+  min-height: 52px;
+}
+
+/* Unified button rhythm */
+.primary-button,
+.secondary-button,
+.danger-button {
+  min-height: 46px;
+  border-radius: 14px;
+  letter-spacing: -0.01em;
+}
+.primary-button:active:not(:disabled),
+.secondary-button:active:not(:disabled),
+.danger-button:active:not(:disabled),
+.icon-button:active:not(:disabled),
+.nav-item:active,
+.nav-add:active {
+  transform: scale(0.98);
+}
+
+/* Form controls — equal height & radius */
+.form-field input,
+.form-field textarea,
+.form-field select,
+.search-field,
+.preference-field select,
+.locale-field input {
+  min-height: 46px;
+  border-radius: 13px;
+}
+.form-field select,
+.preference-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2373736e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+:root[data-theme="dark"] .form-field select,
+:root[data-theme="dark"] .preference-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aaa9a3' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* Panel / card spacing consistency */
+.panel + .panel,
+.section-panel + .section-panel,
+.settings-list + .settings-list,
+.language-settings + .currency-settings,
+.currency-settings + .settings-list {
+  margin-top: 14px;
+}
+.section-panel {
+  padding: 22px;
+}
+.page-header {
+  margin: 4px 0 22px;
+}
+
+/* Transaction rows */
+.transaction-list .transaction-row:first-child {
+  border-top: 0;
+  padding-top: 4px;
+}
+.transaction-list .transaction-row:last-child {
+  padding-bottom: 4px;
+}
+.transaction-row:active {
+  transform: scale(0.995);
+}
+
+/* Empty states */
+.empty-state {
+  padding: 36px 18px;
+}
+.empty-state h3 {
+  margin-top: 2px;
+}
+.empty-state .primary-button {
+  margin-top: 4px;
+}
+
+/* Modal polish */
+.modal-sheet {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.form-actions {
+  gap: 10px;
+  margin-top: 18px;
+}
+.form-actions > button {
+  min-width: 0;
+}
+
+/* Loading skeleton */
+.loading-block {
+  border-radius: 16px;
+}
+
+/* Toast above bottom nav */
+.toast {
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  border-radius: 14px;
+}
+
+/* Filter pills */
+.filter-pill {
+  min-height: 36px;
+  min-width: 44px;
+}
+
+/* Settings rows */
+.setting-row {
+  min-height: 72px;
+}
+.setting-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+}
+
+/* Desktop content balance */
+@media (min-width: 900px) {
+  .app-frame {
+    max-width: 1080px;
+  }
+  .dashboard-grid {
+    gap: 22px;
+  }
+  .section-panel {
+    padding: 24px;
+  }
+}
+
+/* Mobile refinements */
+@media (max-width: 760px) {
+  .app-shell {
+    overflow-x: hidden;
+  }
+  .history-tools {
+    flex-wrap: wrap;
+  }
+  .search-field {
+    max-width: none;
+    width: 100%;
+  }
+  .filter-pills {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .filter-pill {
+    flex: 1;
+    text-align: center;
+  }
+  .page-header {
+    margin-bottom: 18px;
+  }
+  .bottom-nav {
+    width: min(520px, calc(100% - 16px));
+  }
+}
+
+@media (max-width: 450px) {
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    min-height: 48px;
+  }
+  .form-actions {
+    flex-direction: row;
+  }
+  .form-actions > button {
+    flex: 1;
+  }
+  .receipt-deduct {
+    padding: 12px;
+  }
+  .modal-sheet {
+    border-radius: 22px 22px 0 0;
+  }
+}
+
+/* Utility spacing / semantic modifiers */
+.stack-md { margin-top: 16px; }
+.stack-lg { margin-top: 20px; }
+.stack-panel { margin-bottom: 14px; }
+.stack-panel-lg { margin-bottom: 24px; }
+.stack-notice { margin-top: 8px; margin-bottom: 12px; }
+.setting-row.is-static { cursor: default; }
+.setting-row.is-static:hover { background: transparent; padding-left: 18px; }
+.setting-icon.is-danger { color: var(--coral); background: var(--coral-soft); }
+.eyebrow.accent-green { color: var(--green); }
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  color: var(--subtle);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.stack-sm { margin-bottom: 8px; }
+.stack-tight { margin: 0 0 6px; }
+.stack-field { margin-bottom: 14px; }
+.auth-legal {
+  margin: 18px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
