@@ -355,7 +355,7 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
                 {!cameraReady && (
                   <div className="scanner-loading" aria-live="polite">
                     <div className="loading-block" style={{ width: 48, height: 48, borderRadius: 14, margin: "0 auto 8px" }} />
-                    <span>{t("cameraStarting")}</span>
+                    <span>{t("cameraStarting") === "—" ? "Starting camera…" : t("cameraStarting")}</span>
                   </div>
                 )}
               </div>
@@ -425,24 +425,36 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
                 <span>{t("date")}</span>
                 <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
               </label>
-              <label className="form-field full receipt-deduct">
-                <span className="receipt-deduct-row">
+              <div className="receipt-deduct full">
+                <label className="receipt-deduct-row">
                   <input
                     type="checkbox"
                     checked={deductFromBalance}
                     onChange={(event) => setDeductFromBalance(event.target.checked)}
                   />
-                  <span>
-                    {t("deductFromBalance", {
-                      amount: displayAmount,
-                      currency: displayCurrency,
-                    })}
+                  <span className="receipt-deduct-label">
+                    {(() => {
+                      const label = t("deductFromBalance", {
+                        amount: displayAmount,
+                        currency: displayCurrency,
+                      });
+                      return label === "—" || !label
+                        ? `Deduct ${displayAmount} ${displayCurrency} from balance`
+                        : label;
+                    })()}
                   </span>
-                </span>
+                </label>
                 {deductFromBalance && (
-                  <span className="transaction-sub receipt-deduct-hint">{t("deductFromBalanceHint")}</span>
+                  <p className="transaction-sub receipt-deduct-hint">
+                    {(() => {
+                      const hint = t("deductFromBalanceHint");
+                      return hint === "—" || !hint
+                        ? "Creates an expense in Activity. Confirming again will not create a duplicate."
+                        : hint;
+                    })()}
+                  </p>
                 )}
-              </label>
+              </div>
               <div className="form-actions">
                 <button className="secondary-button" type="button" disabled={busy} onClick={onClose}>
                   {t("cancel")}
