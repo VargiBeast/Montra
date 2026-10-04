@@ -6,6 +6,8 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
+  Lightbulb,
+  AlertTriangle,
 } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import {
@@ -21,6 +23,12 @@ import {
   type AnalyticsTypeFilter,
   type DateRange,
 } from "../lib/analytics";
+import {
+  buildMonthForecast,
+  buildSavingsProjection,
+  collectInsights,
+  type InsightItem,
+} from "../lib/insights";
 import { formatDate, formatMoney } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -28,6 +36,69 @@ import { useLanguage, useTranslation } from "../lib/i18n";
 interface AnalyticsPageProps {
   transactions: Transaction[];
 }
+
+
+const ANALYTICS_FALLBACK: Record<string, string> = {
+  analytics: "Analytics",
+  analyticsGreeting: "Patterns in your money",
+  analyticsOverview: "Overview",
+  analyticsPeriod: "Period",
+  analyticsThisWeek: "This week",
+  analyticsThisMonth: "This month",
+  analyticsThisYear: "This year",
+  analyticsLastMonth: "Last month",
+  analyticsLastYear: "Last year",
+  analyticsCustom: "Custom",
+  analyticsFrom: "From",
+  analyticsTo: "To",
+  analyticsTypeFilter: "Type filter",
+  analyticsCategory: "Category",
+  analyticsAllCategories: "All categories",
+  analyticsUncategorized: "Uncategorized",
+  analyticsTotalIncome: "Total income",
+  analyticsTotalSpending: "Total spending",
+  analyticsNetChange: "Net change",
+  analyticsSavingsRate: "Savings rate",
+  analyticsIncomeVsExpenses: "Income vs expenses",
+  analyticsSpendingOverTime: "Spending over time",
+  analyticsSpendingByCategory: "Spending by category",
+  analyticsCategoryHint: "Categories use the payment method on each entry. Change is vs the previous period of the same length.",
+  analyticsBiggestExpenses: "Biggest expenses",
+  analyticsEmptyTitle: "No data yet",
+  analyticsEmptyBody: "Add a few purchases and money-in entries to see patterns here.",
+  analyticsNoDataTitle: "Nothing in this period",
+  analyticsNoDataBody: "Try another period or clear filters to see your activity.",
+  analyticsNoSpending: "No spending in this period.",
+  openAnalytics: "Open analytics",
+  analyticsHint: "Income, spending and categories",
+  insightsTitle: "Insights",
+  insightsEmpty: "Not enough activity yet for insights. Add more entries over a few weeks.",
+  insightSpendingUp: "Your spending is {percent}% higher than the previous period.",
+  insightSpendingDown: "Your spending is {percent}% lower than the previous period.",
+  insightCategoryShare: "{category} accounts for {percent}% of your spending in this period.",
+  insightCategoryUp: "{category} spending is up {percent}% vs the previous period.",
+  insightCategoryDown: "{category} spending is down {percent}% vs the previous period.",
+  insightTrendDown: "Your spending has decreased for {weeks} consecutive weeks.",
+  insightTrendUp: "Your spending has increased for {weeks} consecutive weeks.",
+  insightUnusualExpense: "Unusually large expense: {name}.",
+  insightUnusualPeriod: "Spending this month is about {percent}% above your typical month.",
+  forecastTitle: "Month forecast",
+  forecastInsufficient: "Need a bit more history to estimate this month. Keep logging entries.",
+  forecastDisclaimer: "Estimate based on your history and spending so far — not a guarantee.",
+  forecastExpectedSpending: "Expected spending",
+  forecastExpectedIncome: "Expected income",
+  forecastExpectedNet: "Expected net",
+  forecastPaceNote: "Based on day {day} of {days} this month, blended with past months when available.",
+  projectionTitle: "Savings projection",
+  projectionInsufficient: "Projections need at least two months of activity.",
+  projectionDisclaimer: "Simple average from your last {months} month(s). Not a savings goal.",
+  projectionAvgIncome: "Avg. monthly income",
+  projectionAvgSpending: "Avg. monthly spending",
+  projectionAvgNet: "Avg. monthly net",
+  projectionNext3: "If this continues — 3 months",
+  projectionNext6: "If this continues — 6 months",
+  projectionNext12: "If this continues — 12 months",
+};
 
 const PERIODS: AnalyticsPeriod[] = [
   "this_week",
@@ -88,6 +159,7 @@ function SpendingTrendChart({
   spendingLabel: string;
 }) {
   const max = Math.max(1, ...buckets.map((b) => b.spending));
+  const height = 120;
   if (buckets.length === 0) return null;
   const points = buckets.map((b, i) => {
     const x = buckets.length === 1 ? 50 : (i / (buckets.length - 1)) * 100;
@@ -145,7 +217,12 @@ function CategoryBars({
 }
 
 export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
-  const t = useTranslation();
+  const translate = useTranslation();
+  const t = (key: string, values?: Record<string, string | number>) => {
+    const value = translate(key, values);
+    if (value !== "—" ) return value;
+    return ANALYTICS_FALLBACK[key] ?? key;
+  };
   const { language } = useLanguage();
   const { currency, convertFromBase } = useDisplayCurrency();
 
@@ -182,6 +259,18 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
     [inRange, uncategorized, prevInRange],
   );
   const topExpenses = useMemo(() => biggestExpenses(inRange, 8), [inRange]);
+  const insights = useMemo(
+    () => collectInsights(transactions, range, uncategorized),
+    [transactions, range, uncategorized],
+  );
+  const forecast = useMemo(() => buildMonthForecast(transactions), [transactions]);
+  const projection = useMemo(() => buildSavingsProjection(transactions), [transactions]);
+
+  function insightText(item: InsightItem) {
+    const raw = t(item.messageKey, item.values);
+    return raw === "—" ? item.messageKey : raw;
+  }
+
   const categoryOptions = useMemo(
     () => availableCategories(transactions, uncategorized),
     [transactions, uncategorized],
@@ -392,6 +481,124 @@ export function AnalyticsPage({ transactions }: AnalyticsPageProps) {
                       </li>
                     ))}
                   </ul>
+                )}
+              </section>
+
+              <section className="panel section-panel">
+                <div className="section-heading">
+                  <h2>{t("insightsTitle")}</h2>
+                </div>
+                {insights.length === 0 ? (
+                  <p className="analytics-muted">{t("insightsEmpty")}</p>
+                ) : (
+                  <ul className="insights-list">
+                    {insights.map((item) => (
+                      <li key={item.id} className={`insights-item is-${item.severity}`}>
+                        <span className="insights-item-icon" aria-hidden="true">
+                          {item.severity === "warning" ? <AlertTriangle size={16} /> :
+                           item.severity === "positive" ? <TrendingUp size={16} /> :
+                           <Lightbulb size={16} />}
+                        </span>
+                        <p>{insightText(item)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+
+              <section className="panel section-panel">
+                <div className="section-heading">
+                  <h2>{t("forecastTitle")}</h2>
+                </div>
+                {!forecast.hasEnoughData ? (
+                  <p className="analytics-muted">{t("forecastInsufficient")}</p>
+                ) : (
+                  <>
+                    <p className="analytics-hint">{t("forecastDisclaimer")}</p>
+                    <div className="analytics-overview forecast-overview">
+                      {forecast.expectedSpending != null && (
+                        <article className="panel analytics-stat">
+                          <span className="analytics-stat-icon spending"><TrendingDown size={16} /></span>
+                          <span className="eyebrow">{t("forecastExpectedSpending")}</span>
+                          <strong>{money(forecast.expectedSpending)}</strong>
+                        </article>
+                      )}
+                      {forecast.expectedIncome != null && (
+                        <article className="panel analytics-stat">
+                          <span className="analytics-stat-icon income"><TrendingUp size={16} /></span>
+                          <span className="eyebrow">{t("forecastExpectedIncome")}</span>
+                          <strong>{money(forecast.expectedIncome)}</strong>
+                        </article>
+                      )}
+                      {forecast.expectedNet != null && (
+                        <article className="panel analytics-stat">
+                          <span className="analytics-stat-icon net"><Wallet size={16} /></span>
+                          <span className="eyebrow">{t("forecastExpectedNet")}</span>
+                          <strong className={forecast.expectedNet >= 0 ? "is-positive" : "is-negative"}>
+                            {forecast.expectedNet >= 0 ? "+" : "−"}{money(Math.abs(forecast.expectedNet))}
+                          </strong>
+                        </article>
+                      )}
+                    </div>
+                    <p className="analytics-hint">
+                      {t("forecastPaceNote", {
+                        day: forecast.daysElapsed,
+                        days: forecast.daysInMonth,
+                      })}
+                    </p>
+                  </>
+                )}
+              </section>
+
+              <section className="panel section-panel">
+                <div className="section-heading">
+                  <h2>{t("projectionTitle")}</h2>
+                </div>
+                {!projection.hasEnoughData ? (
+                  <p className="analytics-muted">{t("projectionInsufficient")}</p>
+                ) : (
+                  <>
+                    <p className="analytics-hint">{t("projectionDisclaimer", { months: projection.monthsUsed })}</p>
+                    <div className="analytics-overview forecast-overview">
+                      <article className="panel analytics-stat">
+                        <span className="analytics-stat-icon income"><TrendingUp size={16} /></span>
+                        <span className="eyebrow">{t("projectionAvgIncome")}</span>
+                        <strong>{money(projection.avgMonthlyIncome)}</strong>
+                      </article>
+                      <article className="panel analytics-stat">
+                        <span className="analytics-stat-icon spending"><TrendingDown size={16} /></span>
+                        <span className="eyebrow">{t("projectionAvgSpending")}</span>
+                        <strong>{money(projection.avgMonthlySpending)}</strong>
+                      </article>
+                      <article className="panel analytics-stat">
+                        <span className="analytics-stat-icon net"><Wallet size={16} /></span>
+                        <span className="eyebrow">{t("projectionAvgNet")}</span>
+                        <strong className={projection.avgMonthlyNet >= 0 ? "is-positive" : "is-negative"}>
+                          {projection.avgMonthlyNet >= 0 ? "+" : "−"}{money(Math.abs(projection.avgMonthlyNet))}
+                        </strong>
+                      </article>
+                    </div>
+                    <ul className="projection-horizon">
+                      <li>
+                        <span>{t("projectionNext3")}</span>
+                        <strong className={projection.projectedNet3Months >= 0 ? "is-positive" : "is-negative"}>
+                          {projection.projectedNet3Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet3Months))}
+                        </strong>
+                      </li>
+                      <li>
+                        <span>{t("projectionNext6")}</span>
+                        <strong className={projection.projectedNet6Months >= 0 ? "is-positive" : "is-negative"}>
+                          {projection.projectedNet6Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet6Months))}
+                        </strong>
+                      </li>
+                      <li>
+                        <span>{t("projectionNext12")}</span>
+                        <strong className={projection.projectedNet12Months >= 0 ? "is-positive" : "is-negative"}>
+                          {projection.projectedNet12Months >= 0 ? "+" : "−"}{money(Math.abs(projection.projectedNet12Months))}
+                        </strong>
+                      </li>
+                    </ul>
+                  </>
                 )}
               </section>
             </>
