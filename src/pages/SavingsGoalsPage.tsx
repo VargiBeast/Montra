@@ -38,6 +38,7 @@ const FALLBACK: Record<string, string> = {
   savingsGoalsCancel: "Cancel",
   savingsGoalsNamePlaceholder: "e.g. New MacBook",
   savingsGoalsLoadError: "Could not load goals.",
+  savingsGoalsHint: "Track progress toward a target",
   back: "Back",
   loading: "Loading\u2026",
 };
@@ -63,7 +64,7 @@ export function SavingsGoalsPage({
     return text;
   };
   const { language } = useLanguage();
-  const { currency, convertFromBase } = useDisplayCurrency();
+  const { currency, convertFromBase, convertToBase } = useDisplayCurrency();
 
   const [editing, setEditing] = useState<SavingsGoal | null>(null);
   const [creating, setCreating] = useState(false);
@@ -103,8 +104,11 @@ export function SavingsGoalsPage({
     setCreating(false);
     setEditing(goal);
     setName(goal.name);
-    setTarget(String(goal.target_amount));
-    setCurrent(String(goal.current_amount));
+    // Show amounts in display currency; storage stays base (NOK)
+    const targetDisplay = convertFromBase(Number(goal.target_amount), currency);
+    const currentDisplay = convertFromBase(Number(goal.current_amount), currency);
+    setTarget(String(Math.round(targetDisplay * 100) / 100));
+    setCurrent(String(Math.round(currentDisplay * 100) / 100));
     setDeadline(goal.deadline ?? "");
     setFormError(null);
   }
@@ -118,10 +122,12 @@ export function SavingsGoalsPage({
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
+    const targetDisplay = Number(target);
+    const currentDisplay = Number(current || 0);
     const input: SavingsGoalInput = {
       name,
-      target_amount: Number(target),
-      current_amount: Number(current || 0),
+      target_amount: Math.round(convertToBase(targetDisplay, currency) * 100) / 100,
+      current_amount: Math.round(convertToBase(currentDisplay, currency) * 100) / 100,
       deadline: deadline || null,
     };
     setBusy(true);
@@ -209,7 +215,7 @@ export function SavingsGoalsPage({
     );
   }
 
-  const showForm = creating || editing;
+  const showForm = creating || Boolean(editing);
 
   return (
     <main className="page-content savings-goals-page">
@@ -295,7 +301,7 @@ export function SavingsGoalsPage({
                 />
               </label>
               <label className="form-field">
-                <span>{t("savingsGoalsTarget")}</span>
+                <span>{t("savingsGoalsTarget")} ({currency})</span>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -307,7 +313,7 @@ export function SavingsGoalsPage({
                 />
               </label>
               <label className="form-field">
-                <span>{t("savingsGoalsCurrent")}</span>
+                <span>{t("savingsGoalsCurrent")} ({currency})</span>
                 <input
                   type="number"
                   inputMode="decimal"
