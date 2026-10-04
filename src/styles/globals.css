@@ -1,1 +1,56 @@
-/* RESTORE_MARKER - full content follows in next attempt if this is too large */
+/* Montra globals — restored via import + receipt overrides */
+@import url("https://cdn.jsdelivr.net/gh/VargiBeast/Montra@a481be4409a8b10a75da264c7997e4715bdc3aac/src/styles/globals.css");
+
+/* Receipt scanner: live video under guide frame */
+.scanner-stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+  z-index: 0;
+}
+.scanner-frame {
+  z-index: 1;
+}
+.scanner-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(8, 8, 8, 0.45);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Deduct-from-balance checkbox on receipt review */
+.receipt-deduct {
+  gap: 6px;
+}
+.receipt-deduct-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.receipt-deduct-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--accent, #6f4e33);
+}
+.receipt-deduct-hint {
+  display: block;
+  margin-left: 28px;
+}
