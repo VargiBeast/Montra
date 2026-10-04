@@ -1,0 +1,50 @@
+/* Home balance card is newer than the pinned base stylesheet.
+   Transaction name and method are spans, so they need a column. */
+.balance-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.balance-card .eyebrow,
+.balance-card .balance-value {
+  display: block;
+}
+.balance-value {
+  margin: 2px 0 4px;
+  font: 800 32px/1.1 var(--display, inherit);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.balance-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+.balance-split > div { min-width: 0; }
+.balance-split-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.balance-split strong {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.transaction-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.transaction-name,
+.transaction-sub {
+  display: block;
+  max-width: 100%;
+}
+.transaction-sub { margin-top: 0; }
