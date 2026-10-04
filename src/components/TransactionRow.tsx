@@ -14,7 +14,7 @@ interface TransactionRowProps {
 export function TransactionRow({ transaction, getImageUrl, onClick }: TransactionRowProps) {
   const t = useTranslation();
   const { language } = useLanguage();
-  const { currency } = useDisplayCurrency();
+  const { currency, convertFromBase } = useDisplayCurrency();
   const { url } = useSignedImage(transaction.image_url, getImageUrl);
   const Icon = transaction.image_url ? null : transaction.type === "in" ? ArrowDownLeft : ShoppingBag;
 
@@ -26,11 +26,11 @@ export function TransactionRow({ transaction, getImageUrl, onClick }: Transactio
       <span className="transaction-main">
         <span className="transaction-name">{transaction.name}</span>
         <span className="transaction-sub">
-          {transaction.method || (transaction.type === "in" ? t("moneyIn") : t("purchase"))} · {formatDate(transaction.date)}
+          {transaction.method || (transaction.type === "in" ? t("moneyIn") : t("purchase"))} · {formatDate(transaction.date, language)}
         </span>
       </span>
       <span className={`transaction-value ${transaction.type}`}>
-        {transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language)}
+        {transaction.type === "in" ? "+" : "−"}{formatMoney(Number(transaction.amount), currency, language, convertFromBase)}
       </span>
     </button>
   );
