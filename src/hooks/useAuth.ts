@@ -97,6 +97,14 @@ export function useAuth() {
     },
     [],
   );
+  const requestPasswordReset = useCallback(
+    (email: string) => runAuthAction(() => authService.requestPasswordReset(email)),
+    [runAuthAction],
+  );
+  const updatePassword = useCallback(
+    (password: string) => runAuthAction(() => authService.updatePassword(password)),
+    [runAuthAction],
+  );
   const signOut = useCallback(
     () => runAuthAction(() => authService.signOut()),
     [runAuthAction],
@@ -133,6 +141,8 @@ export function useAuth() {
     verifyEmailCode,
     signInWithPassword,
     signUpWithPassword,
+    requestPasswordReset,
+    updatePassword,
     signOut,
     retrySession,
   };
