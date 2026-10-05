@@ -30,11 +30,11 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusPricingBody: "Start with 7 days free. Then choose monthly or yearly — prices stay clear, no hidden fees.",
   plusTrialBadge: "7 days free",
   plusTrialThen: "Then",
-  plusPriceMonthly: "79 NOK",
+  plusPriceMonthly: "39 NOK",
   plusPriceMonthlyLabel: "per month",
-  plusPriceYearly: "790 NOK",
+  plusPriceYearly: "329 NOK",
   plusPriceYearlyLabel: "per year",
-  plusPriceYearlyNote: "Save two months vs monthly",
+  plusPriceYearlyNote: "About 30% off",
   plusIncluded: "Included with Plus",
   plusIncluded1: "Advanced analytics & category insights",
   plusIncluded2: "Goal planning & progress projections",
@@ -61,10 +61,15 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
     const lookedUp = translate(key, values);
-    const filled = fillMissingCopy(key, lookedUp, language);
-    // Dictionary first. English PLUS_FALLBACK only if lookup still has no copy.
-    let value = filled === "\u2014" || filled === key ? (PLUS_FALLBACK[key] ?? filled) : filled;
-    if (value === key) value = PLUS_FALLBACK[key] ?? "\u2014";
+    // Prefer real dictionary copy. Fall back to English PLUS_FALLBACK only when the
+    // lookup still yields the missing-copy sentinel or the raw key.
+    let value = lookedUp;
+    if (!value || value === "\u2014" || value === key) {
+      value = fillMissingCopy(key, lookedUp, language);
+    }
+    if (!value || value === "\u2014" || value === key) {
+      value = PLUS_FALLBACK[key] ?? "\u2014";
+    }
     if (values) {
       value = value.replace(/\{(\w+)\}/g, (m, n) => Object.hasOwn(values, n) ? String(values[n]) : m);
     }
