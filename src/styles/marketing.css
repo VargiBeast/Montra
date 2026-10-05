@@ -3,7 +3,7 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg, #f2f0eb);
+  background: var(--canvas);
   color: var(--ink);
 }
 .marketing-body {
@@ -23,7 +23,7 @@
      backdrop-filter stays on the pseudo so Safari 26 does not sample
      the blur into the status bar and clip the header. */
   padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-  background: color-mix(in srgb, var(--bg, #f2f0eb) 88%, transparent);
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
   border-bottom: 1px solid var(--line);
   isolation: isolate;
 }
