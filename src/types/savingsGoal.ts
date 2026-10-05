@@ -54,3 +54,38 @@ export function goalStage(percent: number, isComplete: boolean): GoalStage {
   return "early";
 }
 
+
+
+/** Planning helpers for Plus — honest math from target, current and optional deadline. */
+export interface GoalPlanInsight {
+  remaining: number;
+  monthsRemaining: number | null;
+  monthlyNeeded: number | null;
+  estimatedCompletion: string | null;
+  hasDeadline: boolean;
+  isComplete: boolean;
+  onTrack: boolean | null;
+}
+
+export function goalPlanInsight(
+  goal: Pick<SavingsGoal, "current_amount" | "target_amount" | "deadline">,
+  now = new Date(),
+): GoalPlanInsight {
+  const progress = goalProgress(goal);
+  const remaining = progress.remaining;
+  const isComplete = progress.isComplete;
+  if (isComplete || remaining <= 0) {
+    return { remaining: 0, monthsRemaining: null, monthlyNeeded: null, estimatedCompletion: null, hasDeadline: Boolean(goal.deadline), isComplete: true, onTrack: true };
+  }
+  const deadline = goal.deadline && /^\d{4}-\d{2}-\d{2}$/.test(goal.deadline) ? goal.deadline : null;
+  if (!deadline) {
+    return { remaining, monthsRemaining: null, monthlyNeeded: null, estimatedCompletion: null, hasDeadline: false, isComplete: false, onTrack: null };
+  }
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = new Date(`${deadline}T12:00:00`);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const daysLeft = Math.max(0, Math.ceil((end.getTime() - today.getTime()) / msPerDay));
+  const monthsRemaining = Math.max(1 / 30, daysLeft / 30.4375);
+  const monthlyNeeded = Math.round((remaining / monthsRemaining) * 100) / 100;
+  return { remaining, monthsRemaining: Math.round(monthsRemaining * 10) / 10, monthlyNeeded, estimatedCompletion: deadline, hasDeadline: true, isComplete: false, onTrack: daysLeft > 0 ? true : null };
+}
