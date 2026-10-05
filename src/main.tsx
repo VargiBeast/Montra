@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/globals.css";
+import "./styles/plus.css";
 import "./styles/preference-fix.css";
 import "./styles/layout-fix.css";
 import { CurrencyProvider } from "./lib/currency";
