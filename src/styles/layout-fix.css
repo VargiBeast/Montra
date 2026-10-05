@@ -186,7 +186,7 @@
   line-height: 1.3;
 }
 
-/* Appearance theme choices — even spacing, aligned icons, clear selected state */
+/* Appearance theme choices */
 .theme-choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -270,8 +270,7 @@
   }
 }
 
-/* Modals portaled to body must center on the viewport (not page-content).
-   page-content uses transform animation which otherwise traps position:fixed. */
+/* Modals */
 .modal-backdrop {
   position: fixed;
   z-index: 50;
@@ -305,7 +304,7 @@
   }
 }
 
-/* —— Onboarding —— */
+/* Onboarding */
 .onboarding-shell {
   min-height: 100dvh;
 }
@@ -463,5 +462,114 @@
 
   .onboarding-choice-list {
     max-height: min(48dvh, 320px);
+  }
+}
+
+/* —— Add Transaction form hierarchy —— */
+.transaction-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tx-amount-field {
+  margin: 2px 0 4px;
+}
+
+.tx-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-raised);
+  box-sizing: border-box;
+}
+
+.tx-amount-field.has-error .tx-amount-row,
+.form-field.has-error input,
+.form-field.has-error textarea {
+  border-color: color-mix(in srgb, #c45c5c 70%, var(--line));
+}
+
+.tx-amount-currency {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tx-amount-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--ink);
+  font-size: clamp(1.55rem, 6.5vw, 2rem) !important;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.tx-amount-input:focus {
+  box-shadow: none !important;
+}
+
+.tx-amount-row:focus-within {
+  border-color: color-mix(in srgb, var(--accent, var(--green)), var(--line) 40%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, var(--green)) 18%, transparent);
+}
+
+.tx-details-toggle {
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.tx-details-grid {
+  margin: 0;
+}
+
+.tx-form-actions {
+  margin-top: 8px;
+  position: sticky;
+  bottom: 0;
+  padding-top: 8px;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--surface-solid, var(--surface)) 70%, transparent);
+}
+
+.tx-form-actions .primary-button {
+  flex: 1.2;
+  min-height: 48px;
+}
+
+.tx-form-actions .secondary-button {
+  flex: 1;
+  min-height: 48px;
+}
+
+.type-toggle button {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+@media (max-width: 450px) {
+  .tx-amount-row {
+    min-height: 58px;
+    padding: 6px 12px;
+  }
+
+  .tx-amount-input {
+    font-size: clamp(1.4rem, 7vw, 1.75rem) !important;
   }
 }
