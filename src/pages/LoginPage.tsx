@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, ChevronDown, Globe2, KeyRound, Mail } from "lucide-react";
+import { ArrowLeft, ChevronDown, Globe2, Mail } from "lucide-react";
 import { getLoginCopy, languageOptions, useLanguage } from "../lib/i18n";
 
 interface LoginPageProps {
@@ -7,14 +7,10 @@ interface LoginPageProps {
   busy: boolean;
   isConfigured: boolean;
   onGoogle: () => Promise<void>;
-  onEmail: (email: string) => Promise<void>;
-  onVerifyCode: (email: string, token: string) => Promise<void>;
-  onPassword: (email: string, password: string) => Promise<void>;
-  onSignUp: (email: string, password: string) => Promise<{ needsConfirmation: boolean }>;
+  /** Sends a magic-link email (Supabase OTP email). No password. */
+  onMagicLink: (email: string) => Promise<void>;
   onRetry: () => Promise<void>;
 }
-
-type EmailMethod = "password" | "code" | null;
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -25,26 +21,20 @@ export function LoginPage({
   busy,
   isConfigured,
   onGoogle,
-  onEmail,
-  onVerifyCode,
-  onPassword,
-  onSignUp,
+  onMagicLink,
   onRetry,
 }: LoginPageProps) {
   const { language, setLanguage } = useLanguage();
   const [languageOpen, setLanguageOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [method, setMethod] = useState<EmailMethod>(null);
-  const [creating, setCreating] = useState(false);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [localBusy, setLocalBusy] = useState(false);
   const [localError, setLocalError] = useState("");
   const languageRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const copy = getLoginCopy(language);
+  const isBusy = busy || localBusy;
 
   useEffect(() => {
     if (!languageOpen) return;
@@ -67,266 +57,199 @@ export function LoginPage({
     setLanguageOpen(false);
   }
 
-  function resetFeedback() {
-    setLocalError("");
-    setNotice("");
-  }
-
   function backToStart() {
     setShowEmail(false);
-    setMethod(null);
-    setCreating(false);
     setSent(false);
-    setCode("");
-    resetFeedback();
+    setLocalError("");
   }
 
-  function backToMethods() {
-    setMethod(null);
-    setCreating(false);
-    setSent(false);
-    setCode("");
-    resetFeedback();
-  }
-
-  function requireEmail() {
+  async function submitMagicLink(event: FormEvent) {
+    event.preventDefault();
+    setLocalError("");
     const value = email.trim();
     if (!value) {
       setLocalError(copy.enterEmail);
-      return null;
+      return;
     }
     if (!isValidEmail(value)) {
       setLocalError(copy.invalidEmail);
-      return null;
-    }
-    return value;
-  }
-
-  async function submitPassword(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    resetFeedback();
-    const value = requireEmail();
-    if (!value) return;
-    if (!password) {
-      setLocalError(copy.enterPassword);
       return;
     }
-    if (password.length < 6) {
-      setLocalError(copy.shortPassword);
-      return;
-    }
+    setLocalBusy(true);
     try {
-      if (creating) {
-        const result = await onSignUp(value, password);
-        setNotice(result.needsConfirmation ? copy.accountCreated : copy.signedUpReady);
-        setCreating(false);
-        return;
-      }
-      await onPassword(value, password);
-    } catch (reason) {
-      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSignIn);
-    }
-  }
-
-  async function submitCode(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    resetFeedback();
-    const value = requireEmail();
-    if (!value) return;
-    try {
-      await onEmail(value);
+      await onMagicLink(value);
       setSent(true);
-      setNotice(copy.codeSent);
     } catch (reason) {
-      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSend);
+      const message =
+        reason instanceof Error && reason.message
+          ? reason.message
+          : (copy as { sendFailed?: string }).sendFailed ??
+            "We couldn’t send the magic link. Please try again.";
+      setLocalError(message);
+    } finally {
+      setLocalBusy(false);
     }
   }
 
-  async function submitVerify(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    resetFeedback();
-    const value = requireEmail();
-    if (!value) return;
-    const token = code.replace(/\s/g, "");
-    if (!token) {
-      setLocalError(copy.enterCode);
-      return;
-    }
-    try {
-      await onVerifyCode(value, token);
-    } catch (reason) {
-      setLocalError(reason instanceof Error ? reason.message : copy.couldNotSignIn);
-    }
-  }
-
-  const storyLines = copy.storyTitle.split("\n");
+  const sendLabel =
+    (copy as { sendMagicLink?: string }).sendMagicLink ??
+    copy.sendCode ??
+    "Send magic link";
+  const sentTitle =
+    (copy as { magicLinkSent?: string }).magicLinkSent ?? copy.codeSent ?? "Magic link sent";
+  const sentBody =
+    (copy as { magicLinkSentBody?: string }).magicLinkSentBody ??
+    copy.codeSentBody ??
+    "Open the link we sent to";
+  const sentHint =
+    (copy as { magicLinkSentHint?: string }).magicLinkSentHint ??
+    copy.codeSentHint ??
+    "The link expires after a short time.";
 
   return (
-    <div className="auth-page">
-      <section className="auth-story">
-        <div className="brand" style={{ color: "#f5fff9" }}>
-          <span className="brand-mark" aria-hidden="true" style={{ color: "var(--green)", background: "#f5fff9" }}><img className="mark-dark" src="/branding/mark-dark.png" alt="" /></span>
+    <div className="auth-shell">
+      <section className="auth-story panel" aria-hidden="true">
+        <div className="auth-story-brand">
+          <span className="brand-mark" aria-hidden="true">
+            <img className="mark-light" src="/branding/mark-light.png" alt="" />
+            <img className="mark-dark" src="/branding/mark-dark.png" alt="" />
+          </span>
           MONTRA
         </div>
-        <h1>{storyLines[0]}<br />{storyLines[1]}</h1>
-        <p>{copy.storyBody}</p>
+        <h1 className="auth-story-title">{copy.storyTitle}</h1>
+        <p className="auth-story-body">{copy.storyBody}</p>
       </section>
-      <section className="panel auth-panel">
+
+      <section className="auth-panel panel" aria-label={copy.welcome}>
         <div className="auth-panel-top">
           <div>
-            <h2>{copy.welcome}</h2>
-            <p>{copy.welcomeBody}</p>
+            <h2 className="auth-welcome">{copy.welcome}</h2>
+            <p className="auth-welcome-body">{copy.welcomeBody}</p>
           </div>
-          <div className="language-picker" ref={languageRef}>
+          <div className="language-menu" ref={languageRef}>
             <button
-              className="language-button"
               type="button"
-              aria-haspopup="listbox"
+              className="language-trigger"
+              aria-label={copy.languageLabel}
               aria-expanded={languageOpen}
               aria-controls={menuId}
-              onClick={() => setLanguageOpen((open) => !open)}
+              onClick={() => setLanguageOpen((v) => !v)}
             >
               <Globe2 size={14} aria-hidden="true" />
-              {new Intl.DisplayNames([language], { type: "language" }).of(language) ?? language}
-              <ChevronDown size={14} />
+              <span>{languageOptions.find((o) => o[0] === language)?.[1] ?? copy.languageName}</span>
+              <ChevronDown size={14} aria-hidden="true" />
             </button>
             {languageOpen && (
-              <div className="language-menu" id={menuId} role="listbox" aria-label={copy.languageLabel}>
-                {languageOptions.map(([locale, name]) => {
-                  const languageBase = language.toLowerCase().split("-")[0];
-                  const localeBase = locale.toLowerCase().split("-")[0];
-                  const selected = languageBase === localeBase || (languageBase === "no" && localeBase === "nb");
-                  return <button key={locale} type="button" role="option" aria-selected={selected} className={selected ? "selected" : ""} onClick={() => chooseLanguage(locale)}>{name}</button>;
-                })}
-              </div>
+              <ul id={menuId} className="language-dropdown" role="listbox">
+                {languageOptions.map(([code, label]) => (
+                  <li key={code}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={code === language}
+                      onClick={() => chooseLanguage(code)}
+                    >
+                      {label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
 
-        {!isConfigured && <div className="notice" role="alert">{authError || copy.notConnected}</div>}
-        {authError && isConfigured && !localError && (
+        {!isConfigured && (
           <div className="notice" role="alert">
-            {authError}
-            <button className="text-action" type="button" onClick={() => void onRetry()} style={{ marginLeft: 7 }}>{copy.tryAgain}</button>
+            <strong>{copy.notConnected}</strong>
+            <button type="button" className="text-action" onClick={() => void onRetry()}>
+              {copy.tryAgain}
+            </button>
           </div>
         )}
 
+        {authError && !localError && (
+          <p className="form-error" role="alert">
+            {authError}
+          </p>
+        )}
+
         {!showEmail ? (
-          <div className="auth-buttons auth-step">
-            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => void onGoogle()}>
+          <div className="auth-actions">
+            <button
+              className="secondary-button auth-button wide"
+              type="button"
+              disabled={isBusy || !isConfigured}
+              onClick={() => void onGoogle()}
+            >
               <GoogleMark />
               {copy.continueGoogle}
             </button>
-            <button className="secondary-button auth-button wide" type="button" disabled={busy || !isConfigured} onClick={() => { resetFeedback(); setShowEmail(true); }}>
-              <Mail size={17} />
+            <p className="auth-or">{copy.or}</p>
+            <button
+              className="secondary-button auth-button wide"
+              type="button"
+              disabled={isBusy || !isConfigured}
+              onClick={() => {
+                setLocalError("");
+                setSent(false);
+                setShowEmail(true);
+              }}
+            >
+              <Mail size={16} />
               {copy.continueEmail}
             </button>
           </div>
         ) : (
-          <div className="auth-step">
-            <button className="text-action auth-back" type="button" onClick={method || sent ? backToMethods : backToStart}>
-              <ArrowLeft size={15} />
-              {copy.back}
+          <div className="auth-email-flow">
+            <button type="button" className="text-action auth-back" onClick={backToStart} disabled={isBusy}>
+              <ArrowLeft size={14} /> {copy.back}
             </button>
-            <div className="form-field">
-              <label htmlFor="login-email">{copy.email}</label>
-              <input
-                id="login-email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder={copy.emailPlaceholder}
-              />
-            </div>
 
-            {!method && (
-              <div className="method-chooser">
-                <p>{copy.choose}</p>
-                <div className="method-grid">
-                  <button className="method-card" type="button" onClick={() => { resetFeedback(); setMethod("password"); }}>
-                    <KeyRound size={18} />
-                    <span>{copy.password}</span>
-                  </button>
-                  <button className="method-card" type="button" onClick={() => { resetFeedback(); setMethod("code"); }}>
-                    <Mail size={18} />
-                    <span>{copy.oneTime}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {method === "password" && (
-              <form onSubmit={submitPassword}>
+            {!sent ? (
+              <form onSubmit={(e) => void submitMagicLink(e)}>
                 <div className="form-field">
-                  <label htmlFor="login-password">{copy.passwordLabel}</label>
+                  <label htmlFor="login-email">{copy.email}</label>
                   <input
-                    id="login-password"
-                    type="password"
-                    autoComplete={creating ? "new-password" : "current-password"}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder={copy.passwordPlaceholder}
+                    id="login-email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder={copy.emailPlaceholder}
+                    disabled={isBusy}
+                    required
                   />
                 </div>
-                {localError && <p className="form-error" role="alert">{localError}</p>}
-                {notice && <div className="notice" role="status">{notice}</div>}
-                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
-                  {busy ? copy.continuing : creating ? copy.createAccount : copy.continue}
-                  {!busy && <ArrowRight size={15} />}
-                </button>
-                <p className="auth-switch">
-                  {creating ? copy.haveAccount : copy.needAccount}{" "}
-                  <button className="text-action" type="button" onClick={() => { setCreating((value) => !value); resetFeedback(); }}>
-                    {creating ? copy.signInInstead : copy.createAccount}
-                  </button>
-                </p>
-                {!creating && (
-                  <p className="auth-switch">
-                    <a className="text-action" href="/forgot-password">{(copy as { forgotTitle?: string }).forgotTitle ?? "Forgot password"}?</a>
+                {localError && (
+                  <p className="form-error" role="alert">
+                    {localError}
                   </p>
                 )}
-              </form>
-            )}
-
-            {method === "code" && !sent && (
-              <form onSubmit={submitCode}>
-                <p className="method-hint">{copy.choose} {copy.oneTime}</p>
-                {localError && <p className="form-error" role="alert">{localError}</p>}
-                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
+                <button
+                  className="primary-button wide"
+                  style={{ marginTop: 13 }}
+                  type="submit"
+                  disabled={isBusy || !isConfigured}
+                >
                   <Mail size={16} />
-                  {busy ? copy.sending : copy.sendCode}
+                  {isBusy ? copy.sending : sendLabel}
                 </button>
               </form>
-            )}
-
-            {method === "code" && sent && (
-              <form onSubmit={submitVerify}>
-                <div className="notice" role="status">
-                  <strong>{copy.codeSent}.</strong> {copy.codeSentBody} <strong>{email.trim()}</strong>. {copy.codeSentHint}
-                </div>
-                <div className="form-field" style={{ marginTop: 14 }}>
-                  <label htmlFor="login-code">{copy.codeLabel}</label>
-                  <input
-                    id="login-code"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    value={code}
-                    onChange={(event) => setCode(event.target.value)}
-                    placeholder={copy.codePlaceholder}
-                  />
-                </div>
-                {localError && <p className="form-error" role="alert">{localError}</p>}
-                <button className="primary-button wide" style={{ marginTop: 13 }} type="submit" disabled={busy || !isConfigured}>
-                  {busy ? copy.verifying : copy.verify}
-                </button>
-                <p className="auth-switch">
-                  <button className="text-action" type="button" disabled={busy || !isConfigured} onClick={() => void submitCode({ preventDefault() {} } as FormEvent<HTMLFormElement>)}>
-                    {busy ? copy.sending : copy.resend}
+            ) : (
+              <div className="notice" role="status">
+                <strong>{sentTitle}.</strong> {sentBody} <strong>{email.trim()}</strong>. {sentHint}
+                <p className="auth-switch" style={{ marginTop: 12 }}>
+                  <button
+                    className="text-action"
+                    type="button"
+                    disabled={isBusy || !isConfigured}
+                    onClick={() => void submitMagicLink({ preventDefault() {} } as FormEvent)}
+                  >
+                    {isBusy ? copy.sending : copy.resend ?? "Resend link"}
                   </button>
                 </p>
-              </form>
+              </div>
             )}
           </div>
         )}
