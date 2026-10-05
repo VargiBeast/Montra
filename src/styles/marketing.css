@@ -1,0 +1,188 @@
+/* Public marketing site — Liquid Glass aligned */
+.marketing-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg, #f2f0eb);
+  color: var(--ink);
+}
+.marketing-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--surface-raised, #fff) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+.marketing-brand { text-decoration: none; color: inherit; }
+.marketing-nav {
+  display: none;
+  gap: 18px;
+  margin-left: 12px;
+  flex: 1;
+}
+.marketing-nav a {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.marketing-nav a.active,
+.marketing-nav a:hover { color: var(--ink); }
+.marketing-header-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.marketing-main {
+  width: min(960px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 48px;
+  flex: 1;
+}
+.marketing-hero {
+  padding: 32px 28px;
+  margin-bottom: 20px;
+}
+.marketing-hero h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+.marketing-lead {
+  margin: 0 0 18px;
+  max-width: 52ch;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500;
+}
+.marketing-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.marketing-section { margin: 28px 0; }
+.marketing-section h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+.marketing-section-lead {
+  margin: 0 0 16px;
+  color: var(--muted);
+  max-width: 56ch;
+  line-height: 1.5;
+}
+.marketing-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.marketing-card {
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+}
+.marketing-card h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.marketing-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.marketing-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--green) 18%, transparent);
+}
+.marketing-plus-banner {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  margin: 20px 0;
+}
+.marketing-activity-preview { padding: 22px; display: grid; gap: 10px; }
+.marketing-simple { padding: 28px; }
+.marketing-simple h1 { margin-top: 0; }
+.pricing-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.pricing-plan-card {
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+}
+.pricing-plan-card.is-featured {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--green) 8%, transparent);
+}
+.pricing-plan-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.marketing-footer {
+  border-top: 1px solid var(--line);
+  padding: 28px 20px 36px;
+  background: color-mix(in srgb, var(--surface-raised, #fff) 70%, transparent);
+}
+.marketing-footer-grid {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+.marketing-footer-grid a {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+.marketing-footer-grid a:hover { color: var(--ink); }
+.marketing-footer-copy {
+  width: min(960px, 100%);
+  margin: 22px auto 0;
+  color: var(--subtle, var(--muted));
+  font-size: 12px;
+}
+.auth-page-solo {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.auth-page-solo .auth-panel { width: min(420px, 100%); }
+.wide { width: 100%; }
+@media (min-width: 720px) {
+  .marketing-nav { display: flex; }
+  .marketing-feature-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .pricing-compare-grid { grid-template-columns: 1fr 1.1fr; }
+  .marketing-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .marketing-header-actions .secondary-button { display: none; }
+  .marketing-hero { padding: 24px 18px; }
+}
