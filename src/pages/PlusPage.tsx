@@ -27,7 +27,9 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusFeaturePersonalize: "Personalize",
   plusFeaturePersonalizeBody: "Theme, language and display currency already adapt to you. Plus keeps expanding personal tools that fit the existing Montra design.",
   plusPricingTitle: "Pricing",
-  plusPricingBody: "Simple pricing. Payment integration comes next — this screen is ready for it.",
+  plusPricingBody: "Start with 7 days free. Then choose monthly or yearly — prices stay clear, no hidden fees.",
+  plusTrialBadge: "7 days free",
+  plusTrialThen: "Then",
   plusPriceMonthly: "79 NOK",
   plusPriceMonthlyLabel: "per month",
   plusPriceYearly: "790 NOK",
@@ -39,8 +41,11 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusIncluded3: "Month forecast & savings outlook",
   plusIncluded4: "Priority access to new Plus tools",
   plusCtaActive: "You're on Montra Plus",
-  plusCtaLocked: "Get Montra Plus",
-  plusCtaNote: "Payments are not enabled yet. When billing ships, this is where you'll upgrade. Test accounts already unlock Plus features.",
+  plusCtaLocked: "Start 7-day free trial",
+  plusCtaNote: "Payments are not enabled yet. When billing ships, this is where the trial and subscription start. Test accounts already unlock Plus features.",
+  plusCompareTitle: "Free vs Plus",
+  plusCompareFree: "Free",
+  plusComparePlus: "Plus",
   plusOpenAnalytics: "Open analytics",
   plusOpenGoals: "Open savings goals",
   plusBack: "Back",
@@ -116,6 +121,10 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
           <h2>{t("plusPricingTitle")}</h2>
         </div>
         <p className="plus-pricing-body">{t("plusPricingBody")}</p>
+        <div className="plus-trial-banner" role="status">
+          <span className="plus-trial-badge">{t("plusTrialBadge")}</span>
+          <span className="plus-trial-then">{t("plusTrialThen")}</span>
+        </div>
         <div className="plus-price-cards">
           <article className="plus-price-card">
             <strong className="plus-price-amount">{t("plusPriceMonthly")}</strong>
