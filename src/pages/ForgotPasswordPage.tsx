@@ -1,7 +1,7 @@
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Mail } from "lucide-react";
-import { getLoginCopy, useLanguage } from "../lib/i18n";
+import { getLoginCopy, loginCopy, useLanguage } from "../lib/i18n";
 import { useDocumentMeta } from "../lib/seo";
 
 interface Props {
@@ -17,7 +17,7 @@ function isValidEmail(value: string) {
 
 export function ForgotPasswordPage({ busy, isConfigured, authError, onSubmit }: Props) {
   const { language } = useLanguage();
-  const copy = getLoginCopy(language);
+  const copy = getLoginCopy(language) as typeof loginCopy.en;
   const [email, setEmail] = useState("");
   const [localError, setLocalError] = useState("");
   const [sent, setSent] = useState(false);
