@@ -7,6 +7,7 @@ import { HomePublic } from "./pages/public/HomePublic";
 import { FeaturesPublic } from "./pages/public/FeaturesPublic";
 import { PricingPublic } from "./pages/public/PricingPublic";
 import { SimplePublic } from "./pages/public/SimplePublic";
+import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
@@ -157,6 +158,7 @@ export function AppRoutes() {
         <Route path="terms" element={<SimplePublic page="terms" />} />
         <Route path="cookies" element={<SimplePublic page="cookies" />} />
         <Route path="security" element={<SimplePublic page="security" />} />
+        <Route path="wishlist/:token" element={<PublicWishlistPage />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
