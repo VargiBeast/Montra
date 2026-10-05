@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { ArrowLeft, CheckCircle2, Lock, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
 import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
 import { goalPlanInsight, goalProgress, goalStage } from "../types/savingsGoal";
-import { formatDate, formatMoney } from "../lib/utils";
+import { formatMoney } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 
@@ -188,7 +188,7 @@ export function SavingsGoalsPage({
 
   function renderGoalCard(goal: SavingsGoal) {
     const progress = goalProgress(goal);
-    const stage = goalStage(goal);
+    const stage = goalStage(progress.percent, progress.isComplete);
     return (
       <article key={goal.id} className="panel savings-goal-card">
         <div className="savings-goal-card-top">
@@ -210,8 +210,8 @@ export function SavingsGoalsPage({
         </div>
 
         <div className="savings-goal-amounts">
-          <strong>{money(progress.current)}</strong>
-          <span>/ {money(progress.target)}</span>
+          <strong>{money(Number(goal.current_amount))}</strong>
+          <span>/ {money(Number(goal.target_amount))}</span>
         </div>
 
         <div className="savings-goal-bar" aria-hidden="true">
