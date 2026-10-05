@@ -3,7 +3,7 @@ import {
   ArrowDownUp, Gift, Globe2, PiggyBank, Receipt, Sparkles, Wallet,
 } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
-import { useDocumentMeta } from "../../lib/seo";
+import { organizationJsonLd, useDocumentMeta, websiteJsonLd } from "../../lib/seo";
 
 export function HomePublic() {
   const t = useTranslation();
@@ -11,6 +11,7 @@ export function HomePublic() {
     title: t("seoHomeTitle"),
     description: t("seoHomeDescription"),
     path: "/",
+    jsonLd: [websiteJsonLd(), organizationJsonLd()],
   });
 
   const pillars = [

@@ -1,11 +1,22 @@
 User-agent: *
 Allow: /
+Allow: /features
+Allow: /plus
+Allow: /pricing
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /help
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+Allow: /security
+
 Disallow: /app
 Disallow: /home
 Disallow: /activity
 Disallow: /transactions
 Disallow: /receipts
-Disallow: /wishlist
 Disallow: /goals
 Disallow: /more
 Disallow: /settings
@@ -15,5 +26,7 @@ Disallow: /login
 Disallow: /signup
 Disallow: /forgot-password
 Disallow: /reset-password
+# Owner app wishlist (share pages are noindex and use /wishlist/:token)
+Disallow: /wishlist
 
 Sitemap: https://montra.cash/sitemap.xml

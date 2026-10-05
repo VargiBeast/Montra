@@ -145,7 +145,7 @@ function ProtectedApp() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<MarketingLayout />}>
+      <Route path="/" element={<MarketingLayout />}>
         <Route index element={<HomePublic />} />
         <Route path="features" element={<FeaturesPublic />} />
         <Route path="pricing" element={<PricingPublic />} />
