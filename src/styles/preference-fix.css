@@ -1,6 +1,7 @@
 /* Preference dropdown spacing — keeps selects inside the panel, away from borders */
 .language-settings .preference-field,
-.currency-settings .preference-field {
+.currency-settings .preference-field,
+.more-preferences .preference-field {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -10,7 +11,8 @@
 }
 
 .language-settings .preference-field select,
-.currency-settings .preference-field select {
+.currency-settings .preference-field select,
+.more-preferences .preference-field select {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -32,7 +34,8 @@
 }
 
 .language-settings .preference-field svg,
-.currency-settings .preference-field svg {
+.currency-settings .preference-field svg,
+.more-preferences .preference-field svg {
   position: absolute;
   top: 16px;
   inset-inline-end: 30px;
@@ -42,7 +45,8 @@
 
 @media (max-width: 450px) {
   .language-settings .preference-field,
-  .currency-settings .preference-field {
+  .currency-settings .preference-field,
+  .more-preferences .preference-field {
     padding-inline: 12px;
     padding-bottom: 10px;
   }
@@ -62,4 +66,70 @@
 
 html[dir="rtl"] .preference-field select {
   text-align: right;
+}
+
+/* More page control-center polish */
+.more-page .section-label {
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.more-page .section-label:first-of-type {
+  margin-top: 0;
+}
+
+.more-preferences,
+.more-data,
+.more-account {
+  margin-bottom: 6px;
+}
+
+.setting-value {
+  flex-shrink: 0;
+  max-width: 42%;
+  margin-left: auto;
+  padding-left: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[dir="rtl"] .setting-value {
+  margin-left: 0;
+  margin-right: auto;
+  padding-left: 0;
+  padding-right: 10px;
+  text-align: left;
+}
+
+.more-preferences .theme-choices {
+  margin: 0 12px 14px;
+}
+
+.more-preferences .setting-row.is-static + .preference-field,
+.more-preferences .preference-field + .setting-row.is-static {
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+@media (max-width: 390px) {
+  .setting-value {
+    max-width: 36%;
+    font-size: 11px;
+  }
+
+  .theme-choice {
+    min-height: 64px;
+    padding: 12px 6px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 760px) {
+  .more-preferences .theme-choices {
+    max-width: 460px;
+  }
 }
