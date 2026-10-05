@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
-import { Check } from "lucide-react";
+import {
+  ArrowDownUp, Gift, Globe2, Home, PiggyBank, Receipt, Sparkles, Wallet,
+} from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 
@@ -11,13 +13,16 @@ export function FeaturesPublic() {
     path: "/features",
   });
 
-  const items = [
-    { title: t("homePillarTrackTitle"), body: t("homePillarTrackBody") },
-    { title: t("homePillarReceiptsTitle"), body: t("homePillarReceiptsBody") },
-    { title: t("homePillarGoalsTitle"), body: t("homePillarGoalsBody") },
-    { title: t("homePillarWishlistTitle"), body: t("homePillarWishlistBody") },
-    { title: t("homePillarLocaleTitle"), body: t("homePillarLocaleBody") },
-    { title: t("homePillarPlusTitle"), body: t("homePillarPlusBody") },
+  const features = [
+    { icon: <Home size={22} />, title: t("featHomeTitle"), body: t("featHomeBody") },
+    { icon: <ArrowDownUp size={22} />, title: t("featActivityTitle"), body: t("featActivityBody") },
+    { icon: <Wallet size={22} />, title: t("featTransactionsTitle"), body: t("featTransactionsBody") },
+    { icon: <Receipt size={22} />, title: t("featReceiptsTitle"), body: t("featReceiptsBody") },
+    { icon: <PiggyBank size={22} />, title: t("featGoalsTitle"), body: t("featGoalsBody") },
+    { icon: <Gift size={22} />, title: t("featWishlistTitle"), body: t("featWishlistBody") },
+    { icon: <Globe2 size={22} />, title: t("featCurrencyTitle"), body: t("featCurrencyBody") },
+    { icon: <Globe2 size={22} />, title: t("featLanguagesTitle"), body: t("featLanguagesBody") },
+    { icon: <Sparkles size={22} />, title: t("featPlusTitle"), body: t("featPlusBody") },
   ];
 
   return (
@@ -31,17 +36,14 @@ export function FeaturesPublic() {
           <Link to="/pricing" className="secondary-button">{t("navPricing")}</Link>
         </div>
       </section>
-
-      <section className="marketing-section">
-        <div className="marketing-feature-grid">
-          {items.map((item) => (
-            <article key={item.title} className="panel marketing-card">
-              <span className="marketing-card-icon" aria-hidden="true"><Check size={18} /></span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
-        </div>
+      <section className="marketing-feature-grid marketing-section">
+        {features.map((f) => (
+          <article key={f.title} className="panel marketing-card">
+            <span className="marketing-card-icon" aria-hidden="true">{f.icon}</span>
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+          </article>
+        ))}
       </section>
     </main>
   );
