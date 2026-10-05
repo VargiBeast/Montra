@@ -56,19 +56,21 @@ export function toSavingsGoalError(reason: unknown, fallback: string): Error {
 
 function normalizeInput(input: SavingsGoalInput): SavingsGoalInput {
   const name = input.name.trim();
-  if (!name) throw new Error("Add a name for this goal.");
+  if (!name) throw new Error("savingsGoalsNameRequired");
   if (!Number.isFinite(input.target_amount) || input.target_amount <= 0) {
-    throw new Error("Enter a target amount greater than zero.");
+    throw new Error("savingsGoalsTargetInvalid");
   }
   if (!Number.isFinite(input.current_amount) || input.current_amount < 0) {
-    throw new Error("Current amount cannot be negative.");
+    throw new Error("savingsGoalsCurrentInvalid");
   }
   let deadline: string | null = null;
   if (input.deadline && input.deadline.trim()) {
     const d = input.deadline.trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
-      throw new Error("Choose a valid deadline date.");
+      throw new Error("savingsGoalsDeadlineInvalid");
     }
+    const parsed = new Date(`${d}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) throw new Error("savingsGoalsDeadlineInvalid");
     deadline = d;
   }
   return {
@@ -90,10 +92,14 @@ export async function listSavingsGoals(
     .order("updated_at", { ascending: false });
   if (error) throw toSavingsGoalError(error, "Could not load savings goals.");
   return (data ?? []).map((row) => ({
-    ...row,
+    id: row.id,
+    user_id: row.user_id,
+    name: row.name,
     target_amount: Number(row.target_amount),
     current_amount: Number(row.current_amount),
-    wishlist_item_id: row.wishlist_item_id ?? null,
+    deadline: row.deadline ?? null,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
   })) as SavingsGoal[];
 }
 
@@ -118,7 +124,7 @@ export async function saveSavingsGoal(
       })
       .eq("id", existing.id)
       .eq("user_id", userId);
-    if (error) throw toSavingsGoalError(error, "Could not save goal.");
+    if (error) throw toSavingsGoalError(error, "savingsGoalsSaveFailed");
     return;
   }
 
@@ -133,7 +139,7 @@ export async function saveSavingsGoal(
     created_at: now,
     updated_at: now,
   });
-  if (error) throw toSavingsGoalError(error, "Could not save goal.");
+  if (error) throw toSavingsGoalError(error, "savingsGoalsSaveFailed");
 }
 
 export async function deleteSavingsGoal(
@@ -141,10 +147,19 @@ export async function deleteSavingsGoal(
   userId: string,
   goal: SavingsGoal,
 ): Promise<void> {
+  // Wishlist items reference goals. Unlink only this user's rows so a
+  // restrict/cascade foreign key cannot delete the wishlist history.
+  const { error: unlinkError } = await client
+    .from("wishlists")
+    .update({ savings_goal_id: null, updated_at: new Date().toISOString() })
+    .eq("user_id", userId)
+    .eq("savings_goal_id", goal.id);
+  if (unlinkError) throw toSavingsGoalError(unlinkError, "savingsGoalsDeleteFailed");
+
   const { error } = await client
     .from(TABLE)
     .delete()
     .eq("id", goal.id)
     .eq("user_id", userId);
-  if (error) throw toSavingsGoalError(error, "Could not delete goal.");
+  if (error) throw toSavingsGoalError(error, "savingsGoalsDeleteFailed");
 }

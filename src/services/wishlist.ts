@@ -29,9 +29,9 @@ async function removeImage(client: SupabaseClient, path: string | null) {
 
 function normalizeInput(input: WishlistItemInput): Omit<WishlistItemInput, "image" | "removeImage"> {
   const name = input.name.trim();
-  if (!name) throw new Error("Add a name for this item.");
+  if (!name) throw new Error("wishlistNameRequired");
   if (!Number.isFinite(input.price) || input.price <= 0) {
-    throw new Error("Enter a price greater than zero.");
+    throw new Error("wishlistPriceInvalid");
   }
   const currency = (input.currency || "NOK").trim().toUpperCase();
   if (!/^[A-Z]{3}$/.test(currency)) {
@@ -166,15 +166,20 @@ export async function deleteWishlistItem(
   await removeImage(client, imagePath);
 }
 
+const signedUrlCache = new Map<string, { url: string; expiresAt: number }>();
+
 export async function getSignedWishlistImageUrl(
   client: SupabaseClient,
   userId: string,
   path: string,
 ): Promise<string> {
   const safe = requireUserImagePath(path, userId);
+  const cached = signedUrlCache.get(safe);
+  if (cached && cached.expiresAt > Date.now()) return cached.url;
   const { data, error } = await client.storage
     .from(IMAGE_BUCKET)
     .createSignedUrl(safe, 60 * 60);
   if (error) throw error;
+  signedUrlCache.set(safe, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
   return data.signedUrl;
 }

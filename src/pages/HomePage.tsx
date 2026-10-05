@@ -212,7 +212,11 @@ export function HomePage({
                 </span>
                 <strong>{t("savingsGoals")}</strong>
                 <span>
-                  {savingsGoals.length === 0 ? t("homeGoalsEmpty") : t("savingsGoalsHint")}
+                  {savingsGoals.length === 0
+                    ? t("homeGoalsEmpty")
+                    : t("homeGoalsActive", {
+                        count: savingsGoals.filter((g) => !goalProgress(g).isComplete).length,
+                      })}
                 </span>
               </button>
             )}

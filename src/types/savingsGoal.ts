@@ -42,3 +42,15 @@ export function goalProgress(goal: Pick<SavingsGoal, "current_amount" | "target_
     isOverTarget: current > target,
   };
 }
+
+/** Real progress bands. Labels only — never fake urgency. */
+export type GoalStage = "early" | "building" | "halfway" | "almost" | "reached";
+
+export function goalStage(percent: number, isComplete: boolean): GoalStage {
+  if (isComplete || percent >= 100) return "reached";
+  if (percent >= 75) return "almost";
+  if (percent >= 45 && percent <= 55) return "halfway";
+  if (percent >= 25) return "building";
+  return "early";
+}
+

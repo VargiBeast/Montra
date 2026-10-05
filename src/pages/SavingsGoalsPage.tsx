@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, CheckCircle2, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
 import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
-import { goalProgress } from "../types/savingsGoal";
+import { goalProgress, goalStage } from "../types/savingsGoal";
 import { formatDate, formatMoney } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -14,35 +14,16 @@ interface SavingsGoalsPageProps {
   onBack: () => void;
   onSave: (input: SavingsGoalInput, existing?: SavingsGoal) => Promise<void>;
   onDelete: (goal: SavingsGoal) => Promise<void>;
+  onRetry?: () => void;
 }
 
-const FALLBACK: Record<string, string> = {
-  savingsGoals: "Savings goals",
-  savingsGoalsGreeting: "Save toward something real",
-  savingsGoalsEmptyTitle: "No savings goals yet",
-  savingsGoalsEmptyBody: "Create a goal, set a target, and track progress over time.",
-  savingsGoalsAdd: "Add goal",
-  savingsGoalsEdit: "Edit goal",
-  savingsGoalsDelete: "Delete goal",
-  savingsGoalsDeleteConfirm: "Delete this savings goal? This cannot be undone.",
-  savingsGoalsName: "Goal name",
-  savingsGoalsTarget: "Target amount",
-  savingsGoalsCurrent: "Current amount",
-  savingsGoalsDeadline: "Deadline (optional)",
-  savingsGoalsRemaining: "Remaining",
-  savingsGoalsProgress: "Progress",
-  savingsGoalsCompleted: "Completed",
-  savingsGoalsOverTarget: "Above target",
-  savingsGoalsActive: "Active goals",
-  savingsGoalsDoneSection: "Completed goals",
-  savingsGoalsSave: "Save goal",
-  savingsGoalsCancel: "Cancel",
-  savingsGoalsNamePlaceholder: "e.g. New MacBook",
-  savingsGoalsLoadError: "Could not load goals.",
-  savingsGoalsHint: "Track progress toward a target",
-  back: "Back",
-  loading: "Loading\u2026",
-};
+const STAGE_KEY = {
+  early: "savingsGoalsStageEarly",
+  building: "savingsGoalsStageBuilding",
+  halfway: "savingsGoalsStageHalfway",
+  almost: "savingsGoalsStageAlmost",
+  reached: "savingsGoalsReached",
+} as const;
 
 export function SavingsGoalsPage({
   goals,
@@ -51,32 +32,24 @@ export function SavingsGoalsPage({
   onBack,
   onSave,
   onDelete,
+  onRetry,
 }: SavingsGoalsPageProps) {
   const translate = useTranslation();
-  const t = (key: string, values?: Record<string, string | number>) => {
-    const value = translate(key, values);
-    if (value !== "\u2014") return value;
-    let text = FALLBACK[key] ?? key;
-    if (values) {
-      text = text.replace(/\{(\w+)\}/g, (m, n) =>
-        Object.hasOwn(values, n) ? String(values[n]) : m,
-      );
-    }
-    return text;
-  };
+  const t = (key: string, values?: Record<string, string | number>) => translate(key, values);
   const { language } = useLanguage();
   const { currency, convertFromBase, convertToBase } = useDisplayCurrency();
 
   const [editing, setEditing] = useState<SavingsGoal | null>(null);
   const [creating, setCreating] = useState(false);
+  const [addingTo, setAddingTo] = useState<SavingsGoal | null>(null);
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<SavingsGoal | null>(null);
 
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
-  const [current, setCurrent] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [addAmount, setAddAmount] = useState("");
 
   const money = (base: number) =>
     formatMoney(base, currency, language, convertFromBase(base, currency));
@@ -91,43 +64,73 @@ export function SavingsGoalsPage({
     return { active: a, completed: c };
   }, [goals]);
 
+  function explain(reason: unknown, fallbackKey: string) {
+    const raw =
+      reason instanceof Error && reason.message.trim()
+        ? reason.message
+        : reason && typeof reason === "object" && "message" in reason && typeof (reason as { message: unknown }).message === "string"
+          ? (reason as { message: string }).message
+          : fallbackKey;
+    const translated = t(raw);
+    return translated !== "—" ? translated : t(fallbackKey);
+  }
+
   function openCreate() {
     setEditing(null);
+    setAddingTo(null);
     setCreating(true);
     setName("");
     setTarget("");
-    setCurrent("0");
     setDeadline("");
     setFormError(null);
   }
 
   function openEdit(goal: SavingsGoal) {
     setCreating(false);
+    setAddingTo(null);
     setEditing(goal);
     setName(goal.name);
     const targetDisplay = convertFromBase(Number(goal.target_amount), currency);
-    const currentDisplay = convertFromBase(Number(goal.current_amount), currency);
     setTarget(String(Math.round(targetDisplay * 100) / 100));
-    setCurrent(String(Math.round(currentDisplay * 100) / 100));
     setDeadline(goal.deadline ?? "");
+    setFormError(null);
+  }
+
+  function openAdd(goal: SavingsGoal) {
+    setCreating(false);
+    setEditing(null);
+    setAddingTo(goal);
+    setAddAmount("");
     setFormError(null);
   }
 
   function closeForm() {
     setCreating(false);
     setEditing(null);
+    setAddingTo(null);
     setFormError(null);
   }
 
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
+    if (!name.trim()) {
+      setFormError(t("savingsGoalsNameRequired"));
+      return;
+    }
     const targetDisplay = Number(target);
-    const currentDisplay = Number(current || 0);
+    if (!Number.isFinite(targetDisplay) || targetDisplay <= 0) {
+      setFormError(t("savingsGoalsTargetInvalid"));
+      return;
+    }
+    if (deadline && !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+      setFormError(t("savingsGoalsDeadlineInvalid"));
+      return;
+    }
     const input: SavingsGoalInput = {
       name,
       target_amount: Math.round(convertToBase(targetDisplay, currency) * 100) / 100,
-      current_amount: Math.round(convertToBase(currentDisplay, currency) * 100) / 100,
+      current_amount: editing ? editing.current_amount : 0,
       deadline: deadline || null,
     };
     setBusy(true);
@@ -135,16 +138,41 @@ export function SavingsGoalsPage({
       await onSave(input, editing ?? undefined);
       closeForm();
     } catch (reason) {
-      const message =
-        reason instanceof Error && reason.message.trim()
-          ? reason.message
-          : reason && typeof reason === "object" && "message" in reason && typeof (reason as { message: unknown }).message === "string"
-            ? (reason as { message: string }).message
-            : "Could not save goal.";
-      if (import.meta.env.DEV) {
-        console.error("[SavingsGoalsPage] save failed", reason);
-      }
-      setFormError(message);
+      setFormError(explain(reason, "savingsGoalsSaveFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitAdd(e: React.FormEvent) {
+    e.preventDefault();
+    if (!addingTo) return;
+    setFormError(null);
+    const display = Number(addAmount);
+    if (!Number.isFinite(display) || display <= 0) {
+      setFormError(t("savingsGoalsAddInvalid"));
+      return;
+    }
+    const addedBase = Math.round(convertToBase(display, currency) * 100) / 100;
+    const next = Math.round((Number(addingTo.current_amount) + addedBase) * 100) / 100;
+    if (next < 0) {
+      setFormError(t("savingsGoalsCurrentInvalid"));
+      return;
+    }
+    setBusy(true);
+    try {
+      await onSave(
+        {
+          name: addingTo.name,
+          target_amount: addingTo.target_amount,
+          current_amount: next,
+          deadline: addingTo.deadline,
+        },
+        addingTo,
+      );
+      closeForm();
+    } catch (reason) {
+      setFormError(explain(reason, "savingsGoalsSaveFailed"));
     } finally {
       setBusy(false);
     }
@@ -156,16 +184,8 @@ export function SavingsGoalsPage({
       await onDelete(goal);
       setConfirmDelete(null);
     } catch (reason) {
-      const message =
-        reason instanceof Error && reason.message.trim()
-          ? reason.message
-          : reason && typeof reason === "object" && "message" in reason && typeof (reason as { message: unknown }).message === "string"
-            ? (reason as { message: string }).message
-            : "Could not delete goal.";
-      if (import.meta.env.DEV) {
-        console.error("[SavingsGoalsPage] delete failed", reason);
-      }
-      setFormError(message);
+      setFormError(explain(reason, "savingsGoalsDeleteFailed"));
+      setConfirmDelete(null);
     } finally {
       setBusy(false);
     }
@@ -173,20 +193,23 @@ export function SavingsGoalsPage({
 
   function GoalCard({ goal }: { goal: SavingsGoal }) {
     const progress = goalProgress(goal);
+    const stage = goalStage(progress.percent, progress.isComplete);
     return (
-      <article className="panel savings-goal-card">
+      <article className={`panel savings-goal-card stage-${stage}`}>
         <div className="savings-goal-head">
           <div className="savings-goal-title-row">
             <span className="savings-goal-icon" aria-hidden="true">
               {progress.isComplete ? <CheckCircle2 size={18} /> : <Target size={18} />}
             </span>
-            <div>
+            <div className="savings-goal-copy">
               <strong className="savings-goal-name">{goal.name}</strong>
-              {goal.deadline && (
-                <span className="savings-goal-deadline">
-                  {formatDate(goal.deadline, language)}
-                </span>
-              )}
+              <span className="savings-goal-stage">
+                {progress.isComplete
+                  ? progress.isOverTarget
+                    ? t("savingsGoalsOverTarget")
+                    : t("savingsGoalsReached")
+                  : t(STAGE_KEY[stage])}
+              </span>
             </div>
           </div>
           <div className="savings-goal-actions">
@@ -204,31 +227,49 @@ export function SavingsGoalsPage({
           </div>
         </div>
 
-        <div className="savings-goal-progress-track" aria-hidden="true">
+        <p className="savings-goal-amounts">
+          <strong>{money(goal.current_amount)}</strong>
+          <span> / {money(goal.target_amount)}</span>
+        </p>
+
+        <div
+          className="savings-goal-progress-track"
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progress.percent}
+          aria-label={t("savingsGoalsProgress")}
+        >
           <span
-            className={`savings-goal-progress-fill ${progress.isComplete ? "is-complete" : ""} ${progress.isOverTarget ? "is-over" : ""}`}
-            style={{ width: `${Math.min(100, progress.percent)}%` }}
+            className={`savings-goal-progress-fill stage-${stage}`}
+            style={{ width: `${progress.percent}%` }}
           />
         </div>
 
         <div className="savings-goal-meta">
           <span>
-            {t("savingsGoalsProgress")}: <strong>{progress.percent}%</strong>
-            {progress.isComplete && (
-              <span className="savings-goal-badge">
-                {progress.isOverTarget ? t("savingsGoalsOverTarget") : t("savingsGoalsCompleted")}
-              </span>
-            )}
+            {t("savingsGoalsProgress")} <strong>{progress.percent}%</strong>
           </span>
-          <span>
-            {money(goal.current_amount)} / {money(goal.target_amount)}
-          </span>
+          {goal.deadline ? (
+            <span className="savings-goal-deadline">{formatDate(goal.deadline, language)}</span>
+          ) : null}
         </div>
-        {!progress.isComplete && (
-          <p className="savings-goal-remaining">
-            {t("savingsGoalsRemaining")}: <strong>{money(progress.remaining)}</strong>
+
+        {progress.isComplete ? (
+          <p className="savings-goal-remaining is-reached">
+            <CheckCircle2 size={15} aria-hidden="true" />
+            {t("savingsGoalsReached")}
+          </p>
+        ) : (
+          <p className={`savings-goal-remaining ${stage === "almost" ? "is-close" : ""}`}>
+            {t("savingsGoalsLeft", { amount: money(progress.remaining) })}
           </p>
         )}
+
+        <button type="button" className="secondary-button savings-goal-add-money" onClick={() => openAdd(goal)}>
+          <Plus size={15} />
+          {t("savingsGoalsAddMoney")}
+        </button>
       </article>
     );
   }
@@ -241,7 +282,7 @@ export function SavingsGoalsPage({
         <button type="button" className="icon-button" aria-label={t("back")} onClick={onBack}>
           <ArrowLeft size={18} />
         </button>
-        <div>
+        <div className="savings-goals-heading">
           <p className="greeting">{t("savingsGoalsGreeting")}</p>
           <h1 className="page-title">{t("savingsGoals")}</h1>
         </div>
@@ -251,8 +292,17 @@ export function SavingsGoalsPage({
         </button>
       </div>
 
-      {error && <p className="form-error stack-notice">{error || t("savingsGoalsLoadError")}</p>}
-      {formError && !showForm && <p className="form-error stack-notice">{formError}</p>}
+      {error && (
+        <div className="panel stack-notice savings-inline-error">
+          <p className="form-error">{error}</p>
+          {onRetry && (
+            <button type="button" className="secondary-button" onClick={onRetry}>
+              {t("savingsGoalsRetry")}
+            </button>
+          )}
+        </div>
+      )}
+      {formError && !showForm && !addingTo && <p className="form-error stack-notice">{formError}</p>}
 
       {isLoading ? (
         <div className="loading-block panel">{t("loading")}</div>
@@ -304,16 +354,15 @@ export function SavingsGoalsPage({
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id="savings-goal-form-title">
-              {editing ? t("savingsGoalsEdit") : t("savingsGoalsAdd")}
+              {editing ? t("savingsGoalsEdit") : t("savingsGoalsCreate")}
             </h2>
             <form className="stack-md" onSubmit={(e) => void submitForm(e)}>
               <label className="form-field">
-                <span>{t("savingsGoalsName")}</span>
+                <span>{t("savingsGoalsWhatFor")}</span>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t("savingsGoalsNamePlaceholder")}
-                  required
                   maxLength={80}
                   autoFocus
                 />
@@ -327,23 +376,59 @@ export function SavingsGoalsPage({
                   step="0.01"
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
-                  required
-                />
-              </label>
-              <label className="form-field">
-                <span>{t("savingsGoalsCurrent")} ({currency})</span>
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min="0"
-                  step="0.01"
-                  value={current}
-                  onChange={(e) => setCurrent(e.target.value)}
                 />
               </label>
               <label className="form-field">
                 <span>{t("savingsGoalsDeadline")}</span>
                 <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+              </label>
+              {editing && (
+                <p className="analytics-hint">
+                  {t("savingsGoalsSavedNow")}: {money(editing.current_amount)}
+                </p>
+              )}
+              {formError && <p className="form-error">{formError}</p>}
+              <div className="form-actions">
+                <button type="button" className="secondary-button" onClick={closeForm} disabled={busy}>
+                  {t("savingsGoalsCancel")}
+                </button>
+                <button type="submit" className="primary-button" disabled={busy}>
+                  {editing ? t("savingsGoalsSave") : t("savingsGoalsCreate")}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {addingTo && createPortal(
+        <div className="modal-backdrop" role="presentation" onClick={closeForm}>
+          <div
+            className="modal-sheet panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="savings-add-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="savings-add-title">{t("savingsGoalsAddMoneyTitle")}</h2>
+            <p className="analytics-hint">{addingTo.name}</p>
+            <p className="savings-goal-amounts">
+              <strong>{money(addingTo.current_amount)}</strong>
+              <span> / {money(addingTo.target_amount)}</span>
+            </p>
+            <form className="stack-md" onSubmit={(e) => void submitAdd(e)}>
+              <label className="form-field">
+                <span>{t("savingsGoalsAddAmount")} ({currency})</span>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min="0.01"
+                  step="0.01"
+                  value={addAmount}
+                  onChange={(e) => setAddAmount(e.target.value)}
+                  autoFocus
+                />
               </label>
               {formError && <p className="form-error">{formError}</p>}
               <div className="form-actions">
@@ -351,7 +436,7 @@ export function SavingsGoalsPage({
                   {t("savingsGoalsCancel")}
                 </button>
                 <button type="submit" className="primary-button" disabled={busy}>
-                  {t("savingsGoalsSave")}
+                  {t("savingsGoalsAddMoney")}
                 </button>
               </div>
             </form>
@@ -373,6 +458,7 @@ export function SavingsGoalsPage({
             <p>
               <strong>{confirmDelete.name}</strong>
             </p>
+            <p className="analytics-hint">{t("savingsGoalsDeleteLinked")}</p>
             <div className="form-actions">
               <button
                 type="button"

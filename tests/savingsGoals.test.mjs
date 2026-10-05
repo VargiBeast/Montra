@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { goalProgress } from "../src/types/savingsGoal.ts";
+import { goalProgress, goalStage } from "../src/types/savingsGoal.ts";
 
 describe("goalProgress", () => {
   it("handles zero progress", () => {
@@ -27,5 +27,11 @@ describe("goalProgress", () => {
     assert.equal(p.isOverTarget, true);
     assert.equal(p.isComplete, true);
     assert.equal(p.remaining, 0);
+  });
+  it("maps real progress to calm stages", () => {
+    assert.equal(goalStage(10, false), "early");
+    assert.equal(goalStage(50, false), "halfway");
+    assert.equal(goalStage(90, false), "almost");
+    assert.equal(goalStage(100, true), "reached");
   });
 });

@@ -975,6 +975,70 @@ a:focus-visible {
   font-weight: 550;
 }
 .analytics-unlocked-card .primary-button { margin-top: 8px; width: 100%; max-width: 280px; }
+.savings-goal-copy { min-width: 0; }
+.savings-goal-stage {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.savings-goal-amounts {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: -0.02em;
+}
+.savings-goal-amounts strong {
+  font-size: 1.35rem;
+  color: var(--ink);
+  font-weight: 700;
+}
+.savings-goal-progress-fill.stage-early { opacity: 0.72; }
+.savings-goal-progress-fill.stage-building { opacity: 0.86; }
+.savings-goal-progress-fill.stage-halfway { opacity: 1; }
+.savings-goal-progress-fill.stage-almost {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--green) 55%, #d7efe4), var(--green));
+}
+.savings-goal-progress-fill.stage-reached {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--green) 70%, #8fd4c2), var(--green));
+}
+.savings-goal-card.stage-reached {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+}
+.savings-goal-remaining.is-close strong,
+.savings-goal-remaining.is-close { font-size: 15px; }
+.savings-goal-remaining.is-reached {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--green);
+  font-weight: 700;
+}
+.savings-goal-add-money {
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+}
+.savings-goals-heading { min-width: 0; flex: 1; }
+.savings-inline-error {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.savings-inline-error .form-error { margin: 0; }
+.wishlist-card-name.is-purchased { text-decoration: line-through; }
+.wishlist-card.is-purchased .wishlist-card-price { text-decoration: line-through; }
+.wishlist-card-actions { flex-wrap: wrap; }
+.wishlist-goal-chip { max-width: 100%; }
+.wishlist-goal-chip span { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 360px) {
+  .savings-goal-head { flex-wrap: wrap; }
+  .savings-goal-actions { width: 100%; justify-content: flex-end; }
+  .wishlist-totals { grid-template-columns: 1fr; }
+  .savings-goal-amounts strong { font-size: 1.15rem; }
+}
+
 .text-button {
   background: none;
   border: 0;

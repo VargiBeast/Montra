@@ -427,6 +427,7 @@ function App() {
               onBack={() => setPage("home")}
               onSave={savings.save}
               onDelete={savings.remove}
+              onRetry={savings.refresh}
             />
           )}
           {page === "wishlist" && (
@@ -439,6 +440,7 @@ function App() {
               onSave={wishlist.save}
               onDelete={wishlist.remove}
               getImageUrl={wishlist.getImageUrl}
+              onRetry={wishlist.refresh}
             />
           )}
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}

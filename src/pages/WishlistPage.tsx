@@ -26,46 +26,10 @@ interface WishlistPageProps {
   onSave: (input: WishlistItemInput, existing?: WishlistItem) => Promise<void>;
   onDelete: (item: WishlistItem) => Promise<void>;
   getImageUrl: (path: string) => Promise<string>;
+  onRetry?: () => void;
 }
 
-const FALLBACK: Record<string, string> = {
-  wishlist: "Wishlist",
-  wishlistHint: "Save products you want",
-  wishlistGreeting: "Things you\u2019re saving for",
-  wishlistEmptyTitle: "Your wishlist is empty",
-  wishlistEmptyBody: "Add products you want \u2014 track price, link a savings goal, and mark them when purchased.",
-  wishlistAdd: "Add item",
-  wishlistEdit: "Edit item",
-  wishlistDelete: "Delete item",
-  wishlistDeleteConfirm: "Delete this wishlist item? This cannot be undone.",
-  wishlistName: "Name",
-  wishlistPrice: "Price",
-  wishlistCurrency: "Currency",
-  wishlistUrl: "Product URL",
-  wishlistUrlPlaceholder: "https://\u2026",
-  wishlistDetails: "Details",
-  wishlistDetailsPlaceholder: "Size, color, notes\u2026",
-  wishlistImage: "Image",
-  wishlistImageHint: "JPEG, PNG or WebP \u00b7 max 5 MB",
-  wishlistRemoveImage: "Remove image",
-  wishlistSavingsGoal: "Savings goal",
-  wishlistNoGoal: "No goal linked",
-  wishlistPurchased: "Purchased",
-  wishlistNotPurchased: "Not purchased",
-  wishlistOpenProduct: "Open product",
-  wishlistSavingFor: "Saving for this",
-  wishlistTotal: "Wishlist total",
-  wishlistTotalRemaining: "Still to buy",
-  wishlistSave: "Save",
-  wishlistCancel: "Cancel",
-  wishlistLoadError: "Could not load wishlist.",
-  wishlistNamePlaceholder: "e.g. Nike Air Max 95",
-  back: "Back",
-  loading: "Loading\u2026",
-  invalidImageType: "Use a JPEG, PNG or WebP image.",
-  imageTooLarge: "Image must be 5 MB or smaller.",
-  invalidProductLink: "Enter a valid product URL.",
-};
+const FALLBACK: Record<string, string> = {};
 
 export function WishlistPage({
   items,
@@ -76,18 +40,13 @@ export function WishlistPage({
   onSave,
   onDelete,
   getImageUrl,
+  onRetry,
 }: WishlistPageProps) {
   const translate = useTranslation();
   const t = (key: string, values?: Record<string, string | number>) => {
     const value = translate(key, values);
     if (value !== "\u2014") return value;
-    let text = FALLBACK[key] ?? key;
-    if (values) {
-      text = text.replace(/\{(\w+)\}/g, (m, n) =>
-        Object.hasOwn(values, n) ? String(values[n]) : m,
-      );
-    }
-    return text;
+    return FALLBACK[key] ?? key;
   };
   const { language } = useLanguage();
   const { currency: displayCurrency, convertFromBase, convertToBase } = useDisplayCurrency();
@@ -189,6 +148,14 @@ export function WishlistPage({
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
+    if (!name.trim()) {
+      setFormError(t("wishlistNameRequired"));
+      return;
+    }
+    if (!Number.isFinite(Number(price)) || Number(price) <= 0) {
+      setFormError(t("wishlistPriceInvalid"));
+      return;
+    }
     const link = validateProductUrl(url);
     if (link.error) {
       setFormError(t(link.error));
@@ -271,7 +238,16 @@ export function WishlistPage({
         </button>
       </div>
 
-      {error && <p className="form-error stack-notice">{error || t("wishlistLoadError")}</p>}
+      {error && (
+        <div className="panel stack-notice savings-inline-error">
+          <p className="form-error">{error}</p>
+          {onRetry && (
+            <button type="button" className="secondary-button" onClick={onRetry}>
+              {t("wishlistRetry")}
+            </button>
+          )}
+        </div>
+      )}
       {formError && !showForm && <p className="form-error stack-notice">{formError}</p>}
 
       {!isLoading && items.length > 0 && (
@@ -353,7 +329,6 @@ export function WishlistPage({
                     step="0.01"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    required
                   />
                 </label>
                 <label className="form-field">
@@ -367,42 +342,6 @@ export function WishlistPage({
                   </select>
                 </label>
               </div>
-              <label className="form-field">
-                <span>{t("wishlistUrl")}</span>
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder={t("wishlistUrlPlaceholder")}
-                  inputMode="url"
-                />
-              </label>
-              <label className="form-field">
-                <span>{t("wishlistDetails")}</span>
-                <textarea
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
-                  placeholder={t("wishlistDetailsPlaceholder")}
-                  rows={3}
-                />
-              </label>
-              <label className="form-field">
-                <span>{t("wishlistSavingsGoal")}</span>
-                <select value={goalId} onChange={(e) => setGoalId(e.target.value)}>
-                  <option value="">{t("wishlistNoGoal")}</option>
-                  {goals.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-field wishlist-purchased-field">
-                <span className="wishlist-check-row">
-                  <input type="checkbox" checked={purchased} onChange={(e) => setPurchased(e.target.checked)} />
-                  {t("wishlistPurchased")}
-                </span>
-              </label>
               <div className="form-field">
                 <span>{t("wishlistImage")}</span>
                 <p className="analytics-hint">{t("wishlistImageHint")}</p>
@@ -440,6 +379,44 @@ export function WishlistPage({
                   )}
                 </div>
               </div>
+              <label className="form-field">
+                <span>{t("wishlistUrl")}</span>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder={t("wishlistUrlPlaceholder")}
+                  inputMode="url"
+                />
+              </label>
+              <label className="form-field">
+                <span>{t("wishlistDetails")}</span>
+                <input
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                  placeholder={t("wishlistDetailsPlaceholder")}
+                  maxLength={240}
+                />
+              </label>
+              <label className="form-field">
+                <span>{t("wishlistSavingsGoal")}</span>
+                <select value={goalId} onChange={(e) => setGoalId(e.target.value)}>
+                  <option value="">{t("wishlistNoGoal")}</option>
+                  {goals.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {editing && (
+                <label className="form-field wishlist-purchased-field">
+                  <span className="wishlist-check-row">
+                    <input type="checkbox" checked={purchased} onChange={(e) => setPurchased(e.target.checked)} />
+                    {t("wishlistPurchased")}
+                  </span>
+                </label>
+              )}
               {formError && <p className="form-error">{formError}</p>}
               <div className="form-actions">
                 <button type="button" className="secondary-button" onClick={closeForm} disabled={busy}>
@@ -548,26 +525,29 @@ function WishlistCard({
       </div>
       <div className="wishlist-card-body">
         <div className="wishlist-card-top">
-          <strong className="wishlist-card-name">{item.name}</strong>
+        <strong className={`wishlist-card-name ${item.purchased ? "is-purchased" : ""}`}>{item.name}</strong>
           <strong className="wishlist-card-price">{priceLabel}</strong>
         </div>
         {item.details && <p className="wishlist-card-details">{item.details}</p>}
         {goal && (
-          <p className="wishlist-card-goal">
-            <Target size={14} /> {t("wishlistSavingFor")}: {goal.name}
+          <p className="wishlist-goal-chip">
+            <Target size={14} aria-hidden="true" />
+            <span>
+              {t("wishlistSavingFor")}: {goal.name}
+            </span>
           </p>
         )}
         <div className="wishlist-card-actions">
-          {item.url && (
-            <a className="text-button" href={item.url} target="_blank" rel="noreferrer">
+          {item.url ? (
+            <a className="text-button wishlist-link-btn" href={item.url} target="_blank" rel="noreferrer">
               <ExternalLink size={14} /> {t("wishlistOpenProduct")}
             </a>
-          )}
+          ) : null}
           <button type="button" className="text-button" onClick={onEdit} disabled={busy}>
             {t("wishlistEdit")}
           </button>
           <button type="button" className="text-button" onClick={onTogglePurchased} disabled={busy}>
-            {item.purchased ? t("wishlistNotPurchased") : t("wishlistPurchased")}
+            {item.purchased ? t("wishlistMarkNotPurchased") : t("wishlistMarkPurchased")}
           </button>
           <button type="button" className="icon-button" aria-label={t("wishlistDelete")} onClick={onDelete} disabled={busy}>
             <Trash2 size={16} />
