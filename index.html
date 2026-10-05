@@ -25,6 +25,20 @@
     <link rel="icon" href="/icons/favicon.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>Montra — personal money management</title>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("saldo-theme") || localStorage.getItem("saldo_theme");
+          var mode = saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+          var dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute("content", dark ? "#111214" : "#f2f0eb");
+        } catch (e) {
+          /* theme still applied later by the app shell */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

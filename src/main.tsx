@@ -19,6 +19,43 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
   });
 }
 
+function applyTheme(dark: boolean) {
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#111214" : "#f2f0eb");
+}
+
+function readThemePreference(): "light" | "dark" | "system" {
+  try {
+    const saved = window.localStorage.getItem("saldo-theme") ?? window.localStorage.getItem("saldo_theme");
+    return saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
+  } catch {
+    return "system";
+  }
+}
+
+/** Keeps marketing (and any route outside App) on system light/dark when preference is system. */
+function SystemThemeSync() {
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function sync() {
+      const mode = readThemePreference();
+      if (mode === "light") applyTheme(false);
+      else if (mode === "dark") applyTheme(true);
+      else applyTheme(media.matches);
+    }
+
+    sync();
+    media.addEventListener("change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      media.removeEventListener("change", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  return null;
+}
+
 function RepairLiteralEscapes() {
   useEffect(() => {
     const repair = () => {
@@ -45,6 +82,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <LanguageProvider>
         <CurrencyProvider>
+          <SystemThemeSync />
           <RepairLiteralEscapes />
           <AppRoutes />
         </CurrencyProvider>
