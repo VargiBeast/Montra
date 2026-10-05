@@ -6,6 +6,12 @@
   background: var(--bg, #f2f0eb);
   color: var(--ink);
 }
+.marketing-body {
+  flex: 1 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .marketing-header {
   position: sticky;
   top: 0;
@@ -142,6 +148,8 @@
   letter-spacing: -0.03em;
 }
 .marketing-footer {
+  flex-shrink: 0;
+  margin-top: auto;
   border-top: 1px solid var(--line);
   padding: 28px 20px 36px;
   background: color-mix(in srgb, var(--surface-raised, #fff) 70%, transparent);
