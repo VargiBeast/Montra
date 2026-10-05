@@ -1,23 +1,61 @@
-import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, Gift, Lock, PiggyBank, Plus, Sparkles, TrendingUp } from "lucide-react";
+import { useMemo } from "react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  BarChart3,
+  ChevronRight,
+  Gift,
+  Lock,
+  PiggyBank,
+  Plus,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import type { Transaction } from "../types/transaction";
+import type { SavingsGoal } from "../types/savingsGoal";
+import { goalProgress } from "../types/savingsGoal";
+import type { WishlistItem } from "../types/wishlist";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { TransactionRow } from "../components/TransactionRow";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
 
-const PLUS_FALLBACK: Record<string, string> = {
+const HOME_FALLBACK: Record<string, string> = {
   analytics: "Analytics",
   analyticsHint: "Income, spending and categories",
   openAnalytics: "Open analytics",
   analyticsPlusBadge: "Montra Plus",
   analyticsPlusTitle: "Unlock Advanced Analytics",
-  analyticsPlusBody: "See spending trends, category breakdowns, and clearer patterns in your money \u2014 included with Montra Plus.",
+  analyticsPlusBody:
+    "See spending trends, category breakdowns, and clearer patterns in your money \u2014 included with Montra Plus.",
   analyticsPlusBenefitTrends: "Spending trends & income vs expenses",
   analyticsPlusBenefitCategories: "Category breakdowns & comparisons",
   analyticsPlusBenefitInsights: "Insights and future forecasting",
   analyticsPlusCta: "Get Montra Plus",
   analyticsPlusComingSoon: "Montra Plus is coming soon.",
+  balanceAllActivity: "All activity",
+  homeGoalOf: "{current} / {target}",
+  homeGoalRemaining: "{amount} remaining",
+  homeGoalComplete: "Goal reached",
+  homeWishlistCount: "{count} items",
+  homeWishlistEmpty: "Save products you want",
+  homeGoalsEmpty: "Set a target and track progress",
+  noTransactionsYet: "No transactions yet",
+  addFirstTransaction: "Add a purchase or money in to see your balance here.",
+  planning: "Planning",
+  savingsGoals: "Savings goals",
+  savingsGoalsHint: "Track progress toward a target",
+  wishlist: "Wishlist",
+  wishlistHint: "Save products you want",
+  recentActivity: "Recent activity",
+  viewAll: "View all",
+  addTransaction: "Add transaction",
+  currentBalance: "Current balance",
+  moneyIn: "Money in",
+  moneyOut: "Money out",
+  homeTitle: "Home",
+  hello: "Hello",
 };
 
 interface HomePageProps {
@@ -32,6 +70,8 @@ interface HomePageProps {
   onOpenAnalytics?: () => void;
   onOpenSavingsGoals?: () => void;
   onOpenWishlist?: () => void;
+  savingsGoals?: SavingsGoal[];
+  wishlistItems?: WishlistItem[];
 }
 
 export function HomePage({
@@ -46,23 +86,54 @@ export function HomePage({
   onOpenAnalytics,
   onOpenSavingsGoals,
   onOpenWishlist,
+  savingsGoals = [],
+  wishlistItems = [],
 }: HomePageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
-    const value = fillMissingCopy(key, translate(key, values), language);
-    if (value !== "\u2014") return value;
-    return PLUS_FALLBACK[key] ?? key;
+    let value = fillMissingCopy(key, translate(key, values), language);
+    if (value === "\u2014") value = HOME_FALLBACK[key] ?? key;
+    if (values) {
+      value = value.replace(/\{(\w+)\}/g, (m, n) =>
+        Object.hasOwn(values, n) ? String(values[n]) : m,
+      );
+    }
+    return value;
   };
   const { currency, convertFromBase } = useDisplayCurrency();
   const summary = getBalanceSummary(transactions);
-  const money = (value: number) => formatMoney(value, currency, language, convertFromBase(value, currency));
+  const money = (value: number) =>
+    formatMoney(value, currency, language, convertFromBase(value, currency));
+
+  const recent = useMemo(() => transactions.slice(0, 5), [transactions]);
+
+  const featuredGoal = useMemo(() => {
+    const active = savingsGoals
+      .map((g) => ({ goal: g, progress: goalProgress(g) }))
+      .filter((x) => !x.progress.isComplete)
+      .sort((a, b) => b.progress.percent - a.progress.percent);
+    if (active.length > 0) return active[0];
+    if (savingsGoals.length > 0) {
+      const g = savingsGoals[0];
+      return { goal: g, progress: goalProgress(g) };
+    }
+    return null;
+  }, [savingsGoals]);
+
+  const openWishlistCount = useMemo(
+    () => wishlistItems.filter((item) => !item.purchased).length,
+    [wishlistItems],
+  );
 
   return (
-    <main className="page-content">
+    <main className="page-content home-page">
       <div className="page-header">
         <div>
-          <p className="greeting">{t("hello")}{name ? `, ${name}` : ""}</p>
+          <p className="greeting">
+            {t("hello")}
+            {name ? `, ${name}` : ""}
+          </p>
           <h1 className="page-title">{t("homeTitle")}</h1>
         </div>
       </div>
@@ -70,27 +141,69 @@ export function HomePage({
       <section className="panel balance-card" aria-label={t("currentBalance")}>
         <span className="eyebrow">{t("currentBalance")}</span>
         <strong className="balance-value">{money(summary.balance)}</strong>
+        <p className="balance-period">{t("balanceAllActivity")}</p>
         <div className="balance-split">
           <div>
             <span className="balance-split-label">
               <ArrowDownLeft size={14} aria-hidden="true" /> {t("moneyIn")}
             </span>
-            <strong>{money(summary.totalIn)}</strong>
+            <strong className="balance-in">{money(summary.totalIn)}</strong>
           </div>
           <div>
             <span className="balance-split-label">
               <ArrowUpRight size={14} aria-hidden="true" /> {t("moneyOut")}
             </span>
-            <strong>{money(summary.totalOut)}</strong>
+            <strong className="balance-out">{money(summary.totalOut)}</strong>
           </div>
         </div>
       </section>
 
       {(onOpenSavingsGoals || onOpenWishlist) && (
-        <section className="panel section-panel" aria-label={t("planning")}>
+        <section className="panel section-panel home-planning" aria-label={t("planning")}>
           <div className="section-heading">
             <h2>{t("planning")}</h2>
           </div>
+
+          {featuredGoal && onOpenSavingsGoals && (
+            <button
+              type="button"
+              className="home-goal-card"
+              onClick={onOpenSavingsGoals}
+              aria-label={featuredGoal.goal.name}
+            >
+              <div className="home-goal-card-top">
+                <span className="planning-card-icon" aria-hidden="true">
+                  <PiggyBank size={18} />
+                </span>
+                <div className="home-goal-card-copy">
+                  <strong>{featuredGoal.goal.name}</strong>
+                  <span>
+                    {featuredGoal.progress.isComplete
+                      ? t("homeGoalComplete")
+                      : t("homeGoalRemaining", {
+                          amount: money(featuredGoal.progress.remaining),
+                        })}
+                  </span>
+                </div>
+                <span className="home-goal-percent" aria-hidden="true">
+                  {featuredGoal.progress.percent}%
+                </span>
+              </div>
+              <div className="home-goal-track" aria-hidden="true">
+                <span
+                  className={`home-goal-fill ${featuredGoal.progress.isComplete ? "is-complete" : ""}`}
+                  style={{ width: `${featuredGoal.progress.percent}%` }}
+                />
+              </div>
+              <p className="home-goal-amounts">
+                {t("homeGoalOf", {
+                  current: money(featuredGoal.goal.current_amount),
+                  target: money(featuredGoal.goal.target_amount),
+                })}
+              </p>
+            </button>
+          )}
+
           <div className="planning-grid">
             {onOpenSavingsGoals && (
               <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
@@ -98,7 +211,9 @@ export function HomePage({
                   <PiggyBank size={18} />
                 </span>
                 <strong>{t("savingsGoals")}</strong>
-                <span>{t("savingsGoalsHint")}</span>
+                <span>
+                  {savingsGoals.length === 0 ? t("homeGoalsEmpty") : t("savingsGoalsHint")}
+                </span>
               </button>
             )}
             {onOpenWishlist && (
@@ -107,7 +222,11 @@ export function HomePage({
                   <Gift size={18} />
                 </span>
                 <strong>{t("wishlist")}</strong>
-                <span>{t("wishlistHint")}</span>
+                <span>
+                  {wishlistItems.length === 0
+                    ? t("homeWishlistEmpty")
+                    : t("homeWishlistCount", { count: openWishlistCount })}
+                </span>
               </button>
             )}
           </div>
@@ -169,7 +288,7 @@ export function HomePage({
         </section>
       )}
 
-      <section className="panel section-panel">
+      <section className="panel section-panel home-activity" aria-label={t("recentActivity")}>
         <div className="section-heading">
           <h2>{t("recentActivity")}</h2>
           {transactions.length > 0 && (
@@ -179,7 +298,7 @@ export function HomePage({
           )}
         </div>
         {transactions.length === 0 ? (
-          <div className="empty-state">
+          <div className="empty-state home-empty">
             <h3>{t("noTransactionsYet")}</h3>
             <p>{t("addFirstTransaction")}</p>
             <button type="button" className="primary-button" onClick={onAdd}>
@@ -188,7 +307,7 @@ export function HomePage({
           </div>
         ) : (
           <ul className="transaction-list">
-            {transactions.slice(0, 5).map((tx) => (
+            {recent.map((tx) => (
               <TransactionRow key={tx.id} transaction={tx} onClick={onSelect} getImageUrl={getImageUrl} />
             ))}
           </ul>
