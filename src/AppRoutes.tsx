@@ -10,8 +10,6 @@ import { SimplePublic } from "./pages/public/SimplePublic";
 import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
 import { NotFoundPublic } from "./pages/public/NotFoundPublic";
 import { LoginPage } from "./pages/LoginPage";
-import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
-import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { PlusPage } from "./pages/PlusPage";
 import { hasPlusAccess } from "./lib/plus";
 import { useDocumentMeta } from "./lib/seo";
@@ -40,7 +38,6 @@ function PlusPublic() {
 
 function AuthLogin() {
   const auth = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const [busy, setBusy] = useState(false);
   const from = (location.state as { from?: string } | null)?.from || "/app";
@@ -52,17 +49,18 @@ function AuthLogin() {
     noIndex: true,
   });
 
+  // After Google OAuth or Magic Link callback, session is restored and we leave /login.
   if (!auth.isLoading && auth.user) {
     return <Navigate to={from.startsWith("/") ? from : "/app"} replace />;
   }
 
-  async function wrap(action: () => Promise<void>) {
+  async function startGoogle() {
     setBusy(true);
     try {
-      await action();
-      navigate(from.startsWith("/") ? from : "/app", { replace: true });
+      // Redirects away to Google; session lands back via detectSessionInUrl + onAuthStateChange.
+      await auth.signInWithProvider("google");
     } catch {
-      /* error shown via auth.authError / local */
+      /* authError set in useAuth */
     } finally {
       setBusy(false);
     }
@@ -73,22 +71,8 @@ function AuthLogin() {
       authError={auth.authError}
       busy={busy}
       isConfigured={auth.isConfigured}
-      onGoogle={() => wrap(() => auth.signInWithProvider("google"))}
-      onEmail={(email) => auth.signInWithEmail(email)}
-      onVerifyCode={(email, token) => wrap(() => auth.verifyEmailCode(email, token))}
-      onPassword={(email, password) => wrap(() => auth.signInWithPassword(email, password))}
-      onSignUp={async (email, password) => {
-        setBusy(true);
-        try {
-          const result = await auth.signUpWithPassword(email, password);
-          if (!result.needsConfirmation) {
-            navigate("/app", { replace: true });
-          }
-          return result;
-        } finally {
-          setBusy(false);
-        }
-      }}
+      onGoogle={() => startGoogle()}
+      onMagicLink={(email) => auth.signInWithEmail(email)}
       onRetry={auth.retrySession}
     />
   );
@@ -96,46 +80,6 @@ function AuthLogin() {
 
 function AuthSignup() {
   return <AuthLogin />;
-}
-
-function AuthForgot() {
-  const auth = useAuth();
-  const [busy, setBusy] = useState(false);
-  return (
-    <ForgotPasswordPage
-      busy={busy}
-      isConfigured={auth.isConfigured}
-      authError={auth.authError}
-      onSubmit={async (email) => {
-        setBusy(true);
-        try {
-          await auth.requestPasswordReset(email);
-        } finally {
-          setBusy(false);
-        }
-      }}
-    />
-  );
-}
-
-function AuthReset() {
-  const auth = useAuth();
-  const [busy, setBusy] = useState(false);
-  return (
-    <ResetPasswordPage
-      busy={busy}
-      isConfigured={auth.isConfigured}
-      authError={auth.authError}
-      onSubmit={async (password) => {
-        setBusy(true);
-        try {
-          await auth.updatePassword(password);
-        } finally {
-          setBusy(false);
-        }
-      }}
-    />
-  );
 }
 
 function ProtectedApp() {
@@ -164,8 +108,9 @@ export function AppRoutes() {
 
       <Route path="/login" element={<AuthLogin />} />
       <Route path="/signup" element={<AuthSignup />} />
-      <Route path="/forgot-password" element={<AuthForgot />} />
-      <Route path="/reset-password" element={<AuthReset />} />
+      {/* Password auth removed — redirect legacy links to login (Google + magic link). */}
+      <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+      <Route path="/reset-password" element={<Navigate to="/login" replace />} />
 
       <Route path="/app/*" element={<ProtectedApp />} />
       <Route path="/home" element={<ProtectedApp />} />
