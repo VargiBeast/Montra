@@ -194,7 +194,7 @@ function PublicWishlistCard({
         {item.image_url && !imgFailed ? (
           <img
             src={item.image_url}
-            alt=""
+            alt={item.name}
             onError={() => setImgFailed(true)}
           />
         ) : (
