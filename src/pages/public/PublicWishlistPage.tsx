@@ -20,12 +20,18 @@ function classifyError(message: string): LoadState {
   if (m.includes("disabled") || m.includes("not enabled")) {
     return { status: "error", kind: "disabled" };
   }
+  // Edge Function failures for bad/unknown tokens often surface as generic
+  // "non-2xx" / FunctionsHttpError messages without the word "token".
   if (
     m.includes("invalid") ||
     m.includes("not found") ||
     m.includes("missing") ||
     m.includes("404") ||
-    m.includes("token")
+    m.includes("token") ||
+    m.includes("non-2xx") ||
+    m.includes("edge function") ||
+    m.includes("functionshttp") ||
+    m.includes("shareunavailable")
   ) {
     return { status: "error", kind: "invalid" };
   }
