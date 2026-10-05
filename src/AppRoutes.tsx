@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import App from "./App";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useAuth } from "./hooks/useAuth";
 import { MarketingLayout } from "./pages/public/MarketingLayout";
 import { HomePublic } from "./pages/public/HomePublic";
