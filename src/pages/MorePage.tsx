@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop, PiggyBank, Gift } from "lucide-react";
+import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -48,7 +48,7 @@ const CURRENCY_LABELS: Record<string, string> = {
   KRW: "KRW",
 };
 
-export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut, onSavingsGoals, onWishlist }: MorePageProps) {
+export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
   const translate = useTranslation();
@@ -234,19 +234,6 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <ChevronRight size={18} aria-hidden="true" />
         </button>
         <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={(e) => void importFile(e)} />
-      </section>
-
-      <section className="panel settings-list stack-panel">
-        <button className="setting-row" type="button" onClick={() => onSavingsGoals?.()}>
-          <span className="setting-icon"><PiggyBank size={18} /></span>
-          <span className="setting-copy"><strong>{t("savingsGoals")}</strong><span>{t("savingsGoalsHint")}</span></span>
-          <ChevronRight size={18} aria-hidden="true" />
-        </button>
-        <button className="setting-row" type="button" onClick={() => onWishlist?.()}>
-          <span className="setting-icon"><Gift size={18} /></span>
-          <span className="setting-copy"><strong>{t("wishlist")}</strong><span>{t("wishlistHint")}</span></span>
-          <ChevronRight size={18} aria-hidden="true" />
-        </button>
       </section>
 
       <section className="panel settings-list stack-panel-lg">

@@ -255,7 +255,7 @@ function App() {
             <button className="primary-button" type="button" onClick={() => void data.refresh()}>{t("tryAgain")}</button>
           </section>
         </div> : <>
-          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} onGetPlus={() => setToast(t("analyticsPlusComingSoon"))} hasPlus={plusUnlocked} onOpenAnalytics={() => setPage("analytics")} />}
+          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} onGetPlus={() => setToast(t("analyticsPlusComingSoon"))} hasPlus={plusUnlocked} onOpenAnalytics={() => setPage("analytics")} onOpenSavingsGoals={() => setPage("savings")} onOpenWishlist={() => setPage("wishlist")} />}
           {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
           {page === "more" && <MorePage
             userId={auth.user.id}
@@ -293,7 +293,7 @@ function App() {
               goals={savings.goals}
               isLoading={savings.isLoading}
               error={savings.error}
-              onBack={() => setPage("more")}
+              onBack={() => setPage("home")}
               onSave={savings.save}
               onDelete={savings.remove}
             />
@@ -304,7 +304,7 @@ function App() {
               goals={savings.goals}
               isLoading={wishlist.isLoading}
               error={wishlist.error}
-              onBack={() => setPage("more")}
+              onBack={() => setPage("home")}
               onSave={wishlist.save}
               onDelete={wishlist.remove}
               getImageUrl={wishlist.getImageUrl}
