@@ -440,7 +440,7 @@ function App() {
             />
           )}
           {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
-        </>
+        </>}
       </div>
       <nav className="bottom-nav" aria-label={t("mainNavigation")}>
         <button type="button" className={`nav-item ${page === "home" ? "active" : ""}`} aria-current={page === "home" ? "page" : undefined} onClick={() => setPage("home")}><Home size={19} /><span>{t("home")}</span></button>
