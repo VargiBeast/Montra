@@ -286,12 +286,7 @@ function App() {
             onRetry={auth.retrySession}
           />
           {isOnboardingComplete() && (
-            <button
-              type="button"
-              className="text-button"
-              style={{ display: "block", margin: "12px auto", textAlign: "center" }}
-              onClick={() => setForceLogin(false)}
-            >
+            <button type="button" className="text-button" style={{ display: "block", margin: "12px auto", textAlign: "center" }} onClick={() => setForceLogin(false)}>
               {t("back")}
             </button>
           )}
@@ -327,14 +322,7 @@ function App() {
                 <button className="primary-button" type="button" onClick={() => setForceLogin(true)}>
                   {t("onboardingAccountCta")}
                 </button>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => {
-                    dismissAccountPrompt();
-                    setAccountPromptOpen(false);
-                  }}
-                >
+                <button type="button" className="secondary-button" onClick={() => { dismissAccountPrompt(); setAccountPromptOpen(false); }}>
                   {t("onboardingAccountLater")}
                 </button>
               </div>
@@ -384,7 +372,21 @@ function App() {
             <button className="primary-button" type="button" onClick={() => void data.refresh()}>{t("tryAgain")}</button>
           </section>
         </div> : <>
-          {page === "home" && <HomePage transactions={data.transactions} getImageUrl={data.getImageUrl} name={accountName} onAdd={startAdd} onSelect={setSelected} onViewAll={() => setPage("transactions")} onGetPlus={() => setToast(t("analyticsPlusComingSoon"))} hasPlus={plusUnlocked} onOpenAnalytics={() => setPage("analytics")} onOpenSavingsGoals={() => setPage("savings")} onOpenWishlist={() => setPage("wishlist")} />}
+          {page === "home" && <HomePage
+            transactions={data.transactions}
+            getImageUrl={data.getImageUrl}
+            name={accountName}
+            onAdd={startAdd}
+            onSelect={setSelected}
+            onViewAll={() => setPage("transactions")}
+            onGetPlus={() => setToast(t("analyticsPlusComingSoon"))}
+            hasPlus={plusUnlocked}
+            onOpenAnalytics={() => setPage("analytics")}
+            onOpenSavingsGoals={() => setPage("savings")}
+            onOpenWishlist={() => setPage("wishlist")}
+            savingsGoals={savings.goals}
+            wishlistItems={wishlist.items}
+          />}
           {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
           {page === "more" && <MorePage
             userId={auth.user.id}
