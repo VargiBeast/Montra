@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
+import { PLUS_PRICING } from "../../lib/plus";
 
 export function PricingPublic() {
   const t = useTranslation();
@@ -44,13 +45,17 @@ export function PricingPublic() {
           </div>
           <div className="plus-price-cards">
             <div className="plus-price-card">
-              <strong className="plus-price-amount">39 NOK</strong>
+              <strong className="plus-price-amount">{PLUS_PRICING.monthlyLabel}</strong>
               <span className="plus-price-label">{t("plusPriceMonthlyLabel")}</span>
             </div>
             <div className="plus-price-card is-featured">
-              <strong className="plus-price-amount">329 NOK</strong>
+              <strong className="plus-price-amount">{PLUS_PRICING.yearlyLabel}</strong>
               <span className="plus-price-label">{t("plusPriceYearlyLabel")}</span>
-              <span className="plus-price-note">{t("plusPriceYearlyNote") || "About 30% off"}</span>
+              <span className="plus-price-note">
+                {t("plusPriceYearlyNote") !== "\u2014" && t("plusPriceYearlyNote") !== "plusPriceYearlyNote"
+                  ? t("plusPriceYearlyNote")
+                  : PLUS_PRICING.yearlySavingsNoteEn}
+              </span>
             </div>
           </div>
           <ul className="plus-checklist">
