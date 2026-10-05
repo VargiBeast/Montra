@@ -3,6 +3,7 @@ import {
 } from "lucide-react";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
+import { PLUS_PRICING } from "../lib/plus";
 
 interface PlusPageProps {
   hasPlus: boolean;
@@ -60,42 +61,17 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
-    // Pricing amounts and the ~30% savings note must stay exact across all languages.
-    // Prefer PLUS_FALLBACK for these keys so a lagging dictionary cannot show old 79/790 NOK.
-    const PRICE_KEYS = new Set([
-      "plusPriceMonthly",
-      "plusPriceYearly",
-      "plusPriceYearlyNote",
-    ]);
-    if (PRICE_KEYS.has(key) && PLUS_FALLBACK[key]) {
-      if (key === "plusPriceMonthly" || key === "plusPriceYearly") {
-        return PLUS_FALLBACK[key];
-      }
-      // Yearly savings note: map known outdated dictionary strings to ~30% wording.
+    // NOK pricing is fixed — never take amounts from lagging translations.
+    if (key === "plusPriceMonthly") return PLUS_PRICING.monthlyLabel;
+    if (key === "plusPriceYearly") return PLUS_PRICING.yearlyLabel;
+    if (key === "plusPriceYearlyNote") {
       const lookedUp = translate(key, values);
-      const NOTE_MAP: Record<string, string> = {
-        "Save two months vs monthly": "About 30% off",
-        "Spar to måneder mot månedlig": "Omtrent 30 % rabatt",
-        "Spara två månader jämfört med månadspris": "Cirka 30 % rabatt",
-        "Spar to måneder i forhold til månedlig betaling": "Omkring 30 % rabat",
-        "Zwei Monate gegenüber monatlich sparen": "Etwa 30 % sparen",
-        "Deux mois économisés par rapport au mensuel": "Environ 30 % d'économie",
-        "Ahorra dos meses frente al plan mensual": "Ahorra alrededor del 30 %",
-        "Risparmi due mesi rispetto al mensile": "Circa il 30 % di risparmio",
-        "Poupa dois meses face ao plano mensal": "Cerca de 30 % de desconto",
-        "Bespaar twee maanden tegenover maandelijks": "Ongeveer 30 % korting",
-        "Säästä kaksi kuukautta kuukausihintaan verrattuna": "Noin 30 % alennus",
-        "Oszczędzasz dwa miesiące względem planu miesięcznego": "Około 30 % taniej",
-        "Ušetříš dva měsíce oproti měsíční platbě": "Asi o 30 % levněji",
-        "Aylığa göre iki ay kazan": "Yaklaşık %30 tasarruf",
-        "وفّر شهرين مقارنة بالشهري": "وفر حوالي 30٪",
-        "月額より2か月分お得": "約30%お得",
-        "월간 대비 두 달 절약": "약 30% 절약",
-        "比月付省两个月": "大约便宜 30%",
-      };
-      if (lookedUp && NOTE_MAP[lookedUp]) return NOTE_MAP[lookedUp];
+      // Block legacy "two months free" style notes if any dictionary still has them.
+      if (lookedUp && /two months|to måneder|två månader|deux mois|dos meses|due mesi|dois meses|twee maanden|kaksi kuukautta|dwa miesiące|dva měsíce|iki ay|شهرين|2か|두 달|两个月/i.test(lookedUp)) {
+        return PLUS_PRICING.yearlySavingsNoteEn;
+      }
       if (lookedUp && lookedUp !== "\u2014" && lookedUp !== key) return lookedUp;
-      return PLUS_FALLBACK[key];
+      return PLUS_FALLBACK[key] ?? PLUS_PRICING.yearlySavingsNoteEn;
     }
     const lookedUp = translate(key, values);
     // Prefer real dictionary copy. Fall back to English PLUS_FALLBACK only when the
@@ -160,6 +136,29 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
           ))}
         </ul>
       </section>
+      <section className="plus-compare" aria-label={t("plusCompareTitle")}>
+        <h2 className="plus-compare-heading">{t("plusCompareTitle")}</h2>
+        <div className="plus-compare-grid">
+          <article className="panel plus-compare-card">
+            <p className="eyebrow">{t("plusCompareFree")}</p>
+            <h3>{t("plusCompareFree")}</h3>
+            <ul className="plus-checklist">
+              {freeItems.map((item) => (
+                <li key={`free-${item}`}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
+              ))}
+            </ul>
+          </article>
+          <article className="panel plus-compare-card is-plus">
+            <p className="eyebrow accent-green">{t("plusComparePlus")}</p>
+            <h3>{t("plusComparePlus")}</h3>
+            <ul className="plus-checklist">
+              {included.map((item) => (
+                <li key={`plus-${item}`}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </section>
       <section className="panel plus-pricing" aria-label={t("plusPricingTitle")}>
         <div className="plus-pricing-header">
           <Lightbulb size={18} aria-hidden="true" />
@@ -187,7 +186,16 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
             <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
           ))}
         </ul>
-        <button type="button" className={`primary-button plus-cta ${hasPlus ? "is-active" : ""}`} disabled={hasPlus} onClick={() => {}}>
+        <button
+          type="button"
+          className={`primary-button plus-cta ${hasPlus ? "is-active" : ""}`}
+          disabled={hasPlus}
+          aria-disabled={hasPlus ? true : undefined}
+          title={!hasPlus ? t("plusCtaNote") : undefined}
+          onClick={() => {
+            /* Billing not enabled yet — CTA is informational until payments ship. */
+          }}
+        >
           {hasPlus ? (<><Sparkles size={16} /> {t("plusCtaActive")}</>) : (<><Lock size={16} /> {t("plusCtaLocked")}</>)}
         </button>
         <p className="plus-cta-note">{t("plusCtaNote")}</p>
