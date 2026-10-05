@@ -30,7 +30,7 @@ export function HomePublic() {
         <h1>{t("homeHeroTitle")}</h1>
         <p className="marketing-lead">{t("homeHeroBody")}</p>
         <div className="marketing-cta-row">
-          <Link to="/signup" className="primary-button">{t("navGetStarted")}</Link>
+          <Link to="/app" className="primary-button">{t("navGetStarted")}</Link>
           <Link to="/login" className="secondary-button">{t("navSignIn")}</Link>
           <Link to="/plus" className="text-button">{t("navExplorePlus")}</Link>
         </div>
