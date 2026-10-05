@@ -14,6 +14,7 @@ import { ReceiptsPage } from "./pages/ReceiptsPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SavingsGoalsPage } from "./pages/SavingsGoalsPage";
 import { WishlistPage } from "./pages/WishlistPage";
+import { PlusPage } from "./pages/PlusPage";
 import { LoginPage } from "./pages/LoginPage";
 import { OnboardingFlow } from "./pages/OnboardingFlow";
 import { TransactionForm } from "./components/TransactionForm";
@@ -33,7 +34,7 @@ import {
   readGuestTransactions,
 } from "./lib/onboarding";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist" | "plus";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -379,7 +380,7 @@ function App() {
             onAdd={startAdd}
             onSelect={setSelected}
             onViewAll={() => setPage("transactions")}
-            onGetPlus={() => setToast(t("analyticsPlusComingSoon"))}
+            onGetPlus={() => setPage("plus")}
             hasPlus={plusUnlocked}
             onOpenAnalytics={() => setPage("analytics")}
             onOpenSavingsGoals={() => setPage("savings")}
@@ -398,6 +399,8 @@ function App() {
             onSignOut={doSignOut}
             onSavingsGoals={() => setPage("savings")}
             onWishlist={() => setPage("wishlist")}
+            onOpenPlus={() => setPage("plus")}
+            hasPlus={plusUnlocked}
           />}
           {page === "receipts" && (
             receipts.error ? (
@@ -418,7 +421,15 @@ function App() {
               />
             )
           )}
-          {page === "analytics" && <AnalyticsPage transactions={data.transactions} />}
+          {page === "analytics" &&
+            (plusUnlocked ? (
+              <AnalyticsPage transactions={data.transactions} />
+            ) : (
+              <PlusPage hasPlus={false} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} />
+            ))}
+          {page === "plus" && (
+            <PlusPage hasPlus={plusUnlocked} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} />
+          )}
           {page === "savings" && (
             <SavingsGoalsPage
               goals={savings.goals}
@@ -451,7 +462,7 @@ function App() {
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={23} /></button>
         <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" || page === "wishlist" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" || page === "wishlist" || page === "plus" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       <TransactionForm open={formOpen} existing={editing} busy={saving} onClose={() => setFormOpen(false)} onSave={saveTransaction} />
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
