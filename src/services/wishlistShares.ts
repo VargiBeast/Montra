@@ -118,7 +118,19 @@ export async function fetchPublicWishlist(
   });
 
   if (error) {
-    const message = error.message || "shareUnavailable";
+    // Prefer body error text when the Edge Function returned a structured failure.
+    let message = error.message || "shareUnavailable";
+    const ctx = (error as { context?: Response }).context;
+    if (ctx && typeof ctx.json === "function") {
+      try {
+        const body = await ctx.json();
+        if (body && typeof body === "object" && "error" in body && body.error) {
+          message = String(body.error);
+        }
+      } catch {
+        /* keep message */
+      }
+    }
     throw new Error(message);
   }
 
