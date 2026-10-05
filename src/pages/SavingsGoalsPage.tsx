@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowLeft, CheckCircle2, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
 import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
-import { goalProgress, goalStage } from "../types/savingsGoal";
+import { goalPlanInsight, goalProgress, goalStage } from "../types/savingsGoal";
 import { formatDate, formatMoney } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -15,6 +15,7 @@ interface SavingsGoalsPageProps {
   onSave: (input: SavingsGoalInput, existing?: SavingsGoal) => Promise<void>;
   onDelete: (goal: SavingsGoal) => Promise<void>;
   onRetry?: () => void;
+  hasPlus?: boolean;
 }
 
 const STAGE_KEY = {
@@ -33,6 +34,7 @@ export function SavingsGoalsPage({
   onSave,
   onDelete,
   onRetry,
+  hasPlus = false,
 }: SavingsGoalsPageProps) {
   const translate = useTranslation();
   const t = (key: string, values?: Record<string, string | number>) => translate(key, values);
@@ -265,6 +267,26 @@ export function SavingsGoalsPage({
             {t("savingsGoalsLeft", { amount: money(progress.remaining) })}
           </p>
         )}
+
+
+        {hasPlus && !progress.isComplete && (() => {
+          const plan = goalPlanInsight(goal);
+          if (!plan.hasDeadline || plan.monthlyNeeded == null) {
+            return (<p className="savings-goal-plan-hint">{t("savingsGoalsPlanAddDeadline")}</p>);
+          }
+          return (
+            <div className="savings-goal-plan" aria-label={t("savingsGoalsPlanTitle")}>
+              <p className="eyebrow">{t("savingsGoalsPlanTitle")}</p>
+              <div className="savings-goal-plan-stats">
+                <div><span>{t("savingsGoalsPlanMonthly")}</span><strong>{money(plan.monthlyNeeded)}</strong></div>
+                {plan.monthsRemaining != null && (
+                  <div><span>{t("savingsGoalsPlanMonths")}</span><strong>{plan.monthsRemaining}</strong></div>
+                )}
+              </div>
+              <p className="savings-goal-plan-note">{t("savingsGoalsPlanNote")}</p>
+            </div>
+          );
+        })()}
 
         <button type="button" className="secondary-button savings-goal-add-money" onClick={() => openAdd(goal)}>
           <Plus size={15} />
