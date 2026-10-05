@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ArrowDownUp, Home, Moon, Plus, Receipt, UserRound } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
@@ -68,7 +69,44 @@ function App() {
   const wishlist = useWishlist(auth.user?.id);
   const plusUnlocked = hasPlusAccess(auth.user?.email);
   const receipts = useReceipts(auth.user?.id);
-  const [page, setPage] = useState<Page>("home");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const pathToPage = (pathname: string): Page => {
+    if (pathname.startsWith("/activity")) return "transactions";
+    if (pathname.startsWith("/transactions")) return "transactions";
+    if (pathname.startsWith("/receipts")) return "receipts";
+    if (pathname.startsWith("/wishlist")) return "wishlist";
+    if (pathname.startsWith("/goals")) return "savings";
+    if (pathname.startsWith("/profile")) return "profile";
+    if (pathname.startsWith("/plus") || pathname.startsWith("/app/plus")) return "plus";
+    if (pathname.startsWith("/analytics")) return "analytics";
+    if (pathname.startsWith("/more") || pathname.startsWith("/settings")) return "more";
+    if (pathname.startsWith("/home") || pathname === "/app" || pathname === "/app/") return "home";
+    return "home";
+  };
+  const page = pathToPage(location.pathname);
+  const setPage = (next: Page) => {
+    const map: Record<Page, string> = {
+      home: "/app",
+      transactions: "/activity",
+      more: "/more",
+      profile: "/profile",
+      receipts: "/receipts",
+      analytics: "/analytics",
+      savings: "/goals",
+      wishlist: "/wishlist",
+      plus: "/app/plus",
+    };
+    navigate(map[next] ?? "/app");
+  };
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/transactions/new")) {
+      setEditing(null);
+      setSelected(null);
+      setFormOpen(true);
+    }
+  }, [location.pathname]);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [selected, setSelected] = useState<Transaction | null>(null);
