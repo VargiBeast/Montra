@@ -1,0 +1,311 @@
+/* === Montra Plus showcase page === */
+.plus-page { min-width: 0; }
+.plus-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.plus-page-header .page-title { margin-top: 4px; }
+.plus-subtitle {
+  margin: 6px 0 0;
+  max-width: 40ch;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.plus-badge.is-active {
+  color: var(--green);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 16%, transparent));
+}
+.plus-hero {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  margin-bottom: 14px;
+}
+.plus-hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 14%, transparent));
+  border: 1px solid color-mix(in srgb, var(--green) 22%, transparent);
+}
+.plus-hero h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.plus-hero p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.plus-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.plus-feature-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  min-width: 0;
+}
+.plus-feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--green) 18%, transparent);
+}
+.plus-feature-card h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.plus-feature-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+.plus-free-card {
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.plus-free-card h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.plus-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.plus-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.plus-checklist li svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--green);
+}
+.plus-pricing {
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+}
+.plus-pricing-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.plus-pricing-header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+.plus-pricing-body {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.plus-trial-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--green) 28%, transparent);
+  background: var(--green-soft, color-mix(in srgb, var(--green) 12%, transparent));
+}
+.plus-trial-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  color: var(--green);
+  background: color-mix(in srgb, var(--canvas) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 22%, transparent);
+}
+.plus-trial-then {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+}
+.plus-price-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.plus-price-card {
+  display: grid;
+  gap: 4px;
+  padding: 16px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  min-width: 0;
+}
+.plus-price-card.is-featured {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--line));
+  background: color-mix(in srgb, var(--green) 8%, var(--surface-raised));
+}
+.plus-price-amount {
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  word-break: break-word;
+}
+.plus-price-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.plus-price-note {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--green);
+}
+.plus-included-label { margin: 4px 0 0; }
+.plus-cta {
+  width: 100%;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.plus-cta.is-active {
+  opacity: 0.85;
+}
+.plus-cta-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  font-weight: 500;
+}
+.plus-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.plus-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+  cursor: pointer;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.plus-action-btn:hover {
+  border-color: color-mix(in srgb, var(--green) 30%, var(--line));
+}
+
+/* Savings goal Plus planning */
+.savings-goal-plan {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--green) 22%, var(--line));
+  background: color-mix(in srgb, var(--green) 6%, var(--surface-raised));
+  display: grid;
+  gap: 8px;
+}
+.savings-goal-plan .eyebrow {
+  margin: 0;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.savings-goal-plan-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.savings-goal-plan-stats div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.savings-goal-plan-stats span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.savings-goal-plan-stats strong {
+  font-size: 14px;
+  color: var(--ink);
+  word-break: break-word;
+}
+.savings-goal-plan-note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  font-weight: 500;
+}
+.savings-goal-plan-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+@media (min-width: 700px) {
+  .plus-feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 450px) {
+  .plus-price-cards {
+    grid-template-columns: 1fr;
+  }
+  .plus-quick-actions {
+    grid-template-columns: 1fr;
+  }
+  .plus-price-amount {
+    font-size: 1.15rem;
+  }
+}
