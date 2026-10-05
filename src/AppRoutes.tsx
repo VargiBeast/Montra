@@ -8,6 +8,7 @@ import { FeaturesPublic } from "./pages/public/FeaturesPublic";
 import { PricingPublic } from "./pages/public/PricingPublic";
 import { SimplePublic } from "./pages/public/SimplePublic";
 import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
+import { NotFoundPublic } from "./pages/public/NotFoundPublic";
 import { LoginPage } from "./pages/LoginPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
@@ -138,7 +139,6 @@ function AuthReset() {
 }
 
 function ProtectedApp() {
-  // App already owns onboarding, guest mode, and login prompts.
   return <App />;
 }
 
@@ -159,6 +159,7 @@ export function AppRoutes() {
         <Route path="cookies" element={<SimplePublic page="cookies" />} />
         <Route path="security" element={<SimplePublic page="security" />} />
         <Route path="wishlist/:token" element={<PublicWishlistPage />} />
+        <Route path="*" element={<NotFoundPublic />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
@@ -178,8 +179,6 @@ export function AppRoutes() {
       <Route path="/profile" element={<ProtectedApp />} />
       <Route path="/analytics" element={<ProtectedApp />} />
       <Route path="/app/plus" element={<ProtectedApp />} />
-
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
