@@ -31,7 +31,11 @@ export function useSavingsGoals(userId: string | undefined) {
     } catch (reason) {
       console.error("Could not load savings goals.", reason);
       if (requestId === latestRequest.current) {
-        setError("We couldn\u2019t load your savings goals. Check your connection and try again.");
+        const detail =
+          reason instanceof Error && reason.message.trim()
+            ? reason.message
+            : "We couldn\u2019t load your savings goals. Check your connection and try again.";
+        setError(detail);
         setLoadedUserId(userId);
       }
     } finally {
