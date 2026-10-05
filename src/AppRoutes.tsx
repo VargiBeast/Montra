@@ -8,7 +8,6 @@ import { FeaturesPublic } from "./pages/public/FeaturesPublic";
 import { PricingPublic } from "./pages/public/PricingPublic";
 import { SimplePublic } from "./pages/public/SimplePublic";
 import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
-import { NotFoundPublic } from "./pages/public/NotFoundPublic";
 import { LoginPage } from "./pages/LoginPage";
 import { PlusPage } from "./pages/PlusPage";
 import { hasPlusAccess } from "./lib/plus";
@@ -38,6 +37,7 @@ function PlusPublic() {
 
 function AuthLogin() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const [busy, setBusy] = useState(false);
   const from = (location.state as { from?: string } | null)?.from || "/app";
@@ -49,18 +49,21 @@ function AuthLogin() {
     noIndex: true,
   });
 
-  // After Google OAuth or Magic Link callback, session is restored and we leave /login.
   if (!auth.isLoading && auth.user) {
     return <Navigate to={from.startsWith("/") ? from : "/app"} replace />;
   }
 
-  async function startGoogle() {
+  async function wrap(action: () => Promise<void>) {
     setBusy(true);
     try {
-      // Redirects away to Google; session lands back via detectSessionInUrl + onAuthStateChange.
-      await auth.signInWithProvider("google");
+      await action();
+      // OAuth redirects away; magic link stays on page until user clicks email.
+      // Only navigate when a session is already present (e.g. rare same-tab cases).
+      if (auth.user) {
+        navigate(from.startsWith("/") ? from : "/app", { replace: true });
+      }
     } catch {
-      /* authError set in useAuth */
+      /* error shown via auth.authError / local */
     } finally {
       setBusy(false);
     }
@@ -71,7 +74,7 @@ function AuthLogin() {
       authError={auth.authError}
       busy={busy}
       isConfigured={auth.isConfigured}
-      onGoogle={() => startGoogle()}
+      onGoogle={() => wrap(() => auth.signInWithProvider("google"))}
       onMagicLink={(email) => auth.signInWithEmail(email)}
       onRetry={auth.retrySession}
     />
@@ -83,6 +86,7 @@ function AuthSignup() {
 }
 
 function ProtectedApp() {
+  // App already owns onboarding, guest mode, and login prompts.
   return <App />;
 }
 
@@ -103,12 +107,11 @@ export function AppRoutes() {
         <Route path="cookies" element={<SimplePublic page="cookies" />} />
         <Route path="security" element={<SimplePublic page="security" />} />
         <Route path="wishlist/:token" element={<PublicWishlistPage />} />
-        <Route path="*" element={<NotFoundPublic />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
       <Route path="/signup" element={<AuthSignup />} />
-      {/* Password auth removed — redirect legacy links to login (Google + magic link). */}
+      {/* Password reset removed — redirect legacy links to login */}
       <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
       <Route path="/reset-password" element={<Navigate to="/login" replace />} />
 
@@ -124,6 +127,8 @@ export function AppRoutes() {
       <Route path="/profile" element={<ProtectedApp />} />
       <Route path="/analytics" element={<ProtectedApp />} />
       <Route path="/app/plus" element={<ProtectedApp />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
