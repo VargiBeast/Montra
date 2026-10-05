@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   Check,
@@ -162,7 +163,6 @@ export function WishlistPage({
     setUrl(item.url ?? "");
     setDetails(item.details ?? "");
     setPurchased(item.purchased);
-    // Keep link only if the savings goal still exists; deleted goals leave items valid
     const linkedId = item.savings_goal_id ?? "";
     setGoalId(linkedId && goals.some((g) => g.id === linkedId) ? linkedId : "");
     setImageFile(null);
@@ -321,7 +321,7 @@ export function WishlistPage({
         </div>
       )}
 
-      {showForm && (
+      {showForm && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={closeForm}>
           <div
             className="modal-sheet panel wishlist-form-sheet"
@@ -399,11 +399,7 @@ export function WishlistPage({
               </label>
               <label className="form-field wishlist-purchased-field">
                 <span className="wishlist-check-row">
-                  <input
-                    type="checkbox"
-                    checked={purchased}
-                    onChange={(e) => setPurchased(e.target.checked)}
-                  />
+                  <input type="checkbox" checked={purchased} onChange={(e) => setPurchased(e.target.checked)} />
                   {t("wishlistPurchased")}
                 </span>
               </label>
@@ -455,10 +451,11 @@ export function WishlistPage({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      {confirmDelete && (
+      {confirmDelete && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={() => setConfirmDelete(null)}>
           <div
             className="modal-sheet panel"
@@ -472,25 +469,16 @@ export function WishlistPage({
               <strong>{confirmDelete.name}</strong>
             </p>
             <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => setConfirmDelete(null)}
-                disabled={busy}
-              >
+              <button type="button" className="secondary-button" onClick={() => setConfirmDelete(null)} disabled={busy}>
                 {t("wishlistCancel")}
               </button>
-              <button
-                type="button"
-                className="danger-button"
-                disabled={busy}
-                onClick={() => void doDelete(confirmDelete)}
-              >
+              <button type="button" className="danger-button" disabled={busy} onClick={() => void doDelete(confirmDelete)}>
                 {t("wishlistDelete")}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </main>
   );
@@ -559,33 +547,29 @@ function WishlistCard({
         )}
       </div>
       <div className="wishlist-card-body">
-        <strong className="wishlist-card-name">{item.name}</strong>
-        <span className="wishlist-card-price">{priceLabel}</span>
+        <div className="wishlist-card-top">
+          <strong className="wishlist-card-name">{item.name}</strong>
+          <strong className="wishlist-card-price">{priceLabel}</strong>
+        </div>
         {item.details && <p className="wishlist-card-details">{item.details}</p>}
         {goal && (
-          <span className="wishlist-goal-chip">
-            <Target size={12} /> {t("wishlistSavingFor")}: {goal.name}
-          </span>
+          <p className="wishlist-card-goal">
+            <Target size={14} /> {t("wishlistSavingFor")}: {goal.name}
+          </p>
         )}
         <div className="wishlist-card-actions">
           {item.url && (
-            <a
-              className="secondary-button wishlist-link-btn"
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink size={14} />
-              {t("wishlistOpenProduct")}
+            <a className="text-button" href={item.url} target="_blank" rel="noreferrer">
+              <ExternalLink size={14} /> {t("wishlistOpenProduct")}
             </a>
           )}
+          <button type="button" className="text-button" onClick={onEdit} disabled={busy}>
+            {t("wishlistEdit")}
+          </button>
           <button type="button" className="text-button" onClick={onTogglePurchased} disabled={busy}>
             {item.purchased ? t("wishlistNotPurchased") : t("wishlistPurchased")}
           </button>
-          <button type="button" className="text-button" onClick={onEdit}>
-            {t("wishlistEdit")}
-          </button>
-          <button type="button" className="icon-button" aria-label={t("wishlistDelete")} onClick={onDelete}>
+          <button type="button" className="icon-button" aria-label={t("wishlistDelete")} onClick={onDelete} disabled={busy}>
             <Trash2 size={16} />
           </button>
         </div>
