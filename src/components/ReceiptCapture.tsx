@@ -325,7 +325,7 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
         aria-labelledby="receipt-capture-title"
       >
         <header className="modal-header">
-          <h2 id="receipt-capture-title">{step === "review" ? t("reviewReceipt") : t("addReceipt")}</h2>
+          <h2 id="receipt-capture-title">{step === "review" ? t("reviewReceipt") : step === "camera" ? t("scanReceipt") : step === "processing" ? t("readingReceipt") : t("addReceipt")}</h2>
           <button className="icon-button" type="button" aria-label={t("close")} onClick={onClose} disabled={busy}>
             <X size={18} />
           </button>
@@ -338,12 +338,24 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
           )}
           {step === "choose" && (
             <div className="receipt-choice">
-              <p className="transaction-sub">{t("addReceiptChoice")}</p>
-              <button className="primary-button" type="button" onClick={() => void startCamera()}>
-                <Camera size={17} /> {t("scanReceipt")}
+              <p className="receipt-choice-lead">{t("addReceiptChoice")}</p>
+              <button className="receipt-choice-card" type="button" onClick={() => void startCamera()}>
+                <span className="receipt-choice-icon" aria-hidden="true">
+                  <Camera size={20} />
+                </span>
+                <span className="receipt-choice-copy">
+                  <strong>{t("scanReceipt")}</strong>
+                  <span>{t("placeReceiptInFrame")}</span>
+                </span>
               </button>
-              <button className="secondary-button" type="button" onClick={() => fileInput.current?.click()}>
-                <ImagePlus size={17} /> {t("uploadPhoto")}
+              <button className="receipt-choice-card" type="button" onClick={() => fileInput.current?.click()}>
+                <span className="receipt-choice-icon" aria-hidden="true">
+                  <ImagePlus size={20} />
+                </span>
+                <span className="receipt-choice-copy">
+                  <strong>{t("uploadPhoto")}</strong>
+                  <span>{t("receiptReadyToReview")}</span>
+                </span>
               </button>
             </div>
           )}
@@ -383,10 +395,13 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
             </div>
           )}
           {step === "processing" && (
-            <div className="empty-state">
+            <div className="empty-state receipt-processing">
               <div className="loading-block" style={{ width: 72, height: 72, borderRadius: 20, margin: "0 auto 12px" }} />
               <h3>{t("readingReceipt")}</h3>
               <p>{t("receiptProcessing")}</p>
+              {previewUrl ? (
+                <img className="receipt-processing-preview" src={previewUrl} alt="" />
+              ) : null}
             </div>
           )}
           {step === "review" && (
@@ -398,7 +413,10 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
               }}
             >
               {previewUrl && <img className="detail-image" src={previewUrl} alt={t("receiptPhoto")} />}
-              <p className="transaction-sub">{t("receiptReadyToReview")}</p>
+              <div className="receipt-review-banner" role="status">
+                <strong>{t("reviewReceipt")}</strong>
+                <p>{t("receiptReadyToReview")}</p>
+              </div>
               <label className="form-field">
                 <span>{t("receiptMerchant")}</span>
                 <input value={merchant} onChange={(event) => setMerchant(event.target.value)} placeholder={t("merchantPlaceholder")} />
