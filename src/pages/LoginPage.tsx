@@ -282,6 +282,11 @@ export function LoginPage({
                     {creating ? copy.signInInstead : copy.createAccount}
                   </button>
                 </p>
+                {!creating && (
+                  <p className="auth-switch">
+                    <a className="text-action" href="/forgot-password">{(copy as { forgotTitle?: string }).forgotTitle ?? "Forgot password"}?</a>
+                  </p>
+                )}
               </form>
             )}
 
