@@ -136,7 +136,15 @@
   word-break: break-word;
 }
 
-.planning-card span {
+.planning-card-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Hint text only — do not style the icon wrapper span */
+.planning-card > span:not(.planning-card-icon) {
   display: block;
   margin: 0;
   color: var(--muted);
@@ -159,21 +167,32 @@
 .transaction-sub {
   display: block;
   max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction-name {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .transaction-sub {
-  margin-top: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.3;
 }
 
-/* Appearance theme choices — even padding, no edge touch */
+/* Appearance theme choices — even spacing, aligned icons, clear selected state */
 .theme-choices {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  padding: 4px 16px 16px;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
+  margin: 4px 0 8px;
+  padding: 0 2px;
 }
 
 .theme-choice {
@@ -182,22 +201,18 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 82px;
-  min-width: 0;
-  padding: 12px 8px;
+  min-height: 72px;
+  padding: 14px 10px;
   border: 1px solid var(--line);
-  border-radius: 15px;
-  color: var(--muted);
+  border-radius: 14px;
   background: var(--surface-raised);
+  color: var(--muted);
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.25;
-  text-align: center;
+  font-weight: 650;
+  letter-spacing: 0.01em;
   cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
   box-sizing: border-box;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 }
 
 .theme-choice svg {
@@ -205,14 +220,15 @@
 }
 
 .theme-choice:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent, var(--green)), var(--line) 55%);
+  border-color: color-mix(in srgb, var(--accent, var(--green)), var(--line) 50%);
+  color: var(--ink);
 }
 
 .theme-choice.active {
-  border-color: var(--green);
-  color: var(--green);
-  box-shadow: inset 0 0 0 1px var(--green);
+  border-color: var(--accent, var(--green));
+  background: color-mix(in srgb, var(--accent, var(--green)) 12%, var(--surface-raised));
+  color: var(--ink);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, var(--green)) 35%, transparent);
 }
 
 @media (max-width: 450px) {
@@ -222,7 +238,6 @@
 
   .balance-card .balance-value {
     font-size: clamp(1.45rem, 7vw, 1.85rem);
-    margin-bottom: 14px;
   }
 
   .balance-split {
@@ -236,12 +251,12 @@
 
   .theme-choices {
     gap: 8px;
-    padding: 2px 12px 14px;
+    margin: 2px 0 6px;
   }
 
   .theme-choice {
-    min-height: 78px;
-    padding: 10px 6px;
+    min-height: 68px;
+    padding: 12px 8px;
     font-size: 11px;
   }
 
@@ -255,12 +270,37 @@
   }
 }
 
-@media (min-width: 900px) {
-  .balance-card {
-    padding: 24px 26px 22px;
+/* Modals portaled to body must center on the viewport (not page-content).
+   page-content uses transform animation which otherwise traps position:fixed. */
+.modal-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.modal-sheet {
+  position: relative;
+  width: min(540px, 100%);
+  max-height: min(90dvh, 850px);
+  overflow: auto;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
   }
 
-  .balance-card .balance-value {
-    font-size: 2.15rem;
+  .modal-sheet {
+    width: 100%;
+    max-height: 94dvh;
+    border-radius: 25px 25px 0 0;
   }
 }
