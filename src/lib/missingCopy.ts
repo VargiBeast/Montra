@@ -19,6 +19,9 @@ export const missingCopy = {
     onboardingAccountBody: "Sign in to sync this device and keep your entries across sessions.",
     onboardingAccountCta: "Sign in or create account",
     onboardingAccountLater: "Not now",
+    sectionPreferences: "Preferences",
+    sectionData: "Data",
+    sectionAccount: "Account",
   },
   nb: {
     hello: "Hei",
@@ -40,6 +43,9 @@ export const missingCopy = {
     onboardingAccountBody: "Logg inn for \u00e5 synke denne enheten og beholde oppf\u00f8ringene dine.",
     onboardingAccountCta: "Logg inn eller opprett konto",
     onboardingAccountLater: "Ikke n\u00e5",
+    sectionPreferences: "Innstillinger",
+    sectionData: "Data",
+    sectionAccount: "Konto",
   },
 } as const;
 
