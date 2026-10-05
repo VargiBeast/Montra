@@ -28,7 +28,7 @@ export function MarketingLayout() {
           <Link to="/login" className="secondary-button">
             {t("navSignIn")}
           </Link>
-          <Link to="/signup" className="primary-button">
+          <Link to="/app" className="primary-button">
             {t("navGetStarted")}
           </Link>
         </div>
