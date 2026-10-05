@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import { BrowserRouter } from "react-router-dom";
+import { AppRoutes } from "./AppRoutes";
 import "./styles/globals.css";
 import "./styles/plus.css";
 import "./styles/preference-fix.css";
 import "./styles/layout-fix.css";
+import "./styles/marketing.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
 
@@ -39,11 +41,13 @@ function RepairLiteralEscapes() {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <LanguageProvider>
-      <CurrencyProvider>
-        <RepairLiteralEscapes />
-        <App />
-      </CurrencyProvider>
-    </LanguageProvider>
+    <BrowserRouter>
+      <LanguageProvider>
+        <CurrencyProvider>
+          <RepairLiteralEscapes />
+          <AppRoutes />
+        </CurrencyProvider>
+      </LanguageProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 );
