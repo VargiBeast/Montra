@@ -3,6 +3,57 @@ import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
 
 const TABLE = "savings_goals";
 
+/** Build a clear Error from Supabase/Postgrest or unknown failures (for UI + console). */
+export function toSavingsGoalError(reason: unknown, fallback: string): Error {
+  if (reason instanceof Error && reason.message.trim()) {
+    const anyErr = reason as Error & { code?: string; details?: string; hint?: string };
+    if (import.meta.env.DEV) {
+      console.error("[savings_goals]", {
+        message: anyErr.message,
+        code: anyErr.code,
+        details: anyErr.details,
+        hint: anyErr.hint,
+        name: anyErr.name,
+      });
+    }
+    return reason;
+  }
+
+  if (reason && typeof reason === "object") {
+    const obj = reason as {
+      message?: unknown;
+      code?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      error_description?: unknown;
+    };
+    const message = typeof obj.message === "string" && obj.message.trim()
+      ? obj.message
+      : typeof obj.error_description === "string" && obj.error_description.trim()
+        ? obj.error_description
+        : fallback;
+    if (import.meta.env.DEV) {
+      console.error("[savings_goals]", {
+        message,
+        code: obj.code,
+        details: obj.details,
+        hint: obj.hint,
+        raw: reason,
+      });
+    }
+    const err = new Error(message);
+    if (typeof obj.code === "string") (err as Error & { code?: string }).code = obj.code;
+    if (typeof obj.details === "string") (err as Error & { details?: string }).details = obj.details;
+    if (typeof obj.hint === "string") (err as Error & { hint?: string }).hint = obj.hint;
+    return err;
+  }
+
+  if (import.meta.env.DEV) {
+    console.error("[savings_goals]", reason);
+  }
+  return new Error(fallback);
+}
+
 function normalizeInput(input: SavingsGoalInput): SavingsGoalInput {
   const name = input.name.trim();
   if (!name) throw new Error("Add a name for this goal.");
@@ -37,11 +88,12 @@ export async function listSavingsGoals(
     .select("*")
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw toSavingsGoalError(error, "Could not load savings goals.");
   return (data ?? []).map((row) => ({
     ...row,
     target_amount: Number(row.target_amount),
     current_amount: Number(row.current_amount),
+    wishlist_item_id: row.wishlist_item_id ?? null,
   })) as SavingsGoal[];
 }
 
@@ -66,21 +118,22 @@ export async function saveSavingsGoal(
       })
       .eq("id", existing.id)
       .eq("user_id", userId);
-    if (error) throw error;
+    if (error) throw toSavingsGoalError(error, "Could not save goal.");
     return;
   }
 
+  // Live table columns: id, user_id, name, target_amount, current_amount,
+  // deadline, created_at, updated_at — do not send wishlist_item_id.
   const { error } = await client.from(TABLE).insert({
     user_id: userId,
     name: normalized.name,
     target_amount: normalized.target_amount,
     current_amount: normalized.current_amount,
     deadline: normalized.deadline,
-    wishlist_item_id: null,
     created_at: now,
     updated_at: now,
   });
-  if (error) throw error;
+  if (error) throw toSavingsGoalError(error, "Could not save goal.");
 }
 
 export async function deleteSavingsGoal(
@@ -93,5 +146,5 @@ export async function deleteSavingsGoal(
     .delete()
     .eq("id", goal.id)
     .eq("user_id", userId);
-  if (error) throw error;
+  if (error) throw toSavingsGoalError(error, "Could not delete goal.");
 }

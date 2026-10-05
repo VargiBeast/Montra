@@ -8,8 +8,8 @@ export interface SavingsGoal {
   current_amount: number;
   /** Optional deadline YYYY-MM-DD. */
   deadline: string | null;
-  /** Reserved for future Wishlist connection. */
-  wishlist_item_id: string | null;
+  /** Optional; not present on all deployments. */
+  wishlist_item_id?: string | null;
   created_at: string;
   updated_at: string;
 }
