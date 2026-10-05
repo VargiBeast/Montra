@@ -304,3 +304,164 @@
     border-radius: 25px 25px 0 0;
   }
 }
+
+/* —— Onboarding —— */
+.onboarding-shell {
+  min-height: 100dvh;
+}
+
+.onboarding-frame {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.onboarding-progress {
+  margin: 0 0 18px;
+}
+
+.onboarding-progress-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.onboarding-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent, var(--green));
+  transition: width 0.25s ease;
+}
+
+.onboarding-progress-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.onboarding-card {
+  padding: 28px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.onboarding-brand {
+  margin-bottom: 4px;
+}
+
+.onboarding-body {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.onboarding-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: min(52dvh, 360px);
+  overflow: auto;
+  margin: 4px 0 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.onboarding-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+  box-sizing: border-box;
+}
+
+.onboarding-choice.active {
+  border-color: var(--accent, var(--green));
+  background: color-mix(in srgb, var(--accent, var(--green)) 12%, var(--surface-raised));
+}
+
+.onboarding-choice-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.onboarding-type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.onboarding-type {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  color: var(--muted);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.onboarding-type.active {
+  border-color: var(--accent, var(--green));
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent, var(--green)) 12%, var(--surface-raised));
+}
+
+.onboarding-hint {
+  margin: 0;
+  color: var(--subtle);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.primary-button.wide,
+.secondary-button.wide {
+  width: 100%;
+}
+
+.guest-account-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 16px 18px;
+}
+
+.guest-account-banner p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.guest-account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 450px) {
+  .onboarding-card {
+    padding: 22px 16px 20px;
+  }
+
+  .onboarding-choice-list {
+    max-height: min(48dvh, 320px);
+  }
+}
