@@ -39,6 +39,24 @@
         }
       })();
     </script>
+    <script>
+      /* Home-screen / installed PWA: open the app shell, not the marketing site. */
+      (function () {
+        try {
+          var standalone =
+            window.matchMedia("(display-mode: standalone)").matches ||
+            window.matchMedia("(display-mode: fullscreen)").matches ||
+            window.navigator.standalone === true;
+          if (!standalone) return;
+          var path = window.location.pathname || "/";
+          if (path === "/" || path === "") {
+            window.location.replace("/app" + window.location.search + window.location.hash);
+          }
+        } catch (e) {
+          /* stay on current page */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
