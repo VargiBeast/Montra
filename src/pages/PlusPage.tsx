@@ -60,6 +60,43 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
+    // Pricing amounts and the ~30% savings note must stay exact across all languages.
+    // Prefer PLUS_FALLBACK for these keys so a lagging dictionary cannot show old 79/790 NOK.
+    const PRICE_KEYS = new Set([
+      "plusPriceMonthly",
+      "plusPriceYearly",
+      "plusPriceYearlyNote",
+    ]);
+    if (PRICE_KEYS.has(key) && PLUS_FALLBACK[key]) {
+      if (key === "plusPriceMonthly" || key === "plusPriceYearly") {
+        return PLUS_FALLBACK[key];
+      }
+      // Yearly savings note: map known outdated dictionary strings to ~30% wording.
+      const lookedUp = translate(key, values);
+      const NOTE_MAP: Record<string, string> = {
+        "Save two months vs monthly": "About 30% off",
+        "Spar to måneder mot månedlig": "Omtrent 30 % rabatt",
+        "Spara två månader jämfört med månadspris": "Cirka 30 % rabatt",
+        "Spar to måneder i forhold til månedlig betaling": "Omkring 30 % rabat",
+        "Zwei Monate gegenüber monatlich sparen": "Etwa 30 % sparen",
+        "Deux mois économisés par rapport au mensuel": "Environ 30 % d'économie",
+        "Ahorra dos meses frente al plan mensual": "Ahorra alrededor del 30 %",
+        "Risparmi due mesi rispetto al mensile": "Circa il 30 % di risparmio",
+        "Poupa dois meses face ao plano mensal": "Cerca de 30 % de desconto",
+        "Bespaar twee maanden tegenover maandelijks": "Ongeveer 30 % korting",
+        "Säästä kaksi kuukautta kuukausihintaan verrattuna": "Noin 30 % alennus",
+        "Oszczędzasz dwa miesiące względem planu miesięcznego": "Około 30 % taniej",
+        "Ušetříš dva měsíce oproti měsíční platbě": "Asi o 30 % levněji",
+        "Aylığa göre iki ay kazan": "Yaklaşık %30 tasarruf",
+        "وفّر شهرين مقارنة بالشهري": "وفر حوالي 30٪",
+        "月額より2か月分お得": "約30%お得",
+        "월간 대비 두 달 절약": "약 30% 절약",
+        "比月付省两个月": "大约便宜 30%",
+      };
+      if (lookedUp && NOTE_MAP[lookedUp]) return NOTE_MAP[lookedUp];
+      if (lookedUp && lookedUp !== "\u2014" && lookedUp !== key) return lookedUp;
+      return PLUS_FALLBACK[key];
+    }
     const lookedUp = translate(key, values);
     // Prefer real dictionary copy. Fall back to English PLUS_FALLBACK only when the
     // lookup still yields the missing-copy sentinel or the raw key.
