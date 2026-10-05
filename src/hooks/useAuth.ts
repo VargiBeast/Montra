@@ -79,32 +79,6 @@ export function useAuth() {
     (email: string, token: string) => runAuthAction(() => authService.verifyEmailCode(email, token)),
     [runAuthAction],
   );
-  const signInWithPassword = useCallback(
-    (email: string, password: string) => runAuthAction(() => authService.signInWithPassword(email, password)),
-    [runAuthAction],
-  );
-  const signUpWithPassword = useCallback(
-    async (email: string, password: string) => {
-      setAuthError(null);
-      try {
-        return await authService.signUpWithPassword(email, password);
-      } catch (error) {
-        console.error("Authentication failed.", error);
-        const message = getErrorMessage(error, "We couldn’t complete that sign-in. Please try again.");
-        setAuthError(message);
-        throw new Error(message);
-      }
-    },
-    [],
-  );
-  const requestPasswordReset = useCallback(
-    (email: string) => runAuthAction(() => authService.requestPasswordReset(email)),
-    [runAuthAction],
-  );
-  const updatePassword = useCallback(
-    (password: string) => runAuthAction(() => authService.updatePassword(password)),
-    [runAuthAction],
-  );
   const signOut = useCallback(
     () => runAuthAction(() => authService.signOut()),
     [runAuthAction],
@@ -139,10 +113,6 @@ export function useAuth() {
     signInWithProvider,
     signInWithEmail,
     verifyEmailCode,
-    signInWithPassword,
-    signUpWithPassword,
-    requestPasswordReset,
-    updatePassword,
     signOut,
     retrySession,
   };
