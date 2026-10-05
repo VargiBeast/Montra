@@ -18,11 +18,6 @@ const PLUS_FALLBACK: Record<string, string> = {
   analyticsPlusBenefitInsights: "Insights and future forecasting",
   analyticsPlusCta: "Get Montra Plus",
   analyticsPlusComingSoon: "Montra Plus is coming soon.",
-  planning: "Planning",
-  savingsGoals: "Savings goals",
-  savingsGoalsHint: "Track progress toward a target",
-  wishlist: "Wishlist",
-  wishlistHint: "Save products you want",
 };
 
 interface HomePageProps {
