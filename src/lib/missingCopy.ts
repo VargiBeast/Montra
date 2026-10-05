@@ -50,7 +50,11 @@ export const missingCopy = {
 } as const;
 
 export function fillMissingCopy(key: string, value: string, language: string): string {
-  if (value !== "\u2014") return value;
+  // Never surface internal keys. A real translation, including English fallback
+  // already applied by translate(), must pass through unchanged.
+  if (value && value !== "\u2014" && value !== key) return value;
   const lang = language.toLowerCase().startsWith("nb") || language.toLowerCase().startsWith("no") || language.toLowerCase().startsWith("nn") ? "nb" : "en";
-  return missingCopy[lang][key as keyof typeof missingCopy.en] ?? missingCopy.en[key as keyof typeof missingCopy.en] ?? key;
+  return missingCopy[lang][key as keyof typeof missingCopy.en]
+    ?? missingCopy.en[key as keyof typeof missingCopy.en]
+    ?? (value && value !== key ? value : "\u2014");
 }

@@ -60,8 +60,11 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
-    let value = fillMissingCopy(key, translate(key, values), language);
-    if (value === "\u2014") value = PLUS_FALLBACK[key] ?? key;
+    const lookedUp = translate(key, values);
+    const filled = fillMissingCopy(key, lookedUp, language);
+    // Dictionary first. English PLUS_FALLBACK only if lookup still has no copy.
+    let value = filled === "\u2014" || filled === key ? (PLUS_FALLBACK[key] ?? filled) : filled;
+    if (value === key) value = PLUS_FALLBACK[key] ?? "\u2014";
     if (values) {
       value = value.replace(/\{(\w+)\}/g, (m, n) => Object.hasOwn(values, n) ? String(values[n]) : m);
     }
