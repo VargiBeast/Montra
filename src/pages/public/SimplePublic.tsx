@@ -39,7 +39,7 @@ export function SimplePublic({ page }: { page: PageKey }) {
         {(page === "faq" || page === "help") && (
           <div className="marketing-cta-row">
             <Link to="/contact" className="secondary-button">{t("navContact")}</Link>
-            <Link to="/signup" className="primary-button">{t("navGetStarted")}</Link>
+            <Link to="/app" className="primary-button">{t("navGetStarted")}</Link>
           </div>
         )}
       </section>
