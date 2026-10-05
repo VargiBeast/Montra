@@ -1,1 +1,1 @@
-RESTORE_FROM_LOCAL
+file:///tmp/i18n_ready.ts
