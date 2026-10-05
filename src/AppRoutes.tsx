@@ -8,6 +8,7 @@ import { FeaturesPublic } from "./pages/public/FeaturesPublic";
 import { PricingPublic } from "./pages/public/PricingPublic";
 import { SimplePublic } from "./pages/public/SimplePublic";
 import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
+import { NotFoundPublic } from "./pages/public/NotFoundPublic";
 import { LoginPage } from "./pages/LoginPage";
 import { PlusPage } from "./pages/PlusPage";
 import { hasPlusAccess } from "./lib/plus";
@@ -107,6 +108,7 @@ export function AppRoutes() {
         <Route path="cookies" element={<SimplePublic page="cookies" />} />
         <Route path="security" element={<SimplePublic page="security" />} />
         <Route path="wishlist/:token" element={<PublicWishlistPage />} />
+        <Route path="*" element={<NotFoundPublic />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
@@ -128,7 +130,6 @@ export function AppRoutes() {
       <Route path="/analytics" element={<ProtectedApp />} />
       <Route path="/app/plus" element={<ProtectedApp />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
