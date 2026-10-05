@@ -8,15 +8,16 @@ function requireSupabase() {
   return supabase;
 }
 
-function redirectTo() {
-  return window.location.origin;
+function redirectTo(path = "/") {
+  const origin = window.location.origin;
+  return `${origin}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 export async function signInWithProvider(provider: Provider) {
   const client = requireSupabase();
   const { error } = await client.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: redirectTo() },
+    options: { redirectTo: redirectTo("/app") },
   });
   if (error) throw error;
 }
@@ -26,7 +27,7 @@ export async function signInWithEmail(email: string) {
   const { error } = await client.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: redirectTo(),
+      emailRedirectTo: redirectTo("/app"),
       shouldCreateUser: true,
     },
   });
@@ -54,10 +55,26 @@ export async function signUpWithPassword(email: string, password: string) {
   const { data, error } = await client.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: redirectTo() },
+    options: { emailRedirectTo: redirectTo("/app") },
   });
   if (error) throw error;
   return { needsConfirmation: !data.session };
+}
+
+/** Send a password-reset email. Redirects to /reset-password after the user clicks the link. */
+export async function requestPasswordReset(email: string) {
+  const client = requireSupabase();
+  const { error } = await client.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectTo("/reset-password"),
+  });
+  if (error) throw error;
+}
+
+/** Set a new password while the recovery session from the email link is active. */
+export async function updatePassword(password: string) {
+  const client = requireSupabase();
+  const { error } = await client.auth.updateUser({ password });
+  if (error) throw error;
 }
 
 export async function signOut() {
