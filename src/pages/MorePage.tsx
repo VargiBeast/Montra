@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sun, UserRound, Laptop } from "lucide-react";
+import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sparkles, Sun, UserRound, Laptop } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -27,9 +27,11 @@ interface MorePageProps {
   onSignOut: () => Promise<void>;
   onSavingsGoals?: () => void;
   onWishlist?: () => void;
+  onOpenPlus?: () => void;
+  hasPlus?: boolean;
 }
 
-export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut }: MorePageProps) {
+export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut, onOpenPlus, hasPlus = false }: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
   const translate = useTranslation();
@@ -297,6 +299,22 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           onChange={(e) => void importFile(e)}
         />
       </section>
+
+      {onOpenPlus && (
+        <>
+          <p className="section-label">{t("plusTitle")}</p>
+          <section className="panel settings-list more-plus" aria-label={t("plusTitle")}>
+            <button className="setting-row" type="button" onClick={onOpenPlus}>
+              <span className="setting-icon" aria-hidden="true"><Sparkles size={18} /></span>
+              <span className="setting-copy">
+                <strong>{t("plusTitle")}</strong>
+                <span>{hasPlus ? t("plusActiveBadge") : t("plusValueTitle")}</span>
+              </span>
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </section>
+        </>
+      )}
 
       <p className="section-label">{t("sectionAccount")}</p>
       <section className="panel settings-list more-account stack-panel-lg" aria-label={t("sectionAccount")}>
