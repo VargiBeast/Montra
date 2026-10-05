@@ -33,7 +33,7 @@ export function PricingPublic() {
               <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
             ))}
           </ul>
-          <Link to="/signup" className="secondary-button wide">{t("navGetStarted")}</Link>
+          <Link to="/app" className="secondary-button wide">{t("navGetStarted")}</Link>
         </article>
 
         <article className="panel pricing-plan-card is-featured">
@@ -63,7 +63,7 @@ export function PricingPublic() {
               <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
             ))}
           </ul>
-          <Link to="/signup" className="primary-button wide">
+          <Link to="/app" className="primary-button wide">
             <Sparkles size={16} /> {t("plusCtaLocked")}
           </Link>
           <p className="plus-cta-note">{t("plusCtaNote")}</p>
