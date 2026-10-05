@@ -1,10 +1,10 @@
 {
-  "id": "/",
+  "id": "/app",
   "name": "Montra — Personal Finance",
   "short_name": "Montra",
   "description": "A thoughtful, private place to keep track of your money and purchases.",
   "lang": "en",
-  "start_url": "/",
+  "start_url": "/app",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
