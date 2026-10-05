@@ -506,10 +506,10 @@ function App() {
       {formOpen && (
         <TransactionForm
           open={formOpen}
-          initial={editing}
-          saving={saving}
+          existing={editing}
+          busy={saving}
           onClose={() => setFormOpen(false)}
-          onSave={(input) => void saveTransaction(input, editing ?? undefined)}
+          onSave={(input) => saveTransaction(input, editing ?? undefined)}
         />
       )}
       <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
