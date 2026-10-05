@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, Lock, Plus, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, BarChart3, ChevronRight, Gift, Lock, PiggyBank, Plus, Sparkles, TrendingUp } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { TransactionRow } from "../components/TransactionRow";
@@ -18,6 +18,11 @@ const PLUS_FALLBACK: Record<string, string> = {
   analyticsPlusBenefitInsights: "Insights and future forecasting",
   analyticsPlusCta: "Get Montra Plus",
   analyticsPlusComingSoon: "Montra Plus is coming soon.",
+  planning: "Planning",
+  savingsGoals: "Savings goals",
+  savingsGoalsHint: "Track progress toward a target",
+  wishlist: "Wishlist",
+  wishlistHint: "Save products you want",
 };
 
 interface HomePageProps {
@@ -30,9 +35,23 @@ interface HomePageProps {
   onGetPlus?: () => void;
   hasPlus?: boolean;
   onOpenAnalytics?: () => void;
+  onOpenSavingsGoals?: () => void;
+  onOpenWishlist?: () => void;
 }
 
-export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onViewAll, onGetPlus, hasPlus = false, onOpenAnalytics }: HomePageProps) {
+export function HomePage({
+  transactions,
+  getImageUrl,
+  name,
+  onAdd,
+  onSelect,
+  onViewAll,
+  onGetPlus,
+  hasPlus = false,
+  onOpenAnalytics,
+  onOpenSavingsGoals,
+  onOpenWishlist,
+}: HomePageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
@@ -53,20 +72,52 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
         </div>
       </div>
 
-      <section className="panel balance-card">
+      <section className="panel balance-card" aria-label={t("currentBalance")}>
         <span className="eyebrow">{t("currentBalance")}</span>
         <strong className="balance-value">{money(summary.balance)}</strong>
         <div className="balance-split">
           <div>
-            <span className="balance-split-label"><ArrowDownLeft size={14} /> {t("moneyIn")}</span>
+            <span className="balance-split-label">
+              <ArrowDownLeft size={14} aria-hidden="true" /> {t("moneyIn")}
+            </span>
             <strong>{money(summary.totalIn)}</strong>
           </div>
           <div>
-            <span className="balance-split-label"><ArrowUpRight size={14} /> {t("moneyOut")}</span>
+            <span className="balance-split-label">
+              <ArrowUpRight size={14} aria-hidden="true" /> {t("moneyOut")}
+            </span>
             <strong>{money(summary.totalOut)}</strong>
           </div>
         </div>
       </section>
+
+      {(onOpenSavingsGoals || onOpenWishlist) && (
+        <section className="panel section-panel" aria-label={t("planning")}>
+          <div className="section-heading">
+            <h2>{t("planning")}</h2>
+          </div>
+          <div className="planning-grid">
+            {onOpenSavingsGoals && (
+              <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
+                <span className="planning-card-icon" aria-hidden="true">
+                  <PiggyBank size={18} />
+                </span>
+                <strong>{t("savingsGoals")}</strong>
+                <span>{t("savingsGoalsHint")}</span>
+              </button>
+            )}
+            {onOpenWishlist && (
+              <button type="button" className="planning-card" onClick={onOpenWishlist}>
+                <span className="planning-card-icon" aria-hidden="true">
+                  <Gift size={18} />
+                </span>
+                <strong>{t("wishlist")}</strong>
+                <span>{t("wishlistHint")}</span>
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {hasPlus ? (
         <section className="panel section-panel analytics-unlocked-card">
@@ -103,9 +154,18 @@ export function HomePage({ transactions, getImageUrl, name, onAdd, onSelect, onV
             <h2>{t("analyticsPlusTitle")}</h2>
             <p>{t("analyticsPlusBody")}</p>
             <ul className="analytics-plus-benefits">
-              <li><TrendingUp size={16} />{t("analyticsPlusBenefitTrends")}</li>
-              <li><Sparkles size={16} />{t("analyticsPlusBenefitCategories")}</li>
-              <li><BarChart3 size={16} />{t("analyticsPlusBenefitInsights")}</li>
+              <li>
+                <TrendingUp size={16} />
+                {t("analyticsPlusBenefitTrends")}
+              </li>
+              <li>
+                <Sparkles size={16} />
+                {t("analyticsPlusBenefitCategories")}
+              </li>
+              <li>
+                <BarChart3 size={16} />
+                {t("analyticsPlusBenefitInsights")}
+              </li>
             </ul>
             <button type="button" className="primary-button analytics-plus-cta" onClick={() => onGetPlus?.()}>
               {t("analyticsPlusCta")}
