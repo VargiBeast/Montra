@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /home
+Disallow: /activity
+Disallow: /transactions
+Disallow: /receipts
+Disallow: /wishlist
+Disallow: /goals
+Disallow: /more
+Disallow: /settings
+Disallow: /profile
+Disallow: /analytics
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://montra.cash/sitemap.xml
