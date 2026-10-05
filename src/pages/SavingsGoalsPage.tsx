@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { ArrowLeft, CheckCircle2, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
 import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
 import { goalProgress } from "../types/savingsGoal";
@@ -104,7 +105,6 @@ export function SavingsGoalsPage({
     setCreating(false);
     setEditing(goal);
     setName(goal.name);
-    // Show amounts in display currency; storage stays base (NOK)
     const targetDisplay = convertFromBase(Number(goal.target_amount), currency);
     const currentDisplay = convertFromBase(Number(goal.current_amount), currency);
     setTarget(String(Math.round(targetDisplay * 100) / 100));
@@ -135,7 +135,16 @@ export function SavingsGoalsPage({
       await onSave(input, editing ?? undefined);
       closeForm();
     } catch (reason) {
-      setFormError(reason instanceof Error ? reason.message : "Could not save goal.");
+      const message =
+        reason instanceof Error && reason.message.trim()
+          ? reason.message
+          : reason && typeof reason === "object" && "message" in reason && typeof (reason as { message: unknown }).message === "string"
+            ? (reason as { message: string }).message
+            : "Could not save goal.";
+      if (import.meta.env.DEV) {
+        console.error("[SavingsGoalsPage] save failed", reason);
+      }
+      setFormError(message);
     } finally {
       setBusy(false);
     }
@@ -147,7 +156,16 @@ export function SavingsGoalsPage({
       await onDelete(goal);
       setConfirmDelete(null);
     } catch (reason) {
-      setFormError(reason instanceof Error ? reason.message : "Could not delete goal.");
+      const message =
+        reason instanceof Error && reason.message.trim()
+          ? reason.message
+          : reason && typeof reason === "object" && "message" in reason && typeof (reason as { message: unknown }).message === "string"
+            ? (reason as { message: string }).message
+            : "Could not delete goal.";
+      if (import.meta.env.DEV) {
+        console.error("[SavingsGoalsPage] delete failed", reason);
+      }
+      setFormError(message);
     } finally {
       setBusy(false);
     }
@@ -276,7 +294,7 @@ export function SavingsGoalsPage({
         </>
       )}
 
-      {showForm && (
+      {showForm && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={closeForm}>
           <div
             className="modal-sheet panel"
@@ -338,10 +356,11 @@ export function SavingsGoalsPage({
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      {confirmDelete && (
+      {confirmDelete && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={() => setConfirmDelete(null)}>
           <div
             className="modal-sheet panel"
@@ -373,7 +392,8 @@ export function SavingsGoalsPage({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </main>
   );
