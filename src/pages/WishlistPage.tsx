@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import type { WishlistItem, WishlistItemInput } from "../types/wishlist";
 import type { SavingsGoal } from "../types/savingsGoal";
-import { formatMoney, validateProductUrl } from "../lib/utils";
+import { formatMoney, safeExternalHref, validateProductUrl } from "../lib/utils";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { currencyChoices, normalizeDisplayCurrency, type DisplayCurrency } from "../lib/preferences";
@@ -541,8 +541,8 @@ function WishlistCard({
           </p>
         )}
         <div className="wishlist-card-actions">
-          {item.url ? (
-            <a className="text-button wishlist-link-btn" href={item.url} target="_blank" rel="noreferrer">
+          {safeExternalHref(item.url) ? (
+            <a className="text-button wishlist-link-btn" href={safeExternalHref(item.url)!} target="_blank" rel="noopener noreferrer">
               <ExternalLink size={14} /> {t("wishlistOpenProduct")}
             </a>
           ) : null}
