@@ -1,25 +1,56 @@
 /**
  * Montra Plus entitlement + display pricing helpers.
  *
- * Entitlement is temporary until payments ship.
- * Pricing amounts are always NOK and must NOT go through display-currency conversion.
+ * Entitlement source of truth: public.plus_entitlements (server-synced from Stripe).
+ * Frontend only reads the caller's own row via RLS. Never writes entitlement.
  */
 
-/** Google account used for pre-payment Plus testing. Remove when billing ships. */
-const TEMP_PLUS_TEST_EMAILS = new Set(["ivargyt@gmail.com"]);
+/** Row shape from public.plus_entitlements (SELECT only). */
+export type PlusEntitlement = {
+  user_id: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  status: string;
+  current_period_end: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+/** Stripe subscription statuses that grant Plus access. */
+const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 
 /**
- * Returns true when the user should see Plus features unlocked in the UI.
- * Currently: hardcoded test emails only. No payments, no Stripe, no webhooks.
+ * Whether an entitlement row currently grants Plus in the UI.
  *
- * IMPORTANT: This is a temporary *client-side UX* entitlement only.
- * It is NOT a security boundary. Private data remains protected by Supabase RLS
- * and Storage policies. Do not treat hasPlusAccess as authorization for data access.
- * Replace with real subscription verification when billing ships.
+ * Rules:
+ * - status must be `active` or `trialing`
+ * - current_period_end must be missing OR strictly in the future
+ *
+ * This is a client-side UX gate only. Private data remains protected by RLS.
  */
-export function hasPlusAccess(email: string | null | undefined): boolean {
-  if (!email) return false;
-  return TEMP_PLUS_TEST_EMAILS.has(email.trim().toLowerCase());
+export function isPlusEntitlementActive(
+  entitlement: PlusEntitlement | null | undefined,
+  nowMs: number = Date.now(),
+): boolean {
+  if (!entitlement) return false;
+  const status = (entitlement.status ?? "").trim().toLowerCase();
+  if (!ACTIVE_STATUSES.has(status)) return false;
+
+  if (entitlement.current_period_end) {
+    const end = Date.parse(entitlement.current_period_end);
+    if (Number.isFinite(end) && end <= nowMs) return false;
+  }
+  return true;
+}
+
+/**
+ * @deprecated Prefer usePlusEntitlement(). Kept as a pure helper for tests / non-React code.
+ * Does not accept email bypasses — entitlement table is the only source of truth.
+ */
+export function hasPlusAccessFromEntitlement(
+  entitlement: PlusEntitlement | null | undefined,
+): boolean {
+  return isPlusEntitlementActive(entitlement);
 }
 
 /**
