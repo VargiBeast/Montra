@@ -29,4 +29,4 @@ Disallow: /reset-password
 # Owner app wishlist (share pages are noindex and use /wishlist/:token)
 Disallow: /wishlist
 
-Sitemap: https://montra.cash/sitemap.xml
+Sitemap: https://www.montra.cash/sitemap.xml
