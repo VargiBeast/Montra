@@ -86,13 +86,26 @@ export function isImportableTransaction(
   Partial<Pick<Transaction, "method" | "link" | "note">> {
   if (typeof value !== "object" || value === null) return false;
   const record = value as Record<string, unknown>;
-  return (
-    (record.type === "in" || record.type === "out") &&
-    typeof record.name === "string" &&
-    record.name.trim().length > 0 &&
-    Number.isFinite(Number(record.amount)) &&
-    Number(record.amount) > 0 &&
-    typeof record.date === "string" &&
-    isValidCalendarDate(record.date)
-  );
+  if (!(record.type === "in" || record.type === "out")) return false;
+  if (typeof record.name !== "string") return false;
+  const name = record.name.trim();
+  // Reject empty or pathologically long names (untrusted backup input).
+  if (name.length < 1 || name.length > 200) return false;
+  const amount = Number(record.amount);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) return false;
+  if (typeof record.date !== "string" || !isValidCalendarDate(record.date)) return false;
+  if (record.method != null && (typeof record.method !== "string" || record.method.length > 80)) {
+    return false;
+  }
+  if (record.note != null && (typeof record.note !== "string" || record.note.length > 2000)) {
+    return false;
+  }
+  // link validated separately via validateProductUrl at import time
+  return true;
+}
+
+/** Safe http(s) href for user-controlled links; null if unsafe. */
+export function safeExternalHref(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return validateProductUrl(value).url;
 }
