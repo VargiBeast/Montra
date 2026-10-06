@@ -1,1 +1,82 @@
-PLACEHOLDER
+/* Preference dropdown spacing — keeps selects inside the panel, away from borders */
+.language-settings .preference-field,
+.currency-settings .preference-field,
+.more-preferences .preference-field {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0 16px 14px;
+  box-sizing: border-box;
+}
+
+.language-settings .preference-field select,
+.currency-settings .preference-field select,
+.more-preferences .preference-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+}
+
+.language-settings .preference-field svg,
+.currency-settings .preference-field svg,
+.more-preferences .preference-field svg {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
+
+.language-settings .preference-field,
+.currency-settings .preference-field,
+.more-preferences .preference-field {
+  position: relative;
+}
+
+.more-preferences .setting-row.is-static {
+  padding-bottom: 6px;
+}
+
+.more-preferences .theme-choices {
+  padding: 0 16px 14px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 380px) {
+  .theme-choice {
+    font-size: 11px;
+  }
+
+  .theme-choice {
+    min-height: 64px;
+    padding: 12px 6px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 760px) {
+  .more-preferences .theme-choices {
+    max-width: 460px;
+  }
+}
+
+/* Equal height theme buttons on More preferences */
+.more-preferences .theme-choices {
+  align-items: stretch;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.more-preferences .theme-choice {
+  min-height: 76px;
+  padding: 14px 8px;
+}
