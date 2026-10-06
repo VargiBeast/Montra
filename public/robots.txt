@@ -11,8 +11,10 @@ Allow: /privacy
 Allow: /terms
 Allow: /cookies
 Allow: /security
+Allow: /login
+Allow: /signup
+Allow: /app
 
-Disallow: /app
 Disallow: /home
 Disallow: /activity
 Disallow: /transactions
@@ -22,8 +24,6 @@ Disallow: /more
 Disallow: /settings
 Disallow: /profile
 Disallow: /analytics
-Disallow: /login
-Disallow: /signup
 Disallow: /forgot-password
 Disallow: /reset-password
 # Owner app wishlist (share pages are noindex and use /wishlist/:token)
