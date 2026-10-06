@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AppRoutes } from "./AppRoutes";
+import { ConsentBanner } from "./components/ConsentBanner";
+import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import "./styles/globals-base.css";
 import "./styles/globals.css";
 import "./styles/plus.css";
@@ -84,6 +86,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <CurrencyProvider>
           <SystemThemeSync />
           <RepairLiteralEscapes />
+          <AnalyticsTracker />
+          <ConsentBanner />
           <AppRoutes />
         </CurrencyProvider>
       </LanguageProvider>
