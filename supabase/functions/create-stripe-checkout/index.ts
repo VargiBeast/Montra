@@ -1,6 +1,7 @@
 // Montra Plus — create Stripe Checkout Session (subscription + 7-day trial)
 // Deploy: supabase functions deploy create-stripe-checkout
-// (JWT is verified inside the function via supabase.auth.getUser)
+// JWT is verified inside the function via supabase.auth.getUser.
+// Does NOT use service-role credentials.
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -45,14 +46,12 @@ function jsonResponse(
   });
 }
 
-/** Safe diagnostic logging — never logs secrets, JWTs, headers, or payment data. */
 function logError(
   step: string,
   err: unknown,
   extra?: Record<string, string | number | boolean | null | undefined>,
 ): void {
   const base: Record<string, unknown> = { step };
-
   if (err instanceof Error) {
     base.name = err.name;
     base.message = err.message;
@@ -68,14 +67,18 @@ function logError(
   } else {
     base.message = String(err);
   }
-
   if (extra) {
     for (const [k, v] of Object.entries(extra)) {
       if (v !== undefined) base[k] = v;
     }
   }
-
   console.error("checkout:", JSON.stringify(base));
+}
+
+function stripeModeFromSecret(secret: string): "live" | "test" | "unknown" {
+  if (secret.startsWith("sk_live_")) return "live";
+  if (secret.startsWith("sk_test_")) return "test";
+  return "unknown";
 }
 
 Deno.serve(async (req: Request) => {
@@ -94,11 +97,6 @@ Deno.serve(async (req: Request) => {
   try {
     step = "env";
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    // Optional service role for mapping writes; fall back to user JWT client (no key is injected here)
-    const serviceRoleKey =
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ??
-      Deno.env.get("SUPABASE_SERVICE_ROLE") ??
-      null;
     const publishableKey =
       Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") ??
       Deno.env.get("SUPABASE_ANON_KEY") ??
@@ -123,6 +121,8 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    const stripeMode = stripeModeFromSecret(stripeSecret);
+
     step = "auth_header";
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -131,7 +131,6 @@ Deno.serve(async (req: Request) => {
     const jwt = authHeader.slice(7);
 
     step = "auth_get_user";
-    // Authenticate user with the user's JWT (never trust client for identity)
     const supabaseAuth = createClient(supabaseUrl, publishableKey, {
       global: { headers: { Authorization: `Bearer ${jwt}` } },
       auth: { persistSession: false, autoRefreshToken: false },
@@ -142,9 +141,7 @@ Deno.serve(async (req: Request) => {
     } = await supabaseAuth.auth.getUser(jwt);
 
     if (userError || !user) {
-      logError(step, userError ?? "no user", {
-        has_user: !!user,
-      });
+      logError(step, userError ?? "no user", { has_user: !!user });
       return jsonResponse({ error: "Authentication required" }, 401, origin);
     }
 
@@ -180,17 +177,10 @@ Deno.serve(async (req: Request) => {
       httpClient: Stripe.createFetchHttpClient(),
     });
 
-    // Prefer service-role client only if the secret is already present in the
-    // function environment; otherwise use the authenticated user client.
-    // We do not inject or require a service-role key.
-    const supabaseAdmin = serviceRoleKey
-      ? createClient(supabaseUrl, serviceRoleKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        })
-      : supabaseAuth;
+    const supabase = supabaseAuth;
 
     step = "customer_lookup";
-    const { data: linkRow, error: linkError } = await supabaseAdmin
+    const { data: linkRow, error: linkError } = await supabase
       .from("stripe_customer_links")
       .select("stripe_customer_id")
       .eq("user_id", user.id)
@@ -221,7 +211,7 @@ Deno.serve(async (req: Request) => {
         customerId = customer.id;
 
         step = "customer_link_upsert";
-        const { error: upsertError } = await supabaseAdmin
+        const { error: upsertError } = await supabase
           .from("stripe_customer_links")
           .upsert(
             {
@@ -232,7 +222,6 @@ Deno.serve(async (req: Request) => {
           );
 
         if (upsertError) {
-          // Non-fatal: session can still open with the Stripe customer id
           logError(step, upsertError, {
             code: upsertError.code,
             details: upsertError.details ?? null,
@@ -250,6 +239,7 @@ Deno.serve(async (req: Request) => {
           stripe_type: se?.type ?? null,
           stripe_code: se?.code ?? null,
           stripe_status: se?.statusCode ?? null,
+          stripe_mode: stripeMode,
         });
         return jsonResponse(
           {
@@ -261,6 +251,63 @@ Deno.serve(async (req: Request) => {
           origin,
         );
       }
+    }
+
+    step = "stripe_price_retrieve";
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      if (!price || price.deleted) {
+        logError(step, "price missing or deleted", {
+          plan,
+          stripe_mode: stripeMode,
+        });
+        return jsonResponse(
+          {
+            error: "Unable to start checkout",
+            code: "stripe_price_missing",
+            stripe_code: "resource_missing",
+            stripe_mode: stripeMode,
+          },
+          502,
+          origin,
+        );
+      }
+      if (!price.active) {
+        logError(step, "price inactive", { plan, stripe_mode: stripeMode });
+        return jsonResponse(
+          {
+            error: "Unable to start checkout",
+            code: "stripe_price_inactive",
+            stripe_mode: stripeMode,
+          },
+          502,
+          origin,
+        );
+      }
+    } catch (priceErr: unknown) {
+      const se = priceErr as {
+        type?: string;
+        code?: string;
+        message?: string;
+        statusCode?: number;
+      };
+      logError(step, priceErr, {
+        stripe_type: se?.type ?? null,
+        stripe_code: se?.code ?? null,
+        stripe_status: se?.statusCode ?? null,
+        plan,
+        stripe_mode: stripeMode,
+      });
+      return jsonResponse(
+        {
+          error: "Unable to start checkout",
+          code: "stripe_price",
+          stripe_code: se?.code ?? null,
+          stripe_mode: stripeMode,
+        },
+        502,
+        origin,
+      );
     }
 
     step = "stripe_session_create";
@@ -303,12 +350,14 @@ Deno.serve(async (req: Request) => {
         stripe_code: se?.code ?? null,
         stripe_status: se?.statusCode ?? null,
         plan,
+        stripe_mode: stripeMode,
       });
       return jsonResponse(
         {
           error: "Unable to start checkout",
           code: "stripe_session",
           stripe_code: se?.code ?? null,
+          stripe_mode: stripeMode,
         },
         502,
         origin,
