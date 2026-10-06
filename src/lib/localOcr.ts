@@ -20,3 +20,16 @@ export async function recognizeReceiptText(file: Blob): Promise<string> {
   const result = await worker.recognize(file);
   return result.data.text ?? "";
 }
+
+/** Terminate the shared OCR worker (optional — call when leaving receipts for a long time). */
+export async function releaseOcrWorker(): Promise<void> {
+  if (!workerPromise) return;
+  try {
+    const worker = await workerPromise;
+    await worker.terminate();
+  } catch {
+    /* ignore terminate errors */
+  } finally {
+    workerPromise = null;
+  }
+}
