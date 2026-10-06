@@ -3,6 +3,7 @@ import { Check, Sparkles } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 import { PLUS_PRICING } from "../../lib/plus";
+import { trackEvent } from "../../lib/gtm";
 
 export function PricingPublic() {
   const t = useTranslation();
@@ -33,7 +34,7 @@ export function PricingPublic() {
               <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
             ))}
           </ul>
-          <Link to="/app" className="secondary-button wide">{t("navGetStarted")}</Link>
+          <Link to="/app" className="secondary-button wide" onClick={() => trackEvent("get_started", { surface: "pricing" })}>{t("navGetStarted")}</Link>
         </article>
 
         <article className="panel pricing-plan-card is-featured">
@@ -63,7 +64,7 @@ export function PricingPublic() {
               <li key={item}><Check size={16} aria-hidden="true" /><span>{item}</span></li>
             ))}
           </ul>
-          <Link to="/app" className="primary-button wide">
+          <Link to="/app" className="primary-button wide" onClick={() => trackEvent("upgrade_clicked", { surface: "pricing" })}>
             <Sparkles size={16} /> {t("plusCtaLocked")}
           </Link>
           <p className="plus-cta-note">{t("plusCtaNote")}</p>

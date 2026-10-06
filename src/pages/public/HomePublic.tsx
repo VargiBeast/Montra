@@ -3,6 +3,7 @@ import {
   ArrowDownUp, Gift, Globe2, PiggyBank, Receipt, Sparkles, Wallet,
 } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
+import { trackEvent } from "../../lib/gtm";
 import { organizationJsonLd, useDocumentMeta, websiteJsonLd } from "../../lib/seo";
 
 export function HomePublic() {
@@ -30,7 +31,7 @@ export function HomePublic() {
         <h1>{t("homeHeroTitle")}</h1>
         <p className="marketing-lead">{t("homeHeroBody")}</p>
         <div className="marketing-cta-row">
-          <Link to="/app" className="primary-button">{t("navGetStarted")}</Link>
+          <Link to="/app" className="primary-button" onClick={() => trackEvent("get_started", { surface: "home" })}>{t("navGetStarted")}</Link>
           <Link to="/login" className="secondary-button">{t("navSignIn")}</Link>
           <Link to="/plus" className="text-button">{t("navExplorePlus")}</Link>
         </div>
