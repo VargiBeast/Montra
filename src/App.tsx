@@ -23,6 +23,7 @@ import { TransactionDetail } from "./components/TransactionDetail";
 import { ReceiptDetail } from "./components/ReceiptDetail";
 import { ReceiptCapture } from "./components/ReceiptCapture";
 import { UserAvatar } from "./components/UserAvatar";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { useDisplayCurrency } from "./lib/currency";
 import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
@@ -123,6 +124,8 @@ function App() {
   const [forceLogin, setForceLogin] = useState(false);
   const [guestTick, setGuestTick] = useState(0);
   const [accountPromptOpen, setAccountPromptOpen] = useState(() => !isAccountPromptDismissed());
+  const [pendingDeleteTx, setPendingDeleteTx] = useState<Transaction | null>(null);
+  const [pendingDeleteReceipt, setPendingDeleteReceipt] = useState<import("./types/receipt").Receipt | null>(null);
   const guestTransactions = guestTick >= 0 ? readGuestTransactions() : [];
 
   useEffect(() => {
@@ -220,12 +223,19 @@ function App() {
     }
   }
 
-  async function deleteTransaction(transaction: Transaction) {
-    if (!window.confirm(t("deleteConfirm"))) return;
+  function requestDeleteTransaction(transaction: Transaction) {
+    setPendingDeleteTx(transaction);
+  }
+
+  async function confirmDeleteTransaction() {
+    const transaction = pendingDeleteTx;
+    if (!transaction) return;
     setDeleting(true);
     try {
       await data.remove(transaction);
       setSelected(null);
+      setPendingDeleteTx(null);
+      setToast(t("transactionDeleted"));
     } catch (reason) {
       setToast(reason instanceof Error ? reason.message : t("deleteFailed"));
     } finally {
@@ -233,12 +243,18 @@ function App() {
     }
   }
 
-  async function deleteReceipt(receipt: import("./types/receipt").Receipt) {
-    if (!window.confirm(t("receiptDeleteConfirm"))) return;
+  function requestDeleteReceipt(receipt: import("./types/receipt").Receipt) {
+    setPendingDeleteReceipt(receipt);
+  }
+
+  async function confirmDeleteReceipt() {
+    const receipt = pendingDeleteReceipt;
+    if (!receipt) return;
     setDeletingReceipt(true);
     try {
       await receipts.remove(receipt);
       setSelectedReceipt(null);
+      setPendingDeleteReceipt(null);
       setToast(t("receiptDeleted"));
     } catch (reason) {
       setToast(reason instanceof Error ? reason.message : t("receiptDeleteFailed"));
@@ -246,6 +262,8 @@ function App() {
       setDeletingReceipt(false);
     }
   }
+
+
 
   async function doSignOut() {
     setSigningOut(true);
@@ -491,8 +509,32 @@ function App() {
           onSave={(input) => saveTransaction(input, editing ?? undefined)}
         />
       )}
-      <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={(transaction) => void deleteTransaction(transaction)} deleting={deleting} />
+      <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={requestDeleteTransaction} deleting={deleting} />
       {toast && <div className="toast" role="status">{toast}</div>}
+      <ConfirmDialog
+        open={Boolean(pendingDeleteTx)}
+        title={t("delete")}
+        body={pendingDeleteTx
+          ? t("deleteConfirm", { name: pendingDeleteTx.name })
+          : t("deleteConfirm", { name: "" })}
+        confirmLabel={t("delete")}
+        busy={deleting}
+        onConfirm={() => void confirmDeleteTransaction()}
+        onCancel={() => setPendingDeleteTx(null)}
+      />
+      <ConfirmDialog
+        open={Boolean(pendingDeleteReceipt)}
+        title={t("delete")}
+        body={pendingDeleteReceipt
+          ? t("receiptDeleteConfirmNamed", {
+              merchant: pendingDeleteReceipt.merchant?.trim() || t("receipt"),
+            })
+          : t("receiptDeleteConfirm")}
+        confirmLabel={t("delete")}
+        busy={deletingReceipt}
+        onConfirm={() => void confirmDeleteReceipt()}
+        onCancel={() => setPendingDeleteReceipt(null)}
+      />
       <ReceiptCapture
         open={captureOpen}
         currency={currency}
@@ -547,7 +589,7 @@ function App() {
         receipt={selectedReceipt}
         getImageUrl={receipts.getImageUrl}
         onClose={() => setSelectedReceipt(null)}
-        onDelete={(receipt) => void deleteReceipt(receipt)}
+        onDelete={requestDeleteReceipt}
         deleting={deletingReceipt}
       />
     </div>
