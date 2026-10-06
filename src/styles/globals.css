@@ -2117,3 +2117,18 @@ select:focus-visible,
 a:focus-visible {
   outline-color: color-mix(in srgb, var(--accent, var(--blue)), transparent 30%);
 }
+
+/* P4 — lazy route fallback */
+.route-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 40vh;
+}
+.route-fallback-panel {
+  padding: 20px 24px;
+  text-align: center;
+}
+.route-fallback-panel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
