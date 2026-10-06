@@ -320,25 +320,25 @@ export function SavingsGoalsPage({
 
       {showForm && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={closeForm}>
-          <div className="modal-card" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-sheet panel savings-form-sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h2>{editing ? t("savingsGoalsEdit") : t("savingsGoalsAdd")}</h2>
-            <form className="stack-form" onSubmit={submitForm}>
-              <label>
+            <form className="stack-md" onSubmit={submitForm}>
+              <label className="form-field">
                 <span>{t("savingsGoalsName")}</span>
-                <input value={name} onChange={(e) => setName(e.target.value)} required />
+                <input value={name} onChange={(e) => setName(e.target.value)} required autoFocus maxLength={120} />
               </label>
-              <label>
+              <label className="form-field">
                 <span>{t("savingsGoalsTarget")}</span>
                 <input inputMode="decimal" value={target} onChange={(e) => setTarget(e.target.value)} required />
               </label>
-              <label>
+              <label className="form-field">
                 <span>{t("savingsGoalsDeadline")}</span>
                 <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
               </label>
               {formError && <p className="form-error">{formError}</p>}
-              <div className="modal-actions">
+              <div className="form-actions">
                 <button type="button" className="secondary-button" onClick={closeForm} disabled={busy}>{t("cancel")}</button>
-                <button type="submit" className="primary-button" disabled={busy}>{busy ? t("saving") : t("save")}</button>
+                <button type="submit" className="primary-button" disabled={busy}>{busy ? t("saving") : t("saveChanges")}</button>
               </div>
             </form>
           </div>
@@ -348,18 +348,18 @@ export function SavingsGoalsPage({
 
       {addingTo && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={closeForm}>
-          <div className="modal-card" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-sheet panel savings-form-sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h2>{t("savingsGoalsAddMoney")}</h2>
             <p className="modal-lead">{addingTo.name}</p>
-            <form className="stack-form" onSubmit={submitAdd}>
-              <label>
-                <span>{t("amount")}</span>
+            <form className="stack-md" onSubmit={submitAdd}>
+              <label className="form-field">
+                <span>{t("amountNok", { currency })}</span>
                 <input inputMode="decimal" value={addAmount} onChange={(e) => setAddAmount(e.target.value)} required autoFocus />
               </label>
               {formError && <p className="form-error">{formError}</p>}
-              <div className="modal-actions">
+              <div className="form-actions">
                 <button type="button" className="secondary-button" onClick={closeForm} disabled={busy}>{t("cancel")}</button>
-                <button type="submit" className="primary-button" disabled={busy}>{busy ? t("saving") : t("save")}</button>
+                <button type="submit" className="primary-button" disabled={busy}>{busy ? t("saving") : t("saveChanges")}</button>
               </div>
             </form>
           </div>
@@ -369,13 +369,13 @@ export function SavingsGoalsPage({
 
       {confirmDelete && createPortal(
         <div className="modal-backdrop" role="presentation" onClick={() => setConfirmDelete(null)}>
-          <div className="modal-card" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-sheet panel savings-form-sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
             <h2>{t("savingsGoalsDeleteTitle")}</h2>
             <p>{t("savingsGoalsDeleteBody", { name: confirmDelete.name })}</p>
             {formError && <p className="form-error">{formError}</p>}
-            <div className="modal-actions">
+            <div className="form-actions">
               <button type="button" className="secondary-button" onClick={() => setConfirmDelete(null)} disabled={busy}>{t("cancel")}</button>
-              <button type="button" className="primary-button danger" onClick={() => void confirmDeleteGoal()} disabled={busy}>
+              <button type="button" className="danger-button" onClick={() => void confirmDeleteGoal()} disabled={busy}>
                 {busy ? t("saving") : t("delete")}
               </button>
             </div>
