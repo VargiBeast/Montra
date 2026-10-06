@@ -1921,9 +1921,9 @@ a:focus-visible {
 .personalize-accent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 @media (min-width: 640px) { .personalize-accent-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .personalize-accent-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface-raised), transparent 8%); text-align: left; cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
-.personalize-accent-card:hover { border-color: color-mix(in srgb, var(--green) 35%, var(--line)); }
-.personalize-accent-card:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-.personalize-accent-card.active { border-color: var(--green); box-shadow: 0 0 0 1px color-mix(in srgb, var(--green) 40%, transparent); }
+.personalize-accent-card:hover { border-color: color-mix(in srgb, var(--accent, var(--green)) 35%, var(--line)); }
+.personalize-accent-card:focus-visible { outline: 2px solid var(--accent, var(--green)); outline-offset: 2px; }
+.personalize-accent-card.active { border-color: var(--accent, var(--green)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, var(--green)) 40%, transparent); }
 .personalize-accent-swatch { width: 100%; height: 28px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
 .accent-preview-default .personalize-accent-swatch { background: linear-gradient(135deg, color-mix(in srgb, var(--green) 35%, #fff), color-mix(in srgb, var(--surface) 70%, #cde)); }
 .accent-preview-forest .personalize-accent-swatch { background: linear-gradient(135deg, #1d5c45, #6fbf9a); }
@@ -1938,9 +1938,7 @@ a:focus-visible {
 .plus-personalize-cta p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
 .plus-personalize-cta > div { flex: 1 1 180px; }
 .analytics-preview-label { margin: 8px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
-html[data-accent="forest"] { --green: #1f7a55; }
-html[data-accent="dusk"] { --green: #6b5b95; }
-html[data-accent="aurora"] { --green: #2a9d8f; }
+/* Brand accents applied via --accent inline from personalization.ts — semantic --green preserved */
 .theme-choice:focus-visible, .personalize-toggle:focus-visible, .plus-action-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .plus-action-btn { transition: transform 0.12s ease; }
 .plus-action-btn:hover { transform: translateY(-1px); }
@@ -1949,3 +1947,173 @@ html[data-accent="aurora"] { --green: #2a9d8f; }
 .page-title { letter-spacing: -0.02em; line-height: 1.15; }
 .home-page .page-title { font-size: clamp(1.35rem, 2.4vw, 1.6rem); font-weight: 700; }
 .balance-value { letter-spacing: -0.03em; line-height: 1.05; }
+
+
+/* P3 — Custom color control */
+.personalize-custom-color {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-raised), transparent 10%);
+}
+.personalize-custom-color.is-active {
+  border-color: color-mix(in srgb, var(--accent, var(--green)) 45%, var(--line));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, var(--green)) 25%, transparent);
+}
+.personalize-custom-color-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.personalize-custom-color-copy strong { font-size: 14px; }
+.personalize-custom-color-copy span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+.personalize-color-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+.personalize-color-input {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+}
+.personalize-color-input::-webkit-color-swatch-wrapper { padding: 3px; }
+.personalize-color-input::-webkit-color-swatch { border: none; border-radius: 8px; }
+.personalize-color-hex {
+  width: 7.5rem;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+.personalize-color-hex:focus {
+  outline: 2px solid var(--accent, var(--green));
+  outline-offset: 1px;
+}
+
+/* P3 — Matching card groups */
+.planning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+.planning-grid .planning-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 100%;
+  padding: 14px 14px 16px;
+  text-align: left;
+}
+.planning-grid .planning-card strong {
+  margin-top: 2px;
+}
+.planning-grid .planning-card span {
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.plus-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+.plus-feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100%;
+  padding: 16px 16px 18px;
+}
+.plus-feature-card p {
+  margin: 0;
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.plus-price-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+.plus-price-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 100%;
+  padding: 16px;
+}
+.marketing-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+.marketing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100%;
+  padding: 18px 18px 20px;
+}
+.marketing-card p {
+  margin: 0;
+  margin-top: auto;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* P3 — Panel content breathing room */
+.panel {
+  /* keep existing; reinforce content inset for nested text */
+}
+.section-panel > .section-heading {
+  margin-bottom: 10px;
+}
+.section-panel > p,
+.home-planning > p {
+  padding-inline: 0;
+}
+.home-goal-card {
+  padding: 14px;
+}
+.personalize-section-row {
+  padding: 14px 16px;
+}
+
+/* Progress / brand fills use accent when set */
+.home-goal-fill {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--green)) 70%, #8fd4c2), var(--accent, var(--green)));
+}
+
+/* Focus rings prefer accent */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline-color: color-mix(in srgb, var(--accent, var(--blue)), transparent 30%);
+}
