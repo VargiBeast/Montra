@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE = "https://montra.cash";
+const SITE = "https://www.montra.cash";
 /** Real existing branding asset for social previews. */
 const DEFAULT_OG_IMAGE = `${SITE}/icons/icon-512.png`;
 
