@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import App from "./App";
 import { useAuth } from "./hooks/useAuth";
 import { MarketingLayout } from "./pages/public/MarketingLayout";
 import { HomePublic } from "./pages/public/HomePublic";
@@ -14,6 +13,19 @@ import { PlusPage } from "./pages/PlusPage";
 import { hasPlusAccess } from "./lib/plus";
 import { useDocumentMeta } from "./lib/seo";
 import { useTranslation } from "./lib/i18n";
+
+const App = lazy(() => import("./App"));
+
+function RouteFallback() {
+  return (
+    <div className="app-shell route-fallback" role="status" aria-live="polite">
+      <div className="panel route-fallback-panel">
+        <p className="eyebrow">Montra</p>
+        <p>Loading…</p>
+      </div>
+    </div>
+  );
+}
 
 function PlusPublic() {
   const t = useTranslation();
@@ -89,7 +101,11 @@ function AuthSignup() {
 
 function ProtectedApp() {
   // App already owns onboarding, guest mode, and login prompts.
-  return <App />;
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <App />
+    </Suspense>
+  );
 }
 
 export function AppRoutes() {

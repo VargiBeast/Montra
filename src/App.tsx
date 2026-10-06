@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowDownUp, Home, Moon, Plus, Receipt, UserRound } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
@@ -12,7 +12,6 @@ import { TransactionsPage } from "./pages/TransactionsPage";
 import { MorePage } from "./pages/MorePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ReceiptsPage } from "./pages/ReceiptsPage";
-import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SavingsGoalsPage } from "./pages/SavingsGoalsPage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { PlusPage } from "./pages/PlusPage";
@@ -22,9 +21,15 @@ import { OnboardingFlow } from "./pages/OnboardingFlow";
 import { TransactionForm } from "./components/TransactionForm";
 import { TransactionDetail } from "./components/TransactionDetail";
 import { ReceiptDetail } from "./components/ReceiptDetail";
-import { ReceiptCapture } from "./components/ReceiptCapture";
 import { UserAvatar } from "./components/UserAvatar";
 import { ConfirmDialog } from "./components/ConfirmDialog";
+
+const AnalyticsPage = lazy(() =>
+  import("./pages/AnalyticsPage").then((m) => ({ default: m.AnalyticsPage })),
+);
+const ReceiptCapture = lazy(() =>
+  import("./components/ReceiptCapture").then((m) => ({ default: m.ReceiptCapture })),
+);
 import { useDisplayCurrency } from "./lib/currency";
 import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
@@ -481,7 +486,9 @@ function App() {
           )}
           {page === "analytics" &&
             (plusUnlocked ? (
-              <AnalyticsPage transactions={data.transactions} />
+              <Suspense fallback={null}>
+                <AnalyticsPage transactions={data.transactions} />
+              </Suspense>
             ) : (
               <PlusPage hasPlus={false} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} onOpenPersonalize={() => setPage("personalize")} />
             ))}
@@ -568,6 +575,7 @@ function App() {
         onConfirm={() => void confirmDeleteReceipt()}
         onCancel={() => setPendingDeleteReceipt(null)}
       />
+      <Suspense fallback={null}>
       <ReceiptCapture
         open={captureOpen}
         currency={currency}
@@ -618,6 +626,7 @@ function App() {
           setToast(fields.status === "confirmed" ? t("receiptConfirmed") : t("receiptUploaded"));
         }}
       />
+      </Suspense>
       <ReceiptDetail
         receipt={selectedReceipt}
         getImageUrl={receipts.getImageUrl}
