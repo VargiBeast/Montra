@@ -75,7 +75,11 @@ function AuthLogin() {
     setBusy(true);
     try {
       await action();
-      // OAuth redirects away; magic link stays on page until user clicks email.
+      if (auth.user) {
+        navigate(from.startsWith("/") ? from : "/app", { replace: true });
+      }
+    } catch {
+      /* error shown via auth.authError */
     } finally {
       setBusy(false);
     }
@@ -83,11 +87,12 @@ function AuthLogin() {
 
   return (
     <LoginPage
-      busy={busy || auth.isLoading}
-      error={auth.authError}
+      authError={auth.authError}
+      busy={busy}
+      isConfigured={auth.isConfigured}
       onGoogle={() => wrap(() => auth.signInWithProvider("google"))}
-      onEmail={(email) => wrap(() => auth.signInWithEmail(email))}
-      onVerify={(email, token) => wrap(() => auth.verifyEmailCode(email, token))}
+      onMagicLink={(email) => auth.signInWithEmail(email)}
+      onRetry={auth.retrySession}
     />
   );
 }
@@ -97,7 +102,6 @@ function AuthSignup() {
 }
 
 function ProtectedApp() {
-  // App already owns onboarding, guest mode, and login prompts.
   return (
     <Suspense fallback={<RouteFallback />}>
       <App />
