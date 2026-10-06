@@ -1,0 +1,17 @@
+/* Extra clearance so page content never sits under the fixed bottom nav */
+.page-content {
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+.plus-page.page-content,
+.more-page.page-content,
+.personalize-page.page-content {
+  padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Theme choices: equal visual weight */
+.theme-choices {
+  align-items: stretch;
+}
+.theme-choice {
+  min-height: 76px;
+}
