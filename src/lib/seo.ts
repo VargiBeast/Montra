@@ -114,6 +114,6 @@ export function organizationJsonLd() {
     name: "Montra",
     url: SITE,
     logo: `${SITE}/icons/icon-512.png`,
-    email: "hello@montra.cash",
+    email: "contact@montra.cash",
   };
 }
