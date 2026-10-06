@@ -126,18 +126,18 @@ function IncomeExpenseChart({
   return (
     <div className="analytics-chart" role="img" aria-label={`${incomeLabel} / ${spendingLabel}`}>
       <div className="analytics-chart-legend">
-        <span className="legend-item income"><i />{incomeLabel}</span>
-        <span className="legend-item spending"><i />{spendingLabel}</span>
+        <span className="legend-item income"><i aria-hidden="true" /><span className="legend-marker">+</span>{incomeLabel}</span>
+        <span className="legend-item spending"><i aria-hidden="true" /><span className="legend-marker">−</span>{spendingLabel}</span>
       </div>
       <div className="analytics-bars">
         {buckets.map((bucket) => {
           const inH = Math.round((bucket.income / max) * height);
           const outH = Math.round((bucket.spending / max) * height);
           return (
-            <div key={bucket.key} className="analytics-bar-col" title={`${bucket.label}: ${money(bucket.income)} / ${money(bucket.spending)}`}>
+            <div key={bucket.key} className="analytics-bar-col" title={`${bucket.label}: +${money(bucket.income)} / −${money(bucket.spending)}`}>
               <div className="analytics-bar-pair" style={{ height }}>
-                <span className="bar income" style={{ height: inH }} />
-                <span className="bar spending" style={{ height: outH }} />
+                <span className="bar income" style={{ height: inH }} aria-label={`${incomeLabel} ${money(bucket.income)}`} />
+                <span className="bar spending" style={{ height: outH }} aria-label={`${spendingLabel} ${money(bucket.spending)}`} />
               </div>
               <span className="analytics-bar-label">{bucket.label}</span>
             </div>

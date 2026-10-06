@@ -204,8 +204,8 @@ export function HomePage({
             </button>
           )}
 
-          <div className="planning-grid">
-            {onOpenSavingsGoals && (
+          <div className={`planning-grid ${featuredGoal ? "has-featured-goal" : ""}`}>
+            {onOpenSavingsGoals && !featuredGoal && (
               <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
                 <span className="planning-card-icon" aria-hidden="true">
                   <PiggyBank size={18} />
@@ -230,6 +230,19 @@ export function HomePage({
                   {wishlistItems.length === 0
                     ? t("homeWishlistEmpty")
                     : t("homeWishlistCount", { count: openWishlistCount })}
+                </span>
+              </button>
+            )}
+            {featuredGoal && onOpenSavingsGoals && savingsGoals.length > 1 && (
+              <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
+                <span className="planning-card-icon" aria-hidden="true">
+                  <PiggyBank size={18} />
+                </span>
+                <strong>{t("savingsGoals")}</strong>
+                <span>
+                  {t("homeGoalsActive", {
+                    count: savingsGoals.filter((g) => !goalProgress(g).isComplete).length,
+                  })}
                 </span>
               </button>
             )}

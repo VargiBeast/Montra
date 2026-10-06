@@ -10,6 +10,7 @@ import {
   type OnboardingStep,
 } from "../lib/onboarding";
 import type { TransactionInput } from "../types/transaction";
+import { trackEvent } from "../lib/gtm";
 
 interface OnboardingFlowProps {
   onFinished: () => void;
@@ -79,7 +80,7 @@ export function OnboardingFlow({ onFinished, onSignIn }: OnboardingFlowProps) {
       };
       saveGuestTransaction(input);
       markOnboardingComplete();
-      onFinished();
+      trackEvent("onboarding_completed"); onFinished();
     } catch (reason) {
       console.error("Onboarding first transaction failed.", reason);
       setError(reason instanceof Error ? reason.message : t("onboardingSaveFailed"));

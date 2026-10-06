@@ -30,6 +30,11 @@ import {
   type DisplayCurrency,
   type PreferenceLocale,
 } from "../lib/preferences";
+import {
+  readStoredConsent,
+  updateAnalyticsConsent,
+  type AnalyticsConsent,
+} from "../lib/gtm";
 
 type Theme = "light" | "dark" | "system";
 
@@ -79,6 +84,9 @@ export function MorePage({
   const [working, setWorking] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pendingImport, setPendingImport] = useState<ImportRecord[] | null>(null);
+  const [analyticsConsent, setAnalyticsConsent] = useState<AnalyticsConsent>(() =>
+    typeof window !== "undefined" ? readStoredConsent() : null,
+  );
 
   useEffect(() => {
     let active = true;
@@ -108,7 +116,7 @@ export function MorePage({
     setCurrency(next);
     try {
       await saveUserPreferences(userId, { locale: normalizePreferenceLocale(language), currency: next });
-      setMessage(t("preferencesSaved"));
+      setMessage(t("currencyDisplayChanged", { currency: next }));
     } catch {
       setMessage(t("preferencesSaveFailed"));
     }
@@ -457,6 +465,50 @@ export function MorePage({
           </section>
         </>
       )}
+
+
+      <p className="section-label">{t("consentManage")}</p>
+      <section className="panel settings-list more-consent" aria-label={t("consentManage")}>
+        <div className="setting-row is-static">
+          <span className="setting-copy">
+            <strong>{t("consentManage")}</strong>
+            <span>{t("consentManageHint")}</span>
+          </span>
+          <span className="setting-value">
+            {analyticsConsent === "granted"
+              ? t("consentStatusGranted")
+              : analyticsConsent === "denied"
+                ? t("consentStatusDenied")
+                : "—"}
+          </span>
+        </div>
+        <div className="theme-choices consent-choices" role="group" aria-label={t("consentManage")}>
+          <button
+            type="button"
+            className={`theme-choice ${analyticsConsent === "granted" ? "active" : ""}`}
+            aria-pressed={analyticsConsent === "granted"}
+            onClick={() => {
+              updateAnalyticsConsent(true);
+              setAnalyticsConsent("granted");
+              setMessage(t("consentStatusGranted"));
+            }}
+          >
+            {t("consentAccept")}
+          </button>
+          <button
+            type="button"
+            className={`theme-choice ${analyticsConsent === "denied" ? "active" : ""}`}
+            aria-pressed={analyticsConsent === "denied"}
+            onClick={() => {
+              updateAnalyticsConsent(false);
+              setAnalyticsConsent("denied");
+              setMessage(t("consentStatusDenied"));
+            }}
+          >
+            {t("consentReject")}
+          </button>
+        </div>
+      </section>
 
       <p className="section-label">{t("sectionAccount")}</p>
       <section className="panel settings-list more-account stack-panel-lg" aria-label={t("sectionAccount")}>

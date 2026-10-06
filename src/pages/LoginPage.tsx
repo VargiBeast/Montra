@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ChevronDown, Globe2, Mail } from "lucide-react";
 import { getLoginCopy, languageOptions, useLanguage } from "../lib/i18n";
+import { trackEvent } from "../lib/gtm";
 
 interface LoginPageProps {
   authError: string | null;
@@ -195,7 +196,7 @@ export function LoginPage({
               className="secondary-button auth-button wide"
               type="button"
               disabled={busy || !isConfigured}
-              onClick={() => void onGoogle()}
+              onClick={() => { trackEvent("login_started", { surface: "login" }); void onGoogle(); }}
             >
               <GoogleMark />
               {copy.continueGoogle}
