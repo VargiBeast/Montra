@@ -10,6 +10,7 @@ import {
 import {
   applyAccentTheme,
   moveSection,
+  normalizeHexColor,
   type AccentTheme,
   type HomeSectionId,
   type PersonalizationSettings,
@@ -27,7 +28,7 @@ interface PersonalizePageProps {
   onOpenPlus: () => void;
 }
 
-const ACCENTS: AccentTheme[] = ["default", "forest", "dusk", "aurora"];
+const ACCENTS: Exclude<AccentTheme, "custom">[] = ["default", "forest", "dusk", "aurora"];
 
 const SECTION_META: Record<HomeSectionId, { titleKey: string; bodyKey: string }> = {
   planning: { titleKey: "personalizeSectionPlanning", bodyKey: "personalizeSectionPlanningBody" },
@@ -73,6 +74,9 @@ export function PersonalizePage({
         personalizeAccentForest: "Forest",
         personalizeAccentDusk: "Dusk",
         personalizeAccentAurora: "Aurora",
+        personalizeAccentCustom: "Custom",
+        personalizeAccentCustomBody: "Pick any accent color. Gradients and glass stay Montra.",
+        personalizeAccentCustomLabel: "Custom accent color",
         personalizeSaved: "Personalization saved",
         plusBack: "Back",
       };
@@ -84,7 +88,7 @@ export function PersonalizePage({
   function persist(next: PersonalizationSettings) {
     onChange(next);
     if (userId) writePersonalization(userId, next);
-    applyAccentTheme(next.accent);
+    applyAccentTheme(next);
   }
 
   function toggleSection(id: HomeSectionId, visible: boolean) {
@@ -102,15 +106,25 @@ export function PersonalizePage({
   }
 
   function setAccent(accent: AccentTheme) {
-    persist({ ...settings, accent });
+    if (accent === "custom") {
+      const hex = settings.customColor ?? "#27866d";
+      persist({ ...settings, accent: "custom", customColor: hex });
+      return;
+    }
+    persist({ ...settings, accent, customColor: null });
+  }
+
+  function setCustomColor(hex: string) {
+    const normalized = normalizeHexColor(hex) ?? hex;
+    persist({ ...settings, accent: "custom", customColor: normalized });
   }
 
   function reorder(id: HomeSectionId, direction: "up" | "down") {
     persist({ ...settings, sectionOrder: moveSection(settings.sectionOrder, id, direction) });
   }
 
-  const accentLabel = (a: AccentTheme) => {
-    const map: Record<AccentTheme, string> = {
+  const accentLabel = (a: Exclude<AccentTheme, "custom">) => {
+    const map: Record<Exclude<AccentTheme, "custom">, string> = {
       default: t("personalizeAccentDefault"),
       forest: t("personalizeAccentForest"),
       dusk: t("personalizeAccentDusk"),
@@ -234,6 +248,37 @@ export function PersonalizePage({
               <strong>{accentLabel(accent)}</strong>
             </button>
           ))}
+        </div>
+        <div className={`personalize-custom-color ${settings.accent === "custom" ? "is-active" : ""}`}>
+          <div className="personalize-custom-color-copy">
+            <strong>{t("personalizeAccentCustom")}</strong>
+            <span>{t("personalizeAccentCustomBody")}</span>
+          </div>
+          <label className="personalize-color-field">
+            <span className="visually-hidden">{t("personalizeAccentCustomLabel")}</span>
+            <input
+              type="color"
+              className="personalize-color-input"
+              value={settings.customColor ?? "#27866d"}
+              aria-label={t("personalizeAccentCustomLabel")}
+              onChange={(event) => setCustomColor(event.target.value)}
+            />
+            <input
+              type="text"
+              className="personalize-color-hex"
+              value={settings.customColor ?? ""}
+              placeholder="#27866d"
+              spellCheck={false}
+              aria-label={t("personalizeAccentCustomLabel")}
+              onChange={(event) => {
+                const v = event.target.value;
+                if (normalizeHexColor(v) || v === "" || v.startsWith("#")) {
+                  if (normalizeHexColor(v)) setCustomColor(v);
+                  else if (v === "") setAccent("default");
+                }
+              }}
+            />
+          </label>
         </div>
       </section>
     </main>
