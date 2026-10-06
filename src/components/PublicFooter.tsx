@@ -33,6 +33,7 @@ export function PublicFooter() {
           <Link to="/terms">{t("navTerms")}</Link>
           <Link to="/cookies">{t("navCookies")}</Link>
           <Link to="/security">{t("navSecurity")}</Link>
+          <Link to="/refund-policy">{t("navRefund")}</Link>
         </div>
       </div>
       <p className="marketing-footer-copy">{t("marketingFooterCopy")}</p>
