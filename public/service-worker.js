@@ -1,4 +1,4 @@
-const CACHE_NAME = "montra-shell-v4";
+const CACHE_NAME = "montra-shell-v5";
 const APP_SHELL = [
   "/",
   "/manifest.json",
@@ -19,7 +19,15 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => (key.startsWith("saldo-shell-") || key.startsWith("montra-shell-")) && key !== CACHE_NAME).map((key) => caches.delete(key))),
+      Promise.all(
+        keys
+          .filter(
+            (key) =>
+              (key.startsWith("saldo-shell-") || key.startsWith("montra-shell-")) &&
+              key !== CACHE_NAME,
+          )
+          .map((key) => caches.delete(key)),
+      ),
     ),
   );
   self.clients.claim();
@@ -30,6 +38,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
+  // Always prefer network for navigations so HTML points at current hashed assets.
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -43,7 +52,24 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (["script", "style", "font", "image"].includes(request.destination)) {
+  // Hashed JS/CSS must not be served from an old cache entry after a deploy.
+  // Network-first keeps offline fallback when the network fails.
+  if (request.destination === "script" || request.destination === "style") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            void caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(async () => (await caches.match(request)) || Response.error()),
+    );
+    return;
+  }
+
+  if (request.destination === "font" || request.destination === "image") {
     event.respondWith(
       caches.match(request).then((cached) => {
         const fresh = fetch(request)
