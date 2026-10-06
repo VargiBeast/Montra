@@ -125,6 +125,7 @@ export function AppRoutes() {
         <Route path="terms" element={<SimplePublic page="terms" />} />
         <Route path="cookies" element={<SimplePublic page="cookies" />} />
         <Route path="security" element={<SimplePublic page="security" />} />
+        <Route path="refund-policy" element={<SimplePublic page="refund" />} />
         <Route path="wishlist/:token" element={<PublicWishlistPage />} />
         <Route path="*" element={<NotFoundPublic />} />
       </Route>
