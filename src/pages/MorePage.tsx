@@ -1,5 +1,20 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { ChevronDown, ChevronRight, CloudDownload, Coins, FileUp, Languages, LogOut, Moon, Sparkles, Sun, UserRound, Laptop } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  CloudDownload,
+  Coins,
+  FileUp,
+  Gift,
+  Languages,
+  LogOut,
+  Moon,
+  PiggyBank,
+  Sparkles,
+  Sun,
+  UserRound,
+  Laptop,
+} from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
@@ -17,12 +32,23 @@ import {
 } from "../lib/preferences";
 
 type Theme = "light" | "dark" | "system";
+
+type ImportRecord = {
+  type: "in" | "out";
+  name: string;
+  amount: number;
+  date: string;
+  method?: string | null;
+  link?: string | null;
+  note?: string | null;
+};
+
 interface MorePageProps {
   userId: string;
   theme: Theme;
   onThemeChange: (theme: Theme) => void;
   transactions: Transaction[];
-  onImport: (records: Array<{ type: "in" | "out"; name: string; amount: number; date: string; method?: string | null; link?: string | null; note?: string | null }>) => Promise<void>;
+  onImport: (records: ImportRecord[]) => Promise<void>;
   onProfile: () => void;
   onSignOut: () => Promise<void>;
   onSavingsGoals?: () => void;
@@ -31,14 +57,28 @@ interface MorePageProps {
   hasPlus?: boolean;
 }
 
-export function MorePage({ userId, theme, onThemeChange, transactions, onImport, onProfile, onSignOut, onOpenPlus, hasPlus = false }: MorePageProps) {
+export function MorePage({
+  userId,
+  theme,
+  onThemeChange,
+  transactions,
+  onImport,
+  onProfile,
+  onSignOut,
+  onSavingsGoals,
+  onWishlist,
+  onOpenPlus,
+  hasPlus = false,
+}: MorePageProps) {
   const { language, setLanguage } = useLanguage();
   const { currency, setCurrency } = useDisplayCurrency();
   const translate = useTranslation();
-  const t = (key: string, values?: Record<string, string | number>) => fillMissingCopy(key, translate(key, values), language);
+  const t = (key: string, values?: Record<string, string | number>) =>
+    fillMissingCopy(key, translate(key, values), language);
   const fileInput = useRef<HTMLInputElement>(null);
   const [working, setWorking] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingImport, setPendingImport] = useState<ImportRecord[] | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -104,8 +144,9 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    setWorking("import");
+    setWorking("parse");
     setMessage(null);
+    setPendingImport(null);
     try {
       const text = await file.text();
       const parsed = JSON.parse(text) as { transactions?: unknown[]; app?: string; version?: number };
@@ -139,13 +180,34 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         setMessage(t("backupInvalid"));
         return;
       }
-      await onImport(records);
-      setMessage(t("backupImported", { count: records.length }));
+      // Show preview — do not write until the user confirms.
+      setPendingImport(records);
     } catch {
       setMessage(t("backupReadFailed"));
     } finally {
       setWorking(null);
     }
+  }
+
+  async function confirmImport() {
+    if (!pendingImport || pendingImport.length === 0) return;
+    setWorking("import");
+    setMessage(null);
+    try {
+      const count = pendingImport.length;
+      await onImport(pendingImport);
+      setPendingImport(null);
+      setMessage(t("backupImported", { count }));
+    } catch {
+      setMessage(t("backupReadFailed"));
+    } finally {
+      setWorking(null);
+    }
+  }
+
+  function cancelImport() {
+    setPendingImport(null);
+    setMessage(null);
   }
 
   async function signOut() {
@@ -173,6 +235,50 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         <p className="stack-notice" role="status" aria-live="polite">
           {message}
         </p>
+      )}
+
+      {pendingImport && (
+        <section className="panel backup-import-preview" aria-label={t("backupPreviewTitle")} role="dialog" aria-modal="true">
+          <h2 className="backup-preview-title">{t("backupPreviewTitle")}</h2>
+          <p className="backup-preview-body">{t("backupPreviewBody")}</p>
+          <p className="backup-preview-count" role="status">
+            {t("backupPreviewCount", { count: pendingImport.length })}
+          </p>
+          <div className="backup-preview-lists">
+            <div>
+              <p className="eyebrow">{t("backupPreviewIncluded")}</p>
+              <ul className="backup-preview-list">
+                <li>{t("backupPreviewCount", { count: pendingImport.length })}</li>
+              </ul>
+            </div>
+            <div>
+              <p className="eyebrow">{t("backupPreviewExcluded")}</p>
+              <ul className="backup-preview-list is-excluded">
+                <li>{t("backupPreviewExcludedGoals")}</li>
+                <li>{t("backupPreviewExcludedWishlist")}</li>
+                <li>{t("backupPreviewExcludedReceipts")}</li>
+              </ul>
+            </div>
+          </div>
+          <div className="backup-preview-actions">
+            <button
+              type="button"
+              className="primary-button"
+              disabled={Boolean(working)}
+              onClick={() => void confirmImport()}
+            >
+              {working === "import" ? t("backupImporting") : t("backupConfirmImport")}
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={Boolean(working)}
+              onClick={cancelImport}
+            >
+              {t("backupCancelImport")}
+            </button>
+          </div>
+        </section>
       )}
 
       <p className="section-label">{t("sectionPreferences")}</p>
@@ -264,6 +370,38 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
         </div>
       </section>
 
+      {(onSavingsGoals || onWishlist) && (
+        <>
+          <p className="section-label">{t("planning")}</p>
+          <section className="panel settings-list more-planning" aria-label={t("planning")}>
+            {onSavingsGoals && (
+              <button className="setting-row" type="button" onClick={onSavingsGoals}>
+                <span className="setting-icon" aria-hidden="true">
+                  <PiggyBank size={18} />
+                </span>
+                <span className="setting-copy">
+                  <strong>{t("savingsGoals")}</strong>
+                  <span>{t("savingsGoalsHint")}</span>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </button>
+            )}
+            {onWishlist && (
+              <button className="setting-row" type="button" onClick={onWishlist}>
+                <span className="setting-icon" aria-hidden="true">
+                  <Gift size={18} />
+                </span>
+                <span className="setting-copy">
+                  <strong>{t("wishlist")}</strong>
+                  <span>{t("wishlistHint")}</span>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </button>
+            )}
+          </section>
+        </>
+      )}
+
       <p className="section-label">{t("sectionData")}</p>
       <section className="panel settings-list more-data" aria-label={t("sectionData")}>
         <button className="setting-row" type="button" onClick={exportBackup}>
@@ -280,13 +418,15 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           className="setting-row"
           type="button"
           onClick={() => fileInput.current?.click()}
-          disabled={Boolean(working)}
+          disabled={Boolean(working) || Boolean(pendingImport)}
         >
           <span className="setting-icon" aria-hidden="true">
             <FileUp size={18} />
           </span>
           <span className="setting-copy">
-            <strong>{working === "import" ? t("importingBackup") : t("importBackup")}</strong>
+            <strong>
+              {working === "parse" || working === "import" ? t("importingBackup") : t("importBackup")}
+            </strong>
             <span>{t("restoreCopy")}</span>
           </span>
           <ChevronRight size={18} aria-hidden="true" />
@@ -305,7 +445,9 @@ export function MorePage({ userId, theme, onThemeChange, transactions, onImport,
           <p className="section-label">{t("plusTitle")}</p>
           <section className="panel settings-list more-plus" aria-label={t("plusTitle")}>
             <button className="setting-row" type="button" onClick={onOpenPlus}>
-              <span className="setting-icon" aria-hidden="true"><Sparkles size={18} /></span>
+              <span className="setting-icon" aria-hidden="true">
+                <Sparkles size={18} />
+              </span>
               <span className="setting-copy">
                 <strong>{t("plusTitle")}</strong>
                 <span>{hasPlus ? t("plusActiveBadge") : t("plusValueTitle")}</span>
