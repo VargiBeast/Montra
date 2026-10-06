@@ -13,7 +13,8 @@ Allow: /cookies
 Allow: /security
 Allow: /login
 Allow: /signup
-Allow: /app
+Disallow: /app
+Disallow: /app/
 
 Disallow: /home
 Disallow: /activity
