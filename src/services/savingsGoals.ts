@@ -87,7 +87,7 @@ export async function listSavingsGoals(
 ): Promise<SavingsGoal[]> {
   const { data, error } = await client
     .from(TABLE)
-    .select("*")
+    .select("id, user_id, name, target_amount, current_amount, deadline, wishlist_item_id, created_at, updated_at")
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
   if (error) throw toSavingsGoalError(error, "Could not load savings goals.");

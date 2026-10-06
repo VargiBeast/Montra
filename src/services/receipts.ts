@@ -34,7 +34,7 @@ export async function listReceipts(
 ): Promise<Receipt[]> {
   const { data, error } = await client
     .from(TABLE)
-    .select("*")
+    .select("id, user_id, image_path, merchant, total_amount, currency, receipt_date, status, created_at, updated_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;

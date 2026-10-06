@@ -63,7 +63,7 @@ export async function listWishlistItems(
 ): Promise<WishlistItem[]> {
   const { data, error } = await client
     .from(TABLE)
-    .select("*")
+    .select("id, user_id, name, price, currency, url, image_path, details, purchased, savings_goal_id, created_at, updated_at")
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
   if (error) throw error;

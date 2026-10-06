@@ -34,7 +34,7 @@ export async function listTransactions(
 ): Promise<Transaction[]> {
   const { data, error } = await client
     .from(TABLE)
-    .select("*")
+    .select("id, user_id, type, name, amount, date, method, link, note, image_url, created_at")
     .eq("user_id", userId)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false });
