@@ -24,6 +24,7 @@ function classifyError(message: string): LoadState {
   // "non-2xx" / FunctionsHttpError messages without the word "token".
   if (
     m.includes("invalid") ||
+    m.includes("share link") ||
     m.includes("not found") ||
     m.includes("missing") ||
     m.includes("404") ||
@@ -47,7 +48,7 @@ export function PublicWishlistPage() {
   useDocumentMeta({
     title: t("publicWishlistSeoTitle") !== "\u2014"
       ? t("publicWishlistSeoTitle")
-      : "Shared wishlist · Montra",
+      : "Shared wishlist \u00b7 Montra",
     description:
       t("publicWishlistSeoDescription") !== "\u2014"
         ? t("publicWishlistSeoDescription")
@@ -116,7 +117,7 @@ export function PublicWishlistPage() {
 
       {state.status === "loading" && (
         <div className="panel loading-block" role="status">
-          {t("loading") !== "\u2014" ? t("loading") : "Loading…"}
+          {t("loading") !== "\u2014" ? t("loading") : "Loading\u2026"}
         </div>
       )}
 
