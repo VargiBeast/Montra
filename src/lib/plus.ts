@@ -43,6 +43,11 @@ export function isPlusEntitlementActive(
   return true;
 }
 
+/** @deprecated Always false. Use usePlusEntitlement() for real Plus access. */
+export function hasPlusAccess(_email?: string | null): boolean {
+  return false;
+}
+
 /**
  * @deprecated Prefer usePlusEntitlement(). Kept as a pure helper for tests / non-React code.
  * Does not accept email bypasses — entitlement table is the only source of truth.
