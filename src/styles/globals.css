@@ -1902,3 +1902,50 @@ a:focus-visible {
 .more-preferences .theme-choices {
   padding: 0 12px 12px;
 }
+
+
+/* P2 Personalize + polish */
+.home-page { display: flex; flex-direction: column; gap: inherit; }
+.home-page > .page-header { order: -2; }
+.home-page > .balance-card { order: -1; }
+.personalize-hint { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.personalize-section-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.personalize-section-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); background: color-mix(in srgb, var(--surface-raised), transparent 12%); }
+.personalize-section-row.is-off { opacity: 0.72; }
+.personalize-section-copy { flex: 1 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.personalize-section-copy strong { font-size: 14px; }
+.personalize-section-copy span { font-size: 12px; color: var(--muted); }
+.personalize-section-controls { display: flex; align-items: center; gap: 8px; }
+.personalize-reorder { display: flex; flex-direction: column; gap: 2px; }
+.personalize-toggle { min-width: 72px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
+.personalize-accent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .personalize-accent-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.personalize-accent-card { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface-raised), transparent 8%); text-align: left; cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.personalize-accent-card:hover { border-color: color-mix(in srgb, var(--green) 35%, var(--line)); }
+.personalize-accent-card:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.personalize-accent-card.active { border-color: var(--green); box-shadow: 0 0 0 1px color-mix(in srgb, var(--green) 40%, transparent); }
+.personalize-accent-swatch { width: 100%; height: 28px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+.accent-preview-default .personalize-accent-swatch { background: linear-gradient(135deg, color-mix(in srgb, var(--green) 35%, #fff), color-mix(in srgb, var(--surface) 70%, #cde)); }
+.accent-preview-forest .personalize-accent-swatch { background: linear-gradient(135deg, #1d5c45, #6fbf9a); }
+.accent-preview-dusk .personalize-accent-swatch { background: linear-gradient(135deg, #3d3a5c, #a89ccf); }
+.accent-preview-aurora .personalize-accent-swatch { background: linear-gradient(135deg, #1a6b6b, #7ed6c2 40%, #c9a0e8); }
+.personalize-locked { text-align: center; padding: 28px 20px; }
+.personalize-locked-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-bottom: 12px; border-radius: 16px; background: color-mix(in srgb, var(--green) 12%, var(--surface-raised)); color: var(--green); }
+.personalize-locked h2 { margin: 0 0 8px; font-size: 17px; }
+.personalize-locked p { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+.plus-personalize-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; margin-bottom: 14px; }
+.plus-personalize-cta h2 { margin: 0 0 4px; font-size: 16px; }
+.plus-personalize-cta p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.plus-personalize-cta > div { flex: 1 1 180px; }
+.analytics-preview-label { margin: 8px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: var(--muted); }
+html[data-accent="forest"] { --green: #1f7a55; }
+html[data-accent="dusk"] { --green: #6b5b95; }
+html[data-accent="aurora"] { --green: #2a9d8f; }
+.theme-choice:focus-visible, .personalize-toggle:focus-visible, .plus-action-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.plus-action-btn { transition: transform 0.12s ease; }
+.plus-action-btn:hover { transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) { .plus-action-btn, .personalize-accent-card { transition: none; } }
+.home-planning .planning-card, .home-goal-card { box-shadow: none; }
+.page-title { letter-spacing: -0.02em; line-height: 1.15; }
+.home-page .page-title { font-size: clamp(1.35rem, 2.4vw, 1.6rem); font-weight: 700; }
+.balance-value { letter-spacing: -0.03em; line-height: 1.05; }
