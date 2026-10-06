@@ -16,6 +16,7 @@ import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { SavingsGoalsPage } from "./pages/SavingsGoalsPage";
 import { WishlistPage } from "./pages/WishlistPage";
 import { PlusPage } from "./pages/PlusPage";
+import { PersonalizePage } from "./pages/PersonalizePage";
 import { LoginPage } from "./pages/LoginPage";
 import { OnboardingFlow } from "./pages/OnboardingFlow";
 import { TransactionForm } from "./components/TransactionForm";
@@ -29,6 +30,12 @@ import { useLanguage, useTranslation } from "./lib/i18n";
 import { fetchUserPreferences } from "./lib/preferences";
 import { hasPlusAccess } from "./lib/plus";
 import {
+  applyAccentTheme,
+  DEFAULT_PERSONALIZATION,
+  readPersonalization,
+  type PersonalizationSettings,
+} from "./lib/personalization";
+import {
   clearGuestTransactions,
   dismissAccountPrompt,
   isAccountPromptDismissed,
@@ -36,7 +43,7 @@ import {
   readGuestTransactions,
 } from "./lib/onboarding";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist" | "plus";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist" | "plus" | "personalize";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -79,6 +86,7 @@ function App() {
     if (pathname.startsWith("/wishlist")) return "wishlist";
     if (pathname.startsWith("/goals")) return "savings";
     if (pathname.startsWith("/profile")) return "profile";
+    if (pathname.startsWith("/personalize") || pathname.startsWith("/app/personalize")) return "personalize";
     if (pathname.startsWith("/plus") || pathname.startsWith("/app/plus")) return "plus";
     if (pathname.startsWith("/analytics")) return "analytics";
     if (pathname.startsWith("/more") || pathname.startsWith("/settings")) return "more";
@@ -97,6 +105,7 @@ function App() {
       savings: "/goals",
       wishlist: "/wishlist",
       plus: "/app/plus",
+      personalize: "/app/personalize",
     };
     navigate(map[next] ?? "/app");
   };
@@ -119,6 +128,7 @@ function App() {
   const [deletingReceipt, setDeletingReceipt] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [theme, setTheme] = useState<Theme>(initialTheme);
+  const [personalization, setPersonalization] = useState<PersonalizationSettings>(DEFAULT_PERSONALIZATION);
   const [toast, setToast] = useState("");
   const [signingOut, setSigningOut] = useState(false);
   const [forceLogin, setForceLogin] = useState(false);
@@ -170,6 +180,18 @@ function App() {
     const timer = window.setTimeout(() => setToast(""), 3800);
     return () => window.clearTimeout(timer);
   }, [toast]);
+  useEffect(() => {
+    const userId = auth.user?.id;
+    if (!userId) {
+      setPersonalization(DEFAULT_PERSONALIZATION);
+      applyAccentTheme("default");
+      return;
+    }
+    const next = readPersonalization(userId);
+    setPersonalization(next);
+    applyAccentTheme(next.accent);
+  }, [auth.user?.id]);
+
 
   useEffect(() => {
     const userId = auth.user?.id;
@@ -422,6 +444,7 @@ function App() {
             onOpenWishlist={() => setPage("wishlist")}
             savingsGoals={savings.goals}
             wishlistItems={wishlist.items}
+            personalization={personalization}
           />}
           {page === "transactions" && <TransactionsPage transactions={data.transactions} getImageUrl={data.getImageUrl} onAdd={startAdd} onSelect={setSelected} />}
           {page === "more" && <MorePage
@@ -460,10 +483,20 @@ function App() {
             (plusUnlocked ? (
               <AnalyticsPage transactions={data.transactions} />
             ) : (
-              <PlusPage hasPlus={false} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} />
+              <PlusPage hasPlus={false} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} onOpenPersonalize={() => setPage("personalize")} />
             ))}
           {page === "plus" && (
-            <PlusPage hasPlus={plusUnlocked} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} />
+            <PlusPage hasPlus={plusUnlocked} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} onOpenPersonalize={() => setPage("personalize")} />
+          )}
+          {page === "personalize" && (
+            <PersonalizePage
+              hasPlus={plusUnlocked}
+              userId={auth.user.id}
+              settings={personalization}
+              onChange={setPersonalization}
+              onBack={() => setPage("plus")}
+              onOpenPlus={() => setPage("plus")}
+            />
           )}
           {page === "savings" && (
             <SavingsGoalsPage
@@ -498,7 +531,7 @@ function App() {
         <button type="button" className={`nav-item ${page === "transactions" ? "active" : ""}`} aria-current={page === "transactions" ? "page" : undefined} onClick={() => setPage("transactions")}><ArrowDownUp size={19} /><span>{t("activity")}</span></button>
         <button type="button" className="nav-item nav-add" aria-label={t("addTransaction")} onClick={startAdd}><Plus size={22} /></button>
         <button type="button" className={`nav-item ${page === "receipts" ? "active" : ""}`} aria-current={page === "receipts" ? "page" : undefined} onClick={() => setPage("receipts")}><Receipt size={19} /><span>{t("receipts")}</span></button>
-        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" || page === "wishlist" || page === "plus" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
+        <button type="button" className={`nav-item ${page === "more" || page === "profile" || page === "savings" || page === "wishlist" || page === "plus" || page === "personalize" ? "active" : ""}`} aria-current={page === "more" ? "page" : undefined} onClick={() => setPage("more")}><UserRound size={19} /><span>{t("more")}</span></button>
       </nav>
       {formOpen && (
         <TransactionForm
