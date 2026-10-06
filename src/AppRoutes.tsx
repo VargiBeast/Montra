@@ -75,6 +75,7 @@ function AuthLogin() {
     setBusy(true);
     try {
       await action();
+      // OAuth redirects away; magic link stays on page until user clicks email.
     } finally {
       setBusy(false);
     }
@@ -91,18 +92,12 @@ function AuthLogin() {
   );
 }
 
+function AuthSignup() {
+  return <AuthLogin />;
+}
+
 function ProtectedApp() {
-  const auth = useAuth();
-  const location = useLocation();
-
-  if (auth.isLoading) {
-    return <RouteFallback />;
-  }
-
-  if (!auth.user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
-  }
-
+  // App already owns onboarding, guest mode, and login prompts.
   return (
     <Suspense fallback={<RouteFallback />}>
       <App />
@@ -113,19 +108,27 @@ function ProtectedApp() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<MarketingLayout />}>
+      <Route path="/" element={<MarketingLayout />}>
         <Route index element={<HomePublic />} />
         <Route path="features" element={<FeaturesPublic />} />
         <Route path="pricing" element={<PricingPublic />} />
         <Route path="plus" element={<PlusPublic />} />
-        <Route path="privacy" element={<SimplePublic kind="privacy" />} />
-        <Route path="terms" element={<SimplePublic kind="terms" />} />
-        <Route path="support" element={<SimplePublic kind="support" />} />
-        <Route path="w/:shareId" element={<PublicWishlistPage />} />
+        <Route path="about" element={<SimplePublic page="about" />} />
+        <Route path="contact" element={<SimplePublic page="contact" />} />
+        <Route path="faq" element={<SimplePublic page="faq" />} />
+        <Route path="help" element={<SimplePublic page="help" />} />
+        <Route path="privacy" element={<SimplePublic page="privacy" />} />
+        <Route path="terms" element={<SimplePublic page="terms" />} />
+        <Route path="cookies" element={<SimplePublic page="cookies" />} />
+        <Route path="security" element={<SimplePublic page="security" />} />
+        <Route path="wishlist/:token" element={<PublicWishlistPage />} />
         <Route path="*" element={<NotFoundPublic />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
+      <Route path="/signup" element={<AuthSignup />} />
+      <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+      <Route path="/reset-password" element={<Navigate to="/login" replace />} />
 
       <Route path="/app/*" element={<ProtectedApp />} />
       <Route path="/home" element={<ProtectedApp />} />
