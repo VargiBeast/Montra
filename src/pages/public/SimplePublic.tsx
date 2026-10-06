@@ -3,8 +3,15 @@ import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 
 type PageKey =
-  | "about" | "contact" | "faq" | "help"
-  | "privacy" | "terms" | "cookies" | "security";
+  | "about"
+  | "contact"
+  | "faq"
+  | "help"
+  | "privacy"
+  | "terms"
+  | "cookies"
+  | "security"
+  | "refund";
 
 const META: Record<PageKey, { titleKey: string; descKey: string; path: string }> = {
   about: { titleKey: "seoAboutTitle", descKey: "seoAboutDescription", path: "/about" },
@@ -15,6 +22,7 @@ const META: Record<PageKey, { titleKey: string; descKey: string; path: string }>
   terms: { titleKey: "seoTermsTitle", descKey: "seoTermsDescription", path: "/terms" },
   cookies: { titleKey: "seoCookiesTitle", descKey: "seoCookiesDescription", path: "/cookies" },
   security: { titleKey: "seoSecurityTitle", descKey: "seoSecurityDescription", path: "/security" },
+  refund: { titleKey: "seoRefundTitle", descKey: "seoRefundDescription", path: "/refund-policy" },
 };
 
 export function SimplePublic({ page }: { page: PageKey }) {
@@ -26,20 +34,47 @@ export function SimplePublic({ page }: { page: PageKey }) {
     path: meta.path,
   });
 
+  const body = t(`${page}Body`);
+  const paragraphs = body
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
     <main className="marketing-main">
       <section className="panel marketing-simple">
         <h1>{t(`${page}Title`)}</h1>
-        <p className="marketing-lead">{t(`${page}Body`)}</p>
+        {paragraphs.map((para, i) => (
+          <p key={i} className={i === 0 ? "marketing-lead" : "marketing-policy-p"}>
+            {para}
+          </p>
+        ))}
         {page === "contact" && (
           <p>
-            <a className="text-button" href="mailto:contact@montra.cash">contact@montra.cash</a>
+            <a className="text-button" href="mailto:contact@montra.cash">
+              contact@montra.cash
+            </a>
+          </p>
+        )}
+        {page === "refund" && (
+          <p className="marketing-policy-p">
+            <Link to="/contact" className="text-button">
+              {t("navContact")}
+            </Link>
+            {" · "}
+            <a className="text-button" href="mailto:contact@montra.cash">
+              contact@montra.cash
+            </a>
           </p>
         )}
         {(page === "faq" || page === "help") && (
           <div className="marketing-cta-row">
-            <Link to="/contact" className="secondary-button">{t("navContact")}</Link>
-            <Link to="/app" className="primary-button">{t("navGetStarted")}</Link>
+            <Link to="/contact" className="secondary-button">
+              {t("navContact")}
+            </Link>
+            <Link to="/app" className="primary-button">
+              {t("navGetStarted")}
+            </Link>
           </div>
         )}
       </section>
