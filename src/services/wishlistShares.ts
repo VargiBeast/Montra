@@ -113,9 +113,12 @@ export async function fetchPublicWishlist(
   client: SupabaseClient,
   token: string,
 ): Promise<PublicWishlistPayload> {
-  const { data, error } = await client.functions.invoke("public-wishlist", {
-    body: { token },
-  });
+  // Edge Function allows GET only (POST returns "Method not allowed").
+  // Token is passed as a query parameter.
+  const { data, error } = await client.functions.invoke(
+    `public-wishlist?token=${encodeURIComponent(token)}`,
+    { method: "GET" },
+  );
 
   if (error) {
     // Prefer body error text when the Edge Function returned a structured failure.
