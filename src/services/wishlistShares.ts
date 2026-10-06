@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { validateProductUrl } from "../lib/utils";
 
 const TABLE = "wishlist_shares";
 
@@ -154,7 +155,7 @@ export async function fetchPublicWishlist(
       name: String(row.name ?? ""),
       price: Number(row.price) || 0,
       currency: String(row.currency ?? "NOK"),
-      url: typeof row.url === "string" ? row.url : null,
+      url: typeof row.url === "string" ? validateProductUrl(row.url).url : null,
       details: typeof row.details === "string" ? row.details : null,
       purchased: Boolean(row.purchased),
       image_url:
