@@ -184,12 +184,12 @@ function App() {
     const userId = auth.user?.id;
     if (!userId) {
       setPersonalization(DEFAULT_PERSONALIZATION);
-      applyAccentTheme("default");
+      applyAccentTheme(DEFAULT_PERSONALIZATION);
       return;
     }
     const next = readPersonalization(userId);
     setPersonalization(next);
-    applyAccentTheme(next.accent);
+    applyAccentTheme(next);
   }, [auth.user?.id]);
 
 
