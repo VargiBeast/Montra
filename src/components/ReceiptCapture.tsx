@@ -38,6 +38,7 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const previewUrlRef = useRef<string>("");
   const [step, setStep] = useState<Step>("choose");
   const [error, setError] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
@@ -49,6 +50,13 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
   const [deductFromBalance, setDeductFromBalance] = useState(false);
   const [busy, setBusy] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
+
+  function revokePreview() {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = "";
+    }
+  }
 
   function stopCamera() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -62,6 +70,7 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
 
   function reset() {
     stopCamera();
+    revokePreview();
     setStep("choose");
     setError("");
     setPreviewUrl("");
@@ -77,7 +86,10 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
 
   useEffect(() => {
     if (!open) reset();
-    return () => stopCamera();
+    return () => {
+      stopCamera();
+      revokePreview();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -215,7 +227,10 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
     }
     try {
       const prepared = await prepareReceiptImage(file);
-      setPreviewUrl(URL.createObjectURL(prepared));
+      revokePreview();
+      const objectUrl = URL.createObjectURL(prepared);
+      previewUrlRef.current = objectUrl;
+      setPreviewUrl(objectUrl);
       const created = await onUpload(prepared);
       setReceipt(created);
       let text = "";
