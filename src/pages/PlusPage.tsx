@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft, BarChart3, Check, Lightbulb, Lock, Palette, PiggyBank, Sparkles, Target, TrendingUp,
 } from "lucide-react";
-import { useLanguage, useTranslation } from "../lib/i18n";
+import { languageForCopy, useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
 import { PLUS_PRICING } from "../lib/plus";
+import { plusCheckoutCopy } from "../lib/plusCheckoutCopy";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { useAuth } from "../hooks/useAuth";
 
@@ -84,6 +85,16 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
   const [statusMessage, setStatusMessage] = useState<"success" | "cancelled" | null>(null);
 
   const t = (key: string, values?: Record<string, string | number>) => {
+    // Checkout copy lives in plusCheckoutCopy (all 18 languages).
+    const copyLang = languageForCopy(language);
+    const fromCheckout = plusCheckoutCopy[copyLang]?.[key] ?? plusCheckoutCopy.en?.[key];
+    if (fromCheckout) {
+      let value = fromCheckout;
+      if (values) {
+        value = value.replace(/\{(\w+)\}/g, (m, n) => Object.hasOwn(values, n) ? String(values[n]) : m);
+      }
+      return value;
+    }
     if (key === "plusPriceMonthly") return PLUS_PRICING.monthlyLabel;
     if (key === "plusPriceYearly") return PLUS_PRICING.yearlyLabel;
     if (key === "plusPriceYearlyNote") {
