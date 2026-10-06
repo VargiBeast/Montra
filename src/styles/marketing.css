@@ -19,9 +19,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  /* Keep the logo below the iOS status-bar / Safari chrome blur.
-     backdrop-filter stays on the pseudo so Safari 26 does not sample
-     the blur into the status bar and clip the header. */
   padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
   background: color-mix(in srgb, var(--canvas) 88%, transparent);
   border-bottom: 1px solid var(--line);
@@ -240,3 +237,52 @@
 }
 .public-wishlist-grid { margin-top: 8px; }
 .public-wishlist-hero { margin-bottom: 16px; }
+
+/* Pricing CTAs */
+.pricing-cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.pricing-cta-row .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 48px;
+}
+.pricing-cta-plan {
+  font-weight: 650;
+  opacity: 0.85;
+  font-size: 0.92em;
+}
+.pricing-plan-ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.pricing-plan-ctas .secondary-button {
+  min-height: 44px;
+  font-size: 13px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
+  padding: 10px 12px;
+}
+@media (max-width: 480px) {
+  .pricing-plan-ctas {
+    grid-template-columns: 1fr;
+  }
+}
+
+.marketing-policy-p {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 62ch;
+}
+.marketing-simple .marketing-lead {
+  margin-bottom: 1rem;
+}
