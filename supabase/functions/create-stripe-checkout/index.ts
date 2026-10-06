@@ -312,8 +312,12 @@ Deno.serve(async (req: Request) => {
 
     step = "stripe_session_create";
     try {
+      // Hosted Checkout (Stripe Checkout Builder / hosted_web_0001).
+      // Do not hardcode payment_method_types — Stripe uses Dashboard-enabled methods.
+      // automatic_tax requires Stripe Tax to be configured on the account.
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
+        ui_mode: "hosted",
         customer: customerId!,
         line_items: [{ price: priceId, quantity: 1 }],
         subscription_data: {
@@ -323,7 +327,27 @@ Deno.serve(async (req: Request) => {
         success_url: SUCCESS_URL,
         cancel_url: CANCEL_URL,
         client_reference_id: user.id,
-        metadata: { montra_user_id: user.id, montra_plan: plan },
+        metadata: {
+          montra_user_id: user.id,
+          montra_plan: plan,
+          integration_identifier: "hosted_web_0001",
+          origin_context: "web",
+        },
+        billing_address_collection: "auto",
+        phone_number_collection: { enabled: true },
+        payment_method_collection: "always",
+        allow_promotion_codes: true,
+        automatic_tax: { enabled: true },
+        submit_type: "auto",
+        consent_collection: {
+          terms_of_service: "required",
+        },
+        custom_text: {
+          terms_of_service_acceptance: {
+            message:
+              "By starting your trial, you agree to our Terms of Service and Privacy Policy.",
+          },
+        },
       });
 
       if (!session.url) {
