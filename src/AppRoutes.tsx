@@ -10,7 +10,7 @@ import { PublicWishlistPage } from "./pages/public/PublicWishlistPage";
 import { NotFoundPublic } from "./pages/public/NotFoundPublic";
 import { LoginPage } from "./pages/LoginPage";
 import { PlusPage } from "./pages/PlusPage";
-import { hasPlusAccess } from "./lib/plus";
+import { usePlusEntitlement } from "./hooks/usePlusEntitlement";
 import { useDocumentMeta } from "./lib/seo";
 import { useTranslation } from "./lib/i18n";
 
@@ -30,6 +30,7 @@ function RouteFallback() {
 function PlusPublic() {
   const t = useTranslation();
   const auth = useAuth();
+  const plusEntitlement = usePlusEntitlement(auth.user?.id);
   useDocumentMeta({
     title: t("seoPlusTitle"),
     description: t("seoPlusDescription"),
@@ -39,7 +40,10 @@ function PlusPublic() {
   return (
     <main className="marketing-main marketing-plus-page">
       <PlusPage
-        hasPlus={hasPlusAccess(auth.user?.email)}
+        hasPlus={plusEntitlement.hasPlus}
+        entitlementLoading={plusEntitlement.isLoading}
+        entitlementStatus={plusEntitlement.entitlement?.status ?? null}
+        onRefreshEntitlement={plusEntitlement.refresh}
         onBack={() => navigate(-1)}
         onOpenAnalytics={() => navigate("/analytics")}
         onOpenSavings={() => navigate("/goals")}
@@ -71,13 +75,6 @@ function AuthLogin() {
     setBusy(true);
     try {
       await action();
-      // OAuth redirects away; magic link stays on page until user clicks email.
-      // Only navigate when a session is already present (e.g. rare same-tab cases).
-      if (auth.user) {
-        navigate(from.startsWith("/") ? from : "/app", { replace: true });
-      }
-    } catch {
-      /* error shown via auth.authError / local */
     } finally {
       setBusy(false);
     }
@@ -85,22 +82,27 @@ function AuthLogin() {
 
   return (
     <LoginPage
-      authError={auth.authError}
-      busy={busy}
-      isConfigured={auth.isConfigured}
+      busy={busy || auth.isLoading}
+      error={auth.authError}
       onGoogle={() => wrap(() => auth.signInWithProvider("google"))}
-      onMagicLink={(email) => auth.signInWithEmail(email)}
-      onRetry={auth.retrySession}
+      onEmail={(email) => wrap(() => auth.signInWithEmail(email))}
+      onVerify={(email, token) => wrap(() => auth.verifyEmailCode(email, token))}
     />
   );
 }
 
-function AuthSignup() {
-  return <AuthLogin />;
-}
-
 function ProtectedApp() {
-  // App already owns onboarding, guest mode, and login prompts.
+  const auth = useAuth();
+  const location = useLocation();
+
+  if (auth.isLoading) {
+    return <RouteFallback />;
+  }
+
+  if (!auth.user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
+  }
+
   return (
     <Suspense fallback={<RouteFallback />}>
       <App />
@@ -111,28 +113,19 @@ function ProtectedApp() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<MarketingLayout />}>
+      <Route element={<MarketingLayout />}>
         <Route index element={<HomePublic />} />
         <Route path="features" element={<FeaturesPublic />} />
         <Route path="pricing" element={<PricingPublic />} />
         <Route path="plus" element={<PlusPublic />} />
-        <Route path="about" element={<SimplePublic page="about" />} />
-        <Route path="contact" element={<SimplePublic page="contact" />} />
-        <Route path="faq" element={<SimplePublic page="faq" />} />
-        <Route path="help" element={<SimplePublic page="help" />} />
-        <Route path="privacy" element={<SimplePublic page="privacy" />} />
-        <Route path="terms" element={<SimplePublic page="terms" />} />
-        <Route path="cookies" element={<SimplePublic page="cookies" />} />
-        <Route path="security" element={<SimplePublic page="security" />} />
-        <Route path="wishlist/:token" element={<PublicWishlistPage />} />
+        <Route path="privacy" element={<SimplePublic kind="privacy" />} />
+        <Route path="terms" element={<SimplePublic kind="terms" />} />
+        <Route path="support" element={<SimplePublic kind="support" />} />
+        <Route path="w/:shareId" element={<PublicWishlistPage />} />
         <Route path="*" element={<NotFoundPublic />} />
       </Route>
 
       <Route path="/login" element={<AuthLogin />} />
-      <Route path="/signup" element={<AuthSignup />} />
-      {/* Password reset removed — redirect legacy links to login */}
-      <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
-      <Route path="/reset-password" element={<Navigate to="/login" replace />} />
 
       <Route path="/app/*" element={<ProtectedApp />} />
       <Route path="/home" element={<ProtectedApp />} />
@@ -148,7 +141,6 @@ export function AppRoutes() {
       <Route path="/app/plus" element={<ProtectedApp />} />
       <Route path="/app/personalize" element={<ProtectedApp />} />
       <Route path="/personalize" element={<ProtectedApp />} />
-
     </Routes>
   );
 }
