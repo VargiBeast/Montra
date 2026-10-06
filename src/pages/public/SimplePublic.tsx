@@ -33,7 +33,7 @@ export function SimplePublic({ page }: { page: PageKey }) {
         <p className="marketing-lead">{t(`${page}Body`)}</p>
         {page === "contact" && (
           <p>
-            <a className="text-button" href="mailto:hello@montra.cash">hello@montra.cash</a>
+            <a className="text-button" href="mailto:contact@montra.cash">contact@montra.cash</a>
           </p>
         )}
         {(page === "faq" || page === "help") && (
