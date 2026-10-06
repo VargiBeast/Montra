@@ -9,6 +9,7 @@ import "./styles/globals.css";
 import "./styles/plus.css";
 import "./styles/preference-fix.css";
 import "./styles/layout-fix.css";
+import "./styles/layout-clearance.css";
 import "./styles/marketing.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
