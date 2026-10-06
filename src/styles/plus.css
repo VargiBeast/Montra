@@ -289,3 +289,68 @@
   margin-top: 2px;
   color: var(--green);
 }
+
+/* Selectable plan cards */
+.plus-price-card {
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.plus-price-card:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+.plus-price-card.is-selected {
+  border-color: color-mix(in srgb, var(--green) 55%, var(--line));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 28%, transparent);
+  background: color-mix(in srgb, var(--green) 6%, var(--surface-raised, #fff));
+}
+.plus-price-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--green) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.plus-cta.is-loading {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.plus-cta-error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--red, #c0392b);
+  font-weight: 600;
+}
+
+.plus-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 550;
+}
+.plus-status p {
+  margin: 0;
+}
+.plus-status-success {
+  border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line));
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+  color: var(--ink);
+}
+.plus-status-success svg {
+  flex-shrink: 0;
+  color: var(--green);
+  margin-top: 1px;
+}
+.plus-status-cancelled {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-raised, #fff) 90%, transparent);
+  color: var(--muted);
+}
