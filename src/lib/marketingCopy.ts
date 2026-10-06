@@ -78,7 +78,7 @@ export const marketingCopy: Record<string, string> = {
   cookiesTitle: "Cookies",
   cookiesBody: "Montra uses essential storage for sign-in sessions, language and theme preferences. We do not use advertising trackers.",
   securityTitle: "Security",
-  securityBody: "Authentication is handled by Supabase Auth. Data access is scoped to your account with row-level security. Report concerns to hello@montra.cash.",
+  securityBody: "Authentication is handled by Supabase Auth. Data access is scoped to your account with row-level security. Report concerns to contact@montra.cash.",
   seoHomeTitle: "Montra — personal money management",
   seoHomeDescription: "Track spending, receipts, savings goals and wishlists with Montra.",
   seoFeaturesTitle: "Features · Montra",
