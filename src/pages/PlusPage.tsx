@@ -16,6 +16,12 @@ interface PlusPageProps {
   onOpenAnalytics?: () => void;
   onOpenSavings?: () => void;
   onOpenPersonalize?: () => void;
+  /** True while the entitlement row is being read. Does not grant Plus. */
+  entitlementLoading?: boolean;
+  /** Raw Stripe status from plus_entitlements, if any. Informational only. */
+  entitlementStatus?: string | null;
+  /** Re-read plus_entitlements. Checkout success must not unlock Plus by itself. */
+  onRefreshEntitlement?: () => Promise<void> | void;
 }
 
 type Plan = "monthly" | "yearly";
@@ -72,7 +78,7 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusFree4: "Multi-language & display currency",
 };
 
-export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOpenPersonalize }: PlusPageProps) {
+export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOpenPersonalize, entitlementLoading = false, entitlementStatus = null, onRefreshEntitlement }: PlusPageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
   const auth = useAuth();
@@ -122,17 +128,33 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
   useEffect(() => {
     const checkout = searchParams.get("checkout");
     if (checkout === "success") {
+      // Confirmation only. Plus stays locked until plus_entitlements says active/trialing.
       setStatusMessage("success");
       const next = new URLSearchParams(searchParams);
       next.delete("checkout");
       setSearchParams(next, { replace: true });
+      void onRefreshEntitlement?.();
     } else if (checkout === "cancelled") {
       setStatusMessage("cancelled");
       const next = new URLSearchParams(searchParams);
       next.delete("checkout");
       setSearchParams(next, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, onRefreshEntitlement]);
+
+  useEffect(() => {
+    if (statusMessage !== "success" || hasPlus || !onRefreshEntitlement) return;
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      if (attempts > 15) {
+        window.clearInterval(timer);
+        return;
+      }
+      void onRefreshEntitlement();
+    }, 2000);
+    return () => window.clearInterval(timer);
+  }, [statusMessage, hasPlus, onRefreshEntitlement]);
 
   const startCheckout = useCallback(async () => {
     if (loading) return;
@@ -212,8 +234,8 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
         </div>
       </div>
 
-      {statusMessage === "success" && (
-        <div className="panel plus-status plus-status-success" role="status">
+      {statusMessage === "success" && !hasPlus && (
+        <div className="panel plus-status plus-status-success" role="status" data-entitlement-status={entitlementStatus ?? ""} aria-busy={entitlementLoading}>
           <Check size={18} aria-hidden="true" />
           <p>{t("plusCheckoutSuccess")}</p>
         </div>
