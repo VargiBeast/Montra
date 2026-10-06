@@ -1,0 +1,5 @@
+# Minimal local config — production secrets live in Supabase Dashboard / CLI secrets.
+
+[functions.create-stripe-checkout]
+# JWT is verified inside the function; gateway may still forward Authorization.
+verify_jwt = true
