@@ -443,7 +443,14 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
                 <span>{t("date")}</span>
                 <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
               </label>
-              <div className="receipt-deduct full">
+              <div className={`receipt-deduct full ${deductFromBalance ? "is-active" : ""}`}>
+                <p className="receipt-deduct-summary" role="status">
+                  {t("receiptAmount")}: <strong>{displayAmount} {displayCurrency}</strong>
+                  {" · "}
+                  {deductFromBalance
+                    ? t("receiptWillAffectBalance")
+                    : t("receiptWillNotAffectBalance")}
+                </p>
                 <label className="receipt-deduct-row">
                   <input
                     type="checkbox"
@@ -462,16 +469,16 @@ export function ReceiptCapture({ open, currency, onClose, onUpload, onSave }: Re
                     })()}
                   </span>
                 </label>
-                {deductFromBalance && (
-                  <p className="transaction-sub receipt-deduct-hint">
-                    {(() => {
-                      const hint = t("deductFromBalanceHint");
-                      return hint === "—" || !hint
-                        ? "Creates an expense in Activity. Confirming again will not create a duplicate."
-                        : hint;
-                    })()}
-                  </p>
-                )}
+                <p className="transaction-sub receipt-deduct-hint">
+                  {deductFromBalance
+                    ? (() => {
+                        const hint = t("deductFromBalanceHint");
+                        return hint === "—" || !hint
+                          ? "Creates one expense in Activity. Confirming again will not create a duplicate."
+                          : hint;
+                      })()
+                    : t("receiptKeepBalanceSafe")}
+                </p>
               </div>
               <div className="form-actions">
                 <button className="secondary-button" type="button" disabled={busy} onClick={onClose}>
