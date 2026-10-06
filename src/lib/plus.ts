@@ -9,8 +9,13 @@
 const TEMP_PLUS_TEST_EMAILS = new Set(["ivargyt@gmail.com"]);
 
 /**
- * Returns true when the user should see Plus features unlocked.
+ * Returns true when the user should see Plus features unlocked in the UI.
  * Currently: hardcoded test emails only. No payments, no Stripe, no webhooks.
+ *
+ * IMPORTANT: This is a temporary *client-side UX* entitlement only.
+ * It is NOT a security boundary. Private data remains protected by Supabase RLS
+ * and Storage policies. Do not treat hasPlusAccess as authorization for data access.
+ * Replace with real subscription verification when billing ships.
  */
 export function hasPlusAccess(email: string | null | undefined): boolean {
   if (!email) return false;
