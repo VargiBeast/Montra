@@ -10,6 +10,7 @@ interface PlusPageProps {
   onBack: () => void;
   onOpenAnalytics?: () => void;
   onOpenSavings?: () => void;
+  onOpenPersonalize?: () => void;
 }
 
 const PLUS_FALLBACK: Record<string, string> = {
@@ -26,7 +27,7 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusFeaturePredict: "Predict",
   plusFeaturePredictBody: "End-of-month estimates and savings projections based on your transaction history — clearly marked as estimates, never invented.",
   plusFeaturePersonalize: "Personalize",
-  plusFeaturePersonalizeBody: "Theme, language and display currency already adapt to you. Plus keeps expanding personal tools that fit the existing Montra design.",
+  plusFeaturePersonalizeBody: "Choose which Home sections you see, reorder them, and pick a Liquid Glass accent — open Personalize Montra from Plus.",
   plusPricingTitle: "Pricing",
   plusPricingBody: "Start with 7 days free. Then choose monthly or yearly — prices stay clear, no hidden fees.",
   plusTrialBadge: "7 days free",
@@ -49,6 +50,8 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusComparePlus: "Plus",
   plusOpenAnalytics: "Open analytics",
   plusOpenGoals: "Open savings goals",
+  plusOpenPersonalize: "Personalize Montra",
+  plusExplorePersonalize: "See personalization",
   plusBack: "Back",
   plusFreeTitle: "What you already have for free",
   plusFree1: "Track income & spending",
@@ -57,7 +60,7 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusFree4: "Multi-language & display currency",
 };
 
-export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: PlusPageProps) {
+export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOpenPersonalize }: PlusPageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
@@ -197,6 +200,18 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
         </button>
         <p className="plus-cta-note">{t("plusCtaNote")}</p>
       </section>
+      {onOpenPersonalize && (
+        <section className="panel plus-personalize-cta" aria-label={t("plusFeaturePersonalize")}>
+          <span className="plus-feature-icon" aria-hidden="true"><Palette size={22} /></span>
+          <div>
+            <h2>{t("plusFeaturePersonalize")}</h2>
+            <p>{t("plusFeaturePersonalizeBody")}</p>
+          </div>
+          <button type="button" className="primary-button" onClick={onOpenPersonalize}>
+            {hasPlus ? t("plusOpenPersonalize") : t("plusExplorePersonalize")}
+          </button>
+        </section>
+      )}
       {hasPlus && (
         <section className="plus-quick-actions">
           {onOpenAnalytics && (
@@ -207,6 +222,11 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings }: Pl
           {onOpenSavings && (
             <button type="button" className="panel plus-action-btn" onClick={onOpenSavings}>
               <PiggyBank size={18} /><span>{t("plusOpenGoals")}</span>
+            </button>
+          )}
+          {onOpenPersonalize && (
+            <button type="button" className="panel plus-action-btn" onClick={onOpenPersonalize}>
+              <Palette size={18} /><span>{t("plusOpenPersonalize")}</span>
             </button>
           )}
         </section>

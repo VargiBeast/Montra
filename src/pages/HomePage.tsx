@@ -20,6 +20,8 @@ import { TransactionRow } from "../components/TransactionRow";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
+import type { PersonalizationSettings } from "../lib/personalization";
+import { DEFAULT_PERSONALIZATION } from "../lib/personalization";
 
 const HOME_FALLBACK: Record<string, string> = {
   analytics: "Analytics",
@@ -72,6 +74,7 @@ interface HomePageProps {
   onOpenWishlist?: () => void;
   savingsGoals?: SavingsGoal[];
   wishlistItems?: WishlistItem[];
+  personalization?: PersonalizationSettings;
 }
 
 export function HomePage({
@@ -88,6 +91,7 @@ export function HomePage({
   onOpenWishlist,
   savingsGoals = [],
   wishlistItems = [],
+  personalization = DEFAULT_PERSONALIZATION,
 }: HomePageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
@@ -158,8 +162,8 @@ export function HomePage({
         </div>
       </section>
 
-      {(onOpenSavingsGoals || onOpenWishlist) && (
-        <section className="panel section-panel home-planning" aria-label={t("planning")}>
+      {personalization.showPlanning && (onOpenSavingsGoals || onOpenWishlist) && (
+        <section className="panel section-panel home-planning" style={{ order: personalization.sectionOrder.indexOf("planning") }} aria-label={t("planning")}>
           <div className="section-heading">
             <h2>{t("planning")}</h2>
           </div>
@@ -250,8 +254,8 @@ export function HomePage({
         </section>
       )}
 
-      {hasPlus ? (
-        <section className="panel section-panel analytics-unlocked-card">
+      {personalization.showAnalytics && (hasPlus ? (
+        <section className="panel section-panel analytics-unlocked-card" style={{ order: personalization.sectionOrder.indexOf("analytics") }}>
           <div className="section-heading">
             <h2>{t("analytics")}</h2>
           </div>
@@ -261,7 +265,7 @@ export function HomePage({
           </button>
         </section>
       ) : (
-        <section className="panel analytics-plus-card" aria-label={t("analytics")}>
+        <section className="panel analytics-plus-card" style={{ order: personalization.sectionOrder.indexOf("analytics") }} aria-label={t("analytics")}>
           <div className="analytics-plus-preview" aria-hidden="true">
             <div className="analytics-plus-preview-bars">
               <span style={{ height: "42%" }} />
@@ -298,14 +302,16 @@ export function HomePage({
                 {t("analyticsPlusBenefitInsights")}
               </li>
             </ul>
+            <p className="analytics-preview-label">{t("analyticsPreviewLabel")}</p>
             <button type="button" className="primary-button analytics-plus-cta" onClick={() => onGetPlus?.()}>
               {t("analyticsPlusCta")}
             </button>
           </div>
         </section>
-      )}
+      ))}
 
-      <section className="panel section-panel home-activity" aria-label={t("recentActivity")}>
+      {personalization.showActivity && (
+      <section className="panel section-panel home-activity" style={{ order: personalization.sectionOrder.indexOf("activity") }} aria-label={t("recentActivity")}>
         <div className="section-heading">
           <h2>{t("recentActivity")}</h2>
           {transactions.length > 0 && (
@@ -330,6 +336,7 @@ export function HomePage({
           </ul>
         )}
       </section>
+      )}
     </main>
   );
 }
