@@ -31,6 +31,7 @@ function PlusPublic() {
         onBack={() => navigate(-1)}
         onOpenAnalytics={() => navigate("/analytics")}
         onOpenSavings={() => navigate("/goals")}
+        onOpenPersonalize={() => navigate("/app/personalize")}
       />
     </main>
   );
@@ -129,6 +130,8 @@ export function AppRoutes() {
       <Route path="/profile" element={<ProtectedApp />} />
       <Route path="/analytics" element={<ProtectedApp />} />
       <Route path="/app/plus" element={<ProtectedApp />} />
+      <Route path="/app/personalize" element={<ProtectedApp />} />
+      <Route path="/personalize" element={<ProtectedApp />} />
 
     </Routes>
   );
