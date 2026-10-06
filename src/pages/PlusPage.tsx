@@ -1,9 +1,13 @@
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft, BarChart3, Check, Lightbulb, Lock, Palette, PiggyBank, Sparkles, Target, TrendingUp,
 } from "lucide-react";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
 import { PLUS_PRICING } from "../lib/plus";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { useAuth } from "../hooks/useAuth";
 
 interface PlusPageProps {
   hasPlus: boolean;
@@ -12,6 +16,8 @@ interface PlusPageProps {
   onOpenSavings?: () => void;
   onOpenPersonalize?: () => void;
 }
+
+type Plan = "monthly" | "yearly";
 
 const PLUS_FALLBACK: Record<string, string> = {
   plusTitle: "Montra Plus",
@@ -43,8 +49,13 @@ const PLUS_FALLBACK: Record<string, string> = {
   plusIncluded3: "Month forecast & savings outlook",
   plusIncluded4: "Priority access to new Plus tools",
   plusCtaActive: "You're on Montra Plus",
-  plusCtaLocked: "Payments coming soon",
-  plusCtaNote: "Payments are not enabled yet. When billing ships, this is where the trial and subscription start. Test accounts already unlock Plus features.",
+  plusCtaLocked: "Start free trial",
+  plusCtaNote: "7-day free trial. Cancel anytime before it ends — you won't be charged.",
+  plusCtaLoading: "Opening checkout…",
+  plusCtaSignIn: "Sign in to continue",
+  plusCheckoutError: "Could not start checkout. Please try again.",
+  plusCheckoutCancelled: "Checkout was cancelled. No subscription was started.",
+  plusCheckoutSuccess: "Payment received. Your Plus access will be confirmed shortly.",
   plusCompareTitle: "Free vs Plus",
   plusCompareFree: "Free",
   plusComparePlus: "Plus",
@@ -63,13 +74,20 @@ const PLUS_FALLBACK: Record<string, string> = {
 export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOpenPersonalize }: PlusPageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedPlan, setSelectedPlan] = useState<Plan>("yearly");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<"success" | "cancelled" | null>(null);
+
   const t = (key: string, values?: Record<string, string | number>) => {
-    // NOK pricing is fixed — never take amounts from lagging translations.
     if (key === "plusPriceMonthly") return PLUS_PRICING.monthlyLabel;
     if (key === "plusPriceYearly") return PLUS_PRICING.yearlyLabel;
     if (key === "plusPriceYearlyNote") {
       const lookedUp = translate(key, values);
-      // Block legacy "two months free" style notes if any dictionary still has them.
       if (lookedUp && /two months|to måneder|två månader|deux mois|dos meses|due mesi|dois meses|twee maanden|kaksi kuukautta|dwa miesiące|dva měsíce|iki ay|شهرين|2か|두 달|两个月/i.test(lookedUp)) {
         return PLUS_PRICING.yearlySavingsNoteEn;
       }
@@ -77,8 +95,6 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
       return PLUS_FALLBACK[key] ?? PLUS_PRICING.yearlySavingsNoteEn;
     }
     const lookedUp = translate(key, values);
-    // Prefer real dictionary copy. Fall back to English PLUS_FALLBACK only when the
-    // lookup still yields the missing-copy sentinel or the raw key.
     let value = lookedUp;
     if (!value || value === "\u2014" || value === key) {
       value = fillMissingCopy(key, lookedUp, language);
@@ -92,6 +108,65 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
     return value;
   };
 
+  useEffect(() => {
+    const checkout = searchParams.get("checkout");
+    if (checkout === "success") {
+      setStatusMessage("success");
+      const next = new URLSearchParams(searchParams);
+      next.delete("checkout");
+      setSearchParams(next, { replace: true });
+    } else if (checkout === "cancelled") {
+      setStatusMessage("cancelled");
+      const next = new URLSearchParams(searchParams);
+      next.delete("checkout");
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  const startCheckout = useCallback(async () => {
+    if (loading) return;
+    setError(null);
+
+    if (!auth.user) {
+      navigate("/login", { state: { from: "/plus" } });
+      return;
+    }
+
+    if (!isSupabaseConfigured || !supabase) {
+      setError(t("plusCheckoutError"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error: invokeError } = await supabase.functions.invoke("create-stripe-checkout", {
+        body: { plan: selectedPlan },
+      });
+
+      if (invokeError) {
+        console.error("create-stripe-checkout invoke error:", invokeError);
+        setError(t("plusCheckoutError"));
+        setLoading(false);
+        return;
+      }
+
+      const url = (data as { url?: string } | null)?.url;
+      if (typeof url === "string" && url.startsWith("https://")) {
+        window.location.href = url;
+        return;
+      }
+
+      console.error("create-stripe-checkout unexpected response:", data);
+      setError(t("plusCheckoutError"));
+      setLoading(false);
+    } catch (err) {
+      console.error("create-stripe-checkout failed:", err);
+      setError(t("plusCheckoutError"));
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user, loading, selectedPlan, navigate]);
+
   const features = [
     { icon: <BarChart3 size={22} />, title: t("plusFeatureUnderstand"), body: t("plusFeatureUnderstandBody") },
     { icon: <Target size={22} />, title: t("plusFeaturePlan"), body: t("plusFeaturePlanBody") },
@@ -100,6 +175,14 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
   ];
   const included = [t("plusIncluded1"), t("plusIncluded2"), t("plusIncluded3"), t("plusIncluded4")];
   const freeItems = [t("plusFree1"), t("plusFree2"), t("plusFree3"), t("plusFree4")];
+
+  const ctaLabel = hasPlus
+    ? t("plusCtaActive")
+    : loading
+      ? t("plusCtaLoading")
+      : !auth.user
+        ? t("plusCtaSignIn")
+        : t("plusCtaLocked");
 
   return (
     <main className="page-content plus-page">
@@ -117,6 +200,19 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
           <p className="plus-subtitle">{t("plusSubtitle")}</p>
         </div>
       </div>
+
+      {statusMessage === "success" && (
+        <div className="panel plus-status plus-status-success" role="status">
+          <Check size={18} aria-hidden="true" />
+          <p>{t("plusCheckoutSuccess")}</p>
+        </div>
+      )}
+      {statusMessage === "cancelled" && (
+        <div className="panel plus-status plus-status-cancelled" role="status">
+          <p>{t("plusCheckoutCancelled")}</p>
+        </div>
+      )}
+
       <section className="panel plus-hero" aria-label={t("plusValueTitle")}>
         <div className="plus-hero-icon" aria-hidden="true"><Sparkles size={28} /></div>
         <h2>{t("plusValueTitle")}</h2>
@@ -172,16 +268,30 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
           <span className="plus-trial-badge">{t("plusTrialBadge")}</span>
           <span className="plus-trial-then">{t("plusTrialThen")}</span>
         </div>
-        <div className="plus-price-cards">
-          <article className="plus-price-card">
+        <div className="plus-price-cards" role="radiogroup" aria-label={t("plusPricingTitle")}>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedPlan === "monthly"}
+            className={`plus-price-card ${selectedPlan === "monthly" ? "is-selected" : ""}`}
+            onClick={() => setSelectedPlan("monthly")}
+            disabled={loading || hasPlus}
+          >
             <strong className="plus-price-amount">{t("plusPriceMonthly")}</strong>
             <span className="plus-price-label">{t("plusPriceMonthlyLabel")}</span>
-          </article>
-          <article className="plus-price-card is-featured">
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedPlan === "yearly"}
+            className={`plus-price-card is-featured ${selectedPlan === "yearly" ? "is-selected" : ""}`}
+            onClick={() => setSelectedPlan("yearly")}
+            disabled={loading || hasPlus}
+          >
             <strong className="plus-price-amount">{t("plusPriceYearly")}</strong>
             <span className="plus-price-label">{t("plusPriceYearlyLabel")}</span>
             <span className="plus-price-note">{t("plusPriceYearlyNote")}</span>
-          </article>
+          </button>
         </div>
         <p className="eyebrow plus-included-label">{t("plusIncluded")}</p>
         <ul className="plus-checklist">
@@ -191,14 +301,28 @@ export function PlusPage({ hasPlus, onBack, onOpenAnalytics, onOpenSavings, onOp
         </ul>
         <button
           type="button"
-          className={`primary-button plus-cta ${hasPlus ? "is-active" : "is-pending"}`}
-          disabled
-          aria-disabled={true}
-          title={t("plusCtaNote")}
+          className={`primary-button plus-cta ${hasPlus ? "is-active" : ""} ${loading ? "is-loading" : ""}`}
+          disabled={hasPlus || loading}
+          aria-disabled={hasPlus || loading}
+          aria-busy={loading}
+          onClick={hasPlus ? undefined : startCheckout}
         >
-          {hasPlus ? (<><Sparkles size={16} /> {t("plusCtaActive")}</>) : (<><Lock size={16} /> {t("plusCtaLocked")}</>)}
+          {hasPlus ? (
+            <><Sparkles size={16} /> {ctaLabel}</>
+          ) : loading ? (
+            <>{ctaLabel}</>
+          ) : !auth.user ? (
+            <><Lock size={16} /> {ctaLabel}</>
+          ) : (
+            <><Sparkles size={16} /> {ctaLabel}</>
+          )}
         </button>
-        <p className="plus-cta-note">{t("plusCtaNote")}</p>
+        {error && (
+          <p className="plus-cta-error" role="alert">{error}</p>
+        )}
+        {!hasPlus && (
+          <p className="plus-cta-note">{t("plusCtaNote")}</p>
+        )}
       </section>
       {onOpenPersonalize && (
         <section className="panel plus-personalize-cta" aria-label={t("plusFeaturePersonalize")}>
