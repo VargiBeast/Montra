@@ -8,6 +8,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Could not start checkout. Please try again.",
     plusCheckoutCancelled: "Checkout was cancelled. No subscription was started.",
     plusCheckoutSuccess: "Payment received. Your Plus access will be confirmed shortly.",
+    plusManageSubscription: "Manage subscription",
+    plusPortalLoading: "Opening portal…",
+    plusPortalError: "Could not open subscription management. Please try again.",
   },
   nb: {
     plusCtaLocked: "Start gratis prøveperiode",
@@ -17,6 +20,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Kunne ikke starte betaling. Prøv igjen.",
     plusCheckoutCancelled: "Betalingen ble avbrutt. Ingen abonnement ble startet.",
     plusCheckoutSuccess: "Betaling mottatt. Plus-tilgangen din bekreftes snart.",
+    plusManageSubscription: "Administrer abonnement",
+    plusPortalLoading: "Åpner portal…",
+    plusPortalError: "Kunne ikke åpne abonnementsadministrasjon. Prøv igjen.",
   },
   sv: {
     plusCtaLocked: "Starta gratis provperiod",
@@ -26,6 +32,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Kunde inte starta betalning. Försök igen.",
     plusCheckoutCancelled: "Betalningen avbröts. Ingen prenumeration startades.",
     plusCheckoutSuccess: "Betalning mottagen. Din Plus-åtkomst bekräftas snart.",
+    plusManageSubscription: "Hantera prenumeration",
+    plusPortalLoading: "Öppnar portal…",
+    plusPortalError: "Kunde inte öppna prenumerationshantering. Försök igen.",
   },
   da: {
     plusCtaLocked: "Start gratis prøveperiode",
@@ -35,6 +44,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Kunne ikke starte betaling. Prøv igen.",
     plusCheckoutCancelled: "Betalingen blev annulleret. Intet abonnement blev startet.",
     plusCheckoutSuccess: "Betaling modtaget. Din Plus-adgang bekræftes snart.",
+    plusManageSubscription: "Administrer abonnement",
+    plusPortalLoading: "Åbner portal…",
+    plusPortalError: "Kunne ikke åbne abonnementsadministration. Prøv igen.",
   },
   de: {
     plusCtaLocked: "Kostenlose Testphase starten",
@@ -44,6 +56,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Checkout konnte nicht gestartet werden. Bitte erneut versuchen.",
     plusCheckoutCancelled: "Checkout abgebrochen. Es wurde kein Abo gestartet.",
     plusCheckoutSuccess: "Zahlung eingegangen. Dein Plus-Zugang wird in Kürze bestätigt.",
+    plusManageSubscription: "Abo verwalten",
+    plusPortalLoading: "Portal wird geöffnet…",
+    plusPortalError: "Abo-Verwaltung konnte nicht geöffnet werden. Bitte erneut versuchen.",
   },
   fr: {
     plusCtaLocked: "Commencer l'essai gratuit",
@@ -53,6 +68,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Impossible de démarrer le paiement. Réessayez.",
     plusCheckoutCancelled: "Paiement annulé. Aucun abonnement n'a été démarré.",
     plusCheckoutSuccess: "Paiement reçu. Votre accès Plus sera confirmé sous peu.",
+    plusManageSubscription: "Gérer l'abonnement",
+    plusPortalLoading: "Ouverture du portail…",
+    plusPortalError: "Impossible d'ouvrir la gestion de l'abonnement. Réessayez.",
   },
   es: {
     plusCtaLocked: "Empezar prueba gratis",
@@ -62,6 +80,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "No se pudo iniciar el pago. Inténtalo de nuevo.",
     plusCheckoutCancelled: "El pago se canceló. No se inició ninguna suscripción.",
     plusCheckoutSuccess: "Pago recibido. Tu acceso a Plus se confirmará en breve.",
+    plusManageSubscription: "Gestionar suscripción",
+    plusPortalLoading: "Abriendo el portal…",
+    plusPortalError: "No se pudo abrir la gestión de la suscripción. Inténtalo de nuevo.",
   },
   it: {
     plusCtaLocked: "Inizia la prova gratuita",
@@ -71,6 +92,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Impossibile avviare il pagamento. Riprova.",
     plusCheckoutCancelled: "Pagamento annullato. Nessun abbonamento è stato avviato.",
     plusCheckoutSuccess: "Pagamento ricevuto. Il tuo accesso Plus sarà confermato a breve.",
+    plusManageSubscription: "Gestisci abbonamento",
+    plusPortalLoading: "Apertura del portale…",
+    plusPortalError: "Impossibile aprire la gestione dell'abbonamento. Riprova.",
   },
   pt: {
     plusCtaLocked: "Começar teste grátis",
@@ -80,6 +104,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Não foi possível iniciar o pagamento. Tente novamente.",
     plusCheckoutCancelled: "Pagamento cancelado. Nenhuma subscrição foi iniciada.",
     plusCheckoutSuccess: "Pagamento recebido. O seu acesso Plus será confirmado em breve.",
+    plusManageSubscription: "Gerir subscrição",
+    plusPortalLoading: "A abrir o portal…",
+    plusPortalError: "Não foi possível abrir a gestão da subscrição. Tente novamente.",
   },
   nl: {
     plusCtaLocked: "Gratis proefperiode starten",
@@ -89,6 +116,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Checkout kon niet worden gestart. Probeer opnieuw.",
     plusCheckoutCancelled: "Checkout geannuleerd. Er is geen abonnement gestart.",
     plusCheckoutSuccess: "Betaling ontvangen. Je Plus-toegang wordt binnenkort bevestigd.",
+    plusManageSubscription: "Abonnement beheren",
+    plusPortalLoading: "Portal openen…",
+    plusPortalError: "Abonnementsbeheer kon niet worden geopend. Probeer opnieuw.",
   },
   fi: {
     plusCtaLocked: "Aloita ilmainen kokeilu",
@@ -98,6 +128,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Maksua ei voitu aloittaa. Yritä uudelleen.",
     plusCheckoutCancelled: "Maksu peruutettiin. Tilausta ei aloitettu.",
     plusCheckoutSuccess: "Maksu vastaanotettu. Plus-käyttöoikeutesi vahvistetaan pian.",
+    plusManageSubscription: "Hallitse tilausta",
+    plusPortalLoading: "Avataan portaalia…",
+    plusPortalError: "Tilauksen hallintaa ei voitu avata. Yritä uudelleen.",
   },
   pl: {
     plusCtaLocked: "Rozpocznij darmowy okres próbny",
@@ -107,6 +140,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Nie udało się rozpocząć płatności. Spróbuj ponownie.",
     plusCheckoutCancelled: "Płatność została anulowana. Nie rozpoczęto subskrypcji.",
     plusCheckoutSuccess: "Otrzymano płatność. Dostęp do Plus zostanie wkrótce potwierdzony.",
+    plusManageSubscription: "Zarządzaj subskrypcją",
+    plusPortalLoading: "Otwieranie portalu…",
+    plusPortalError: "Nie udało się otworzyć zarządzania subskrypcją. Spróbuj ponownie.",
   },
   cs: {
     plusCtaLocked: "Začít bezplatnou zkušební dobu",
@@ -116,6 +152,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Platbu se nepodařilo spustit. Zkuste to znovu.",
     plusCheckoutCancelled: "Platba byla zrušena. Žádné předplatné nebylo zahájeno.",
     plusCheckoutSuccess: "Platba přijata. Váš přístup k Plus bude brzy potvrzen.",
+    plusManageSubscription: "Spravovat předplatné",
+    plusPortalLoading: "Otevírání portálu…",
+    plusPortalError: "Nepodařilo se otevřít správu předplatného. Zkuste to znovu.",
   },
   tr: {
     plusCtaLocked: "Ücretsiz denemeyi başlat",
@@ -125,6 +164,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "Ödeme başlatılamadı. Lütfen tekrar deneyin.",
     plusCheckoutCancelled: "Ödeme iptal edildi. Abonelik başlatılmadı.",
     plusCheckoutSuccess: "Ödeme alındı. Plus erişiminiz kısa süre içinde onaylanacak.",
+    plusManageSubscription: "Aboneliği yönet",
+    plusPortalLoading: "Portal açılıyor…",
+    plusPortalError: "Abonelik yönetimi açılamadı. Lütfen tekrar deneyin.",
   },
   ar: {
     plusCtaLocked: "ابدأ التجربة المجانية",
@@ -134,6 +176,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "تعذّر بدء الدفع. يُرجى المحاولة مرة أخرى.",
     plusCheckoutCancelled: "تم إلغاء الدفع. لم يتم بدء أي اشتراك.",
     plusCheckoutSuccess: "تم استلام الدفع. سيتم تأكيد وصولك إلى Plus قريبًا.",
+    plusManageSubscription: "إدارة الاشتراك",
+    plusPortalLoading: "جارٍ فتح البوابة…",
+    plusPortalError: "تعذّر فتح إدارة الاشتراك. يُرجى المحاولة مرة أخرى.",
   },
   ja: {
     plusCtaLocked: "無料トライアルを始める",
@@ -143,6 +188,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "チェックアウトを開始できませんでした。もう一度お試しください。",
     plusCheckoutCancelled: "チェックアウトがキャンセルされました。サブスクリプションは開始されていません。",
     plusCheckoutSuccess: "お支払いを受け付けました。Plusへのアクセスはまもなく確認されます。",
+    plusManageSubscription: "サブスクリプションを管理",
+    plusPortalLoading: "ポータルを開いています…",
+    plusPortalError: "サブスクリプション管理を開けませんでした。もう一度お試しください。",
   },
   ko: {
     plusCtaLocked: "무료 체험 시작",
@@ -152,6 +200,9 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "결제를 시작할 수 없습니다. 다시 시도해 주세요.",
     plusCheckoutCancelled: "결제가 취소되었습니다. 구독이 시작되지 않았습니다.",
     plusCheckoutSuccess: "결제가 접수되었습니다. Plus 이용 권한이 곧 확인됩니다.",
+    plusManageSubscription: "구독 관리",
+    plusPortalLoading: "포털 여는 중…",
+    plusPortalError: "구독 관리를 열 수 없습니다. 다시 시도해 주세요.",
   },
   "zh-Hans": {
     plusCtaLocked: "开始免费试用",
@@ -161,5 +212,8 @@ export const plusCheckoutCopy: Record<string, Record<string, string>> = {
     plusCheckoutError: "无法开始结账。请重试。",
     plusCheckoutCancelled: "结账已取消。未开始任何订阅。",
     plusCheckoutSuccess: "已收到付款。您的 Plus 权限将很快确认。",
+    plusManageSubscription: "管理订阅",
+    plusPortalLoading: "正在打开门户…",
+    plusPortalError: "无法打开订阅管理。请重试。",
   },
 };
