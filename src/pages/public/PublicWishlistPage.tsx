@@ -6,7 +6,7 @@ import {
   fetchPublicWishlist,
   type PublicWishlistItem,
 } from "../../services/wishlistShares";
-import { formatMoney } from "../../lib/utils";
+import { formatMoney, safeExternalHref } from "../../lib/utils";
 import { useLanguage, useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 
@@ -223,13 +223,13 @@ function PublicWishlistCard({
           <strong className="wishlist-card-price">{priceLabel}</strong>
         </div>
         {item.details && <p className="wishlist-card-details">{item.details}</p>}
-        {item.url ? (
+        {safeExternalHref(item.url) ? (
           <div className="wishlist-card-actions">
             <a
               className="text-button wishlist-link-btn"
-              href={item.url}
+              href={safeExternalHref(item.url)!}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <ExternalLink size={14} /> {openLabel}
             </a>
