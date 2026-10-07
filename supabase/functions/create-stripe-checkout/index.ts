@@ -335,6 +335,7 @@ Deno.serve(async (req: Request) => {
         name_collection: {
           individual: {
             enabled: true,
+            optional: false,
           },
         },
         phone_number_collection: {
