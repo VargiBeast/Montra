@@ -167,6 +167,7 @@ export async function deleteWishlistItem(
 }
 
 const signedUrlCache = new Map<string, { url: string; expiresAt: number }>();
+const signedUrlInflight = new Map<string, Promise<string>>();
 
 export async function getSignedWishlistImageUrl(
   client: SupabaseClient,
@@ -176,10 +177,20 @@ export async function getSignedWishlistImageUrl(
   const safe = requireUserImagePath(path, userId);
   const cached = signedUrlCache.get(safe);
   if (cached && cached.expiresAt > Date.now()) return cached.url;
-  const { data, error } = await client.storage
-    .from(IMAGE_BUCKET)
-    .createSignedUrl(safe, 60 * 60);
-  if (error) throw error;
-  signedUrlCache.set(safe, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
-  return data.signedUrl;
+  const existing = signedUrlInflight.get(safe);
+  if (existing) return existing;
+  const request = (async () => {
+    try {
+      const { data, error } = await client.storage
+        .from(IMAGE_BUCKET)
+        .createSignedUrl(safe, 60 * 60);
+      if (error) throw error;
+      signedUrlCache.set(safe, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
+      return data.signedUrl;
+    } finally {
+      signedUrlInflight.delete(safe);
+    }
+  })();
+  signedUrlInflight.set(safe, request);
+  return request;
 }

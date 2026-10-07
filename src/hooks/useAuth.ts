@@ -42,7 +42,7 @@ export function useAuth() {
       .catch((error: unknown) => {
         if (!active) return;
         window.clearTimeout(sessionTimeout);
-        console.error("Could not restore the Saldo session.", error);
+        console.error("Could not restore the Montra session.", error);
         setAuthError("We couldn’t connect to your account. Check your connection and try again.");
         setIsLoading(false);
       });
@@ -97,7 +97,7 @@ export function useAuth() {
       if (error) throw error;
       setUser(data.session?.user ?? null);
     } catch (error) {
-      console.error("Could not restore the Saldo session.", error);
+      console.error("Could not restore the Montra session.", error);
       setAuthError("We couldn’t connect to your account. Check your connection and try again.");
     } finally {
       window.clearTimeout(sessionTimeout);
