@@ -8,8 +8,6 @@ import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import "./styles/globals-base.css";
 import "./styles/globals.css";
 import "./styles/plus.css";
-import "./styles/preference-tokens.css";
-import "./styles/layout-tokens.css";
 import "./styles/layout-clearance.css";
 import "./styles/marketing.css";
 import { CurrencyProvider } from "./lib/currency";
