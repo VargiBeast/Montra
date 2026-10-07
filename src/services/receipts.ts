@@ -5,6 +5,9 @@ import type { Receipt } from "../types/receipt";
 const TABLE = "receipts";
 const IMAGE_BUCKET = "receipts";
 
+/** In-memory cache of signed Storage URLs, keyed by image path. */
+const signedUrlCache = new Map<string, { url: string; expiresAt: number }>();
+
 function imageExtension(file: File): string {
   const extensionByType: Record<string, string> = {
     "image/jpeg": "jpg",
@@ -135,9 +138,13 @@ export async function getSignedReceiptUrl(
   path: string,
 ): Promise<string> {
   const safePath = requireUserImagePath(path, userId);
+  const cached = signedUrlCache.get(safePath);
+  if (cached && cached.expiresAt > Date.now()) return cached.url;
   const { data, error } = await client.storage
     .from(IMAGE_BUCKET)
     .createSignedUrl(safePath, 60 * 60);
   if (error) throw error;
+  // Expire slightly before the signed URL (50 of 60 minutes) so clients never use a stale link.
+  signedUrlCache.set(safePath, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
   return data.signedUrl;
 }
