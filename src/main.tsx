@@ -1,18 +1,28 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
 import { AppRoutes } from "./AppRoutes";
 import { ConsentBanner } from "./components/ConsentBanner";
 import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import "./styles/globals-base.css";
 import "./styles/globals.css";
 import "./styles/plus.css";
-import "./styles/preference-fix.css";
-import "./styles/layout-fix.css";
+import "./styles/preference-tokens.css";
+import "./styles/layout-tokens.css";
 import "./styles/layout-clearance.css";
 import "./styles/marketing.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
+
+// Capacitor native (iOS/Android): open the app shell at /app, not the marketing homepage.
+// Browser visits and non-standalone web remain on /. Installed-PWA redirect stays in index.html.
+if (Capacitor.isNativePlatform()) {
+  const path = window.location.pathname || "/";
+  if (path === "/" || path === "") {
+    window.location.replace("/app" + window.location.search + window.location.hash);
+  }
+}
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
