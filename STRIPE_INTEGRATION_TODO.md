@@ -22,6 +22,7 @@ Montra /plus
 | `mode` | `subscription` |
 | `ui_mode` | `hosted` (API equivalent of Checkout Builder “hosted_page”) |
 | `billing_address_collection` | `auto` |
+| `name_collection.individual.enabled` | `true` |
 | `phone_number_collection.enabled` | `true` |
 | `payment_method_collection` | `always` |
 | `allow_promotion_codes` | `true` |
@@ -30,10 +31,13 @@ Montra /plus
 | `consent_collection.terms_of_service` | `required` |
 | `custom_text.terms_of_service_acceptance.message` | Trial + Terms / Privacy acceptance copy |
 | `subscription_data.trial_period_days` | `7` (preserved) |
+| `integration_identifier` | `hosted_web_0001` |
+| `origin_context` | `web` |
 | `payment_method_types` | **not set** — Stripe uses Dashboard-enabled methods |
 
 ### Real values preserved (not placeholders)
 
+- **Secret key:** `STRIPE_SECRET_KEY` env only (never in source)
 - **Monthly price:** `price_1UNWoLPoFbr8ckzNvSQANDDz` (39 NOK/month)
 - **Yearly price:** `price_1UNWoLPoFbr8ckzNjxOSUmSY` (329 NOK/year)
 - **Success URL:** `https://montra.cash/plus?checkout=success`
@@ -42,7 +46,7 @@ Montra /plus
 - **Identity:** `client_reference_id` + `metadata.montra_user_id` / `montra_plan`
 - **Webhook / Sync Engine / plus_entitlements:** untouched
 
-Builder fields `integration_identifier: hosted_web_0001` and `origin_context: web` are stored on session **metadata** (not forced as unknown top-level Session API fields under the current `stripe@17` Edge Function client).
+Builder fields `integration_identifier: hosted_web_0001` and `origin_context: web` are passed on the Session create call (typed via `SessionCreateParams` assertion). `ui_mode` uses API value `hosted` (Builder export label is `hosted_page`).
 
 ## Remaining Stripe Dashboard setup
 
