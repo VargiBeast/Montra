@@ -141,6 +141,8 @@ export async function deleteTransaction(
   if (imagePath) await removeImage(client, imagePath);
 }
 
+const signedUrlInflight = new Map<string, Promise<string>>();
+
 export async function getSignedImageUrl(
   client: SupabaseClient,
   userId: string,
@@ -149,13 +151,23 @@ export async function getSignedImageUrl(
   const safePath = requireUserImagePath(path, userId);
   const cached = signedUrlCache.get(safePath);
   if (cached && cached.expiresAt > Date.now()) return cached.url;
-  const { data, error } = await client.storage
-    .from(IMAGE_BUCKET)
-    .createSignedUrl(safePath, 60 * 60);
-  if (error) throw error;
-  // Expire slightly before the signed URL (50 of 60 minutes) so clients never use a stale link.
-  signedUrlCache.set(safePath, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
-  return data.signedUrl;
+  const existing = signedUrlInflight.get(safePath);
+  if (existing) return existing;
+  const request = (async () => {
+    try {
+      const { data, error } = await client.storage
+        .from(IMAGE_BUCKET)
+        .createSignedUrl(safePath, 60 * 60);
+      if (error) throw error;
+      // Expire slightly before the signed URL (50 of 60 minutes) so clients never use a stale link.
+      signedUrlCache.set(safePath, { url: data.signedUrl, expiresAt: Date.now() + 50 * 60 * 1000 });
+      return data.signedUrl;
+    } finally {
+      signedUrlInflight.delete(safePath);
+    }
+  })();
+  signedUrlInflight.set(safePath, request);
+  return request;
 }
 
 export async function importTransactions(
