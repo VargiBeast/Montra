@@ -5,7 +5,7 @@
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import Stripe from "npm:stripe@17";
+import Stripe from "npm:stripe@19";
 
 const ALLOWED_ORIGINS = new Set([
   "https://montra.cash",
@@ -173,7 +173,7 @@ Deno.serve(async (req: Request) => {
 
     step = "stripe_init";
     const stripe = new Stripe(stripeSecret, {
-      apiVersion: "2024-11-20.acacia",
+      apiVersion: "2025-09-30.clover",
       httpClient: Stripe.createFetchHttpClient(),
     });
 
