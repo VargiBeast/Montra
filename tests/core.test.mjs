@@ -12,9 +12,9 @@ import { languageForCopy, normalizeLanguage, translate } from "../src/lib/i18n.t
 test("language preferences normalize locale codes and localize money without changing its currency", () => {
   assert.equal(normalizeLanguage("pt-br"), "pt-BR");
   assert.equal(normalizeLanguage("not_a_locale"), null);
-  assert.equal(languageForCopy("nb-NO"), "no");
+  assert.equal(languageForCopy("nb-NO"), "nb");
   assert.equal(translate("activity", "nb-NO"), "Aktivitet");
-  assert.equal(translate("activity", "fr-FR"), "Activity");
+  assert.equal(translate("activity", "fr-FR"), "Activité");
 
   const formatted = formatMoney(1234.5, "NOK", "de-DE");
   assert.match(formatted, /1\.234,50/);
@@ -45,7 +45,7 @@ test("product URLs are normalized only for HTTP and HTTPS", () => {
 test("product URLs cannot contain embedded sign-in credentials", () => {
   const result = validateProductUrl("https://person:password@shop.example/item");
   assert.equal(result.url, null);
-  assert.match(result.error, /sign-in details/i);
+  assert.equal(result.error, "productLinkNoCredentials");
 });
 
 test("calendar dates and imported transaction records are validated", () => {

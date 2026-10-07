@@ -1,4 +1,4 @@
-import { languageForCopy, readLanguage } from "./i18n";
+import { languageForCopy, readLanguage } from "./i18n.ts";
 
 function phrase(en: string, no: string) {
   const lang = languageForCopy(readLanguage());

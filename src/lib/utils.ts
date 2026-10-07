@@ -1,5 +1,5 @@
 import type { Transaction } from "../types/transaction";
-import { readLanguage } from "./i18n";
+import { readLanguage } from "./i18n.ts";
 
 /** Format a monetary value that is stored in base currency (NOK). */
 export function formatMoney(
