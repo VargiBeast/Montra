@@ -313,10 +313,13 @@ Deno.serve(async (req: Request) => {
     step = "stripe_session_create";
     try {
       // Hosted Checkout (Stripe Checkout Builder / hosted_web_0001).
+      // Secret key from STRIPE_SECRET_KEY env only — never hardcode keys.
+      // Real Price IDs / success / cancel URLs preserved (not Builder placeholders).
       // Do not hardcode payment_method_types — Stripe uses Dashboard-enabled methods.
-      // automatic_tax requires Stripe Tax to be configured on the account.
+      // automatic_tax requires Stripe Tax configured on the account.
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
+        // Builder export uses hosted_page; Stripe Sessions API accepts "hosted".
         ui_mode: "hosted",
         customer: customerId!,
         line_items: [{ price: priceId, quantity: 1 }],
@@ -327,18 +330,18 @@ Deno.serve(async (req: Request) => {
         success_url: SUCCESS_URL,
         cancel_url: CANCEL_URL,
         client_reference_id: user.id,
-        metadata: {
-          montra_user_id: user.id,
-          montra_plan: plan,
-          integration_identifier: "hosted_web_0001",
-          origin_context: "web",
-        },
+        metadata: { montra_user_id: user.id, montra_plan: plan },
         billing_address_collection: "auto",
-        phone_number_collection: { enabled: true },
+        name_collection: {
+          individual: {
+            enabled: true,
+          },
+        },
+        phone_number_collection: {
+          enabled: true,
+        },
         payment_method_collection: "always",
         allow_promotion_codes: true,
-        automatic_tax: { enabled: true },
-        submit_type: "auto",
         consent_collection: {
           terms_of_service: "required",
         },
@@ -348,7 +351,14 @@ Deno.serve(async (req: Request) => {
               "By starting your trial, you agree to our Terms of Service and Privacy Policy.",
           },
         },
-      });
+        automatic_tax: {
+          enabled: true,
+        },
+        submit_type: "auto",
+        // Builder integration tags (stored as top-level when supported by API).
+        integration_identifier: "hosted_web_0001",
+        origin_context: "web",
+      } as Stripe.Checkout.SessionCreateParams);
 
       if (!session.url) {
         logError(step, "session created without url", {
