@@ -93,7 +93,7 @@ export function ReceiptDetail({
         </header>
         <div className="modal-body receipt-detail-body">
           {imageUrl && !imageError ? (
-            <img className="detail-image" src={imageUrl} alt={t("receiptPhoto")} />
+            <img className="detail-image" src={imageUrl} alt={t("receiptPhoto")} decoding="async" />
           ) : imageError ? (
             <p className="transaction-sub">{t("receiptImageUnavailable")}</p>
           ) : (

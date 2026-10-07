@@ -31,7 +31,7 @@ export function TransactionRow({ transaction, getImageUrl, onClick }: Transactio
       aria-label={`${transaction.name}, ${typeLabel}, ${sign}${formatted}, ${formatDate(transaction.date, language)}`}
     >
       <span className={`transaction-thumb transaction-thumb--${transaction.type}`} aria-hidden="true">
-        {url ? <img src={url} alt="" /> : Icon ? <Icon size={18} strokeWidth={1.85} /> : <ShoppingBag size={18} />}
+        {url ? <img src={url} alt="" loading="lazy" decoding="async" /> : Icon ? <Icon size={18} strokeWidth={1.85} /> : <ShoppingBag size={18} />}
       </span>
       <span className="transaction-main">
         <span className="transaction-name">{transaction.name}</span>
