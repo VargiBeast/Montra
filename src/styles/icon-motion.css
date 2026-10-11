@@ -1,0 +1,243 @@
+/* ============================================================
+   Montra icon motion — lucide-react polish
+   Subtle, interaction-driven. Respects prefers-reduced-motion.
+   ============================================================ */
+
+:root {
+  --icon-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --icon-duration: 180ms;
+  --icon-duration-slow: 260ms;
+}
+
+/* Base: all Lucide SVGs inherit smooth transform */
+.lucide,
+svg.lucide,
+button svg,
+a svg,
+.nav-item svg,
+.icon-button svg,
+.primary-button svg,
+.secondary-button svg,
+.danger-button svg,
+.text-button svg,
+.planning-card-icon svg,
+.setting-icon svg,
+.analytics-plus-icon svg {
+  transform-origin: center;
+  transition:
+    transform var(--icon-duration) var(--icon-ease),
+    opacity var(--icon-duration) var(--icon-ease),
+    color var(--icon-duration) ease;
+}
+
+/* ---- Navigation ---- */
+.nav-item svg {
+  transition:
+    transform var(--icon-duration) var(--icon-ease),
+    opacity var(--icon-duration) ease;
+}
+
+.nav-item:hover:not(.active):not(.nav-add) svg {
+  transform: translateY(-1px) scale(1.06);
+}
+
+.nav-item.active svg {
+  transform: scale(1.08);
+}
+
+.nav-item:active svg {
+  transform: scale(0.94);
+}
+
+/* Plus / add — soft quarter-turn on hover */
+.nav-add svg,
+.nav-item.nav-add svg {
+  transition: transform var(--icon-duration-slow) var(--icon-ease);
+}
+
+.nav-add:hover svg,
+.nav-item.nav-add:hover svg {
+  transform: rotate(90deg) scale(1.05);
+}
+
+.nav-add:active svg,
+.nav-item.nav-add:active svg {
+  transform: rotate(90deg) scale(0.92);
+}
+
+/* Primary/secondary buttons with leading icons */
+.primary-button:hover svg,
+.secondary-button:hover svg {
+  transform: translateX(1px) scale(1.05);
+}
+
+.primary-button:active svg,
+.secondary-button:active svg {
+  transform: scale(0.94);
+}
+
+/* Icon-only toolbar buttons */
+.icon-button:hover svg {
+  transform: scale(1.1);
+}
+
+.icon-button:active svg {
+  transform: scale(0.92);
+}
+
+/* Text buttons (View all →) */
+.text-button:hover svg {
+  transform: translateX(2px);
+}
+
+/* Planning cards */
+.planning-card:hover .planning-card-icon svg,
+.home-goal-card:hover .planning-card-icon svg {
+  transform: scale(1.12);
+}
+
+/* Settings rows */
+.setting-row:hover .setting-icon svg {
+  transform: scale(1.08);
+}
+
+/* ---- Chevrons: rotate when parent is open ---- */
+.lucide-chevron-down,
+.lucide-chevron-right,
+.lucide-chevron-up,
+.lucide-chevron-left {
+  transition: transform var(--icon-duration-slow) var(--icon-ease);
+}
+
+.is-open > .lucide-chevron-down,
+.is-open .lucide-chevron-down,
+[aria-expanded="true"] .lucide-chevron-down,
+[aria-expanded="true"] > .lucide-chevron-down {
+  transform: rotate(180deg);
+}
+
+.is-open > .lucide-chevron-right,
+[aria-expanded="true"] .lucide-chevron-right {
+  transform: rotate(90deg);
+}
+
+/* ---- Loading spinners ---- */
+@keyframes montra-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lucide-loader-2,
+.lucide-loader-circle,
+.lucide-loader,
+svg.spin,
+.icon-spin,
+[data-loading="true"] svg.lucide {
+  animation: montra-icon-spin 0.85s linear infinite;
+}
+
+/* ---- Success / check entrance ---- */
+@keyframes montra-icon-pop-in {
+  0% {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lucide-check,
+.lucide-check-circle,
+.lucide-check-circle-2,
+.lucide-circle-check,
+.icon-success {
+  animation: montra-icon-pop-in var(--icon-duration-slow) var(--icon-ease) both;
+}
+
+/* ---- Close / X: slight rotate on hover ---- */
+.icon-button:hover .lucide-x,
+button:hover > .lucide-x {
+  transform: rotate(90deg) scale(1.05);
+}
+
+/* ---- Theme / moon & sun ---- */
+.icon-button:hover .lucide-moon {
+  transform: rotate(-12deg) scale(1.1);
+}
+
+.icon-button:hover .lucide-sun {
+  transform: rotate(20deg) scale(1.1);
+}
+
+/* ---- Empty-state art icons ---- */
+.empty-art svg,
+.empty-state svg {
+  transition: transform var(--icon-duration-slow) var(--icon-ease), opacity 0.2s ease;
+}
+
+.empty-state:hover .empty-art svg,
+.empty-art:hover svg {
+  transform: scale(1.06);
+}
+
+/* ---- Analytics lock ---- */
+.analytics-plus-icon:hover svg:first-child {
+  transform: scale(1.06);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .lucide,
+  svg.lucide,
+  button svg,
+  a svg,
+  .nav-item svg,
+  .icon-button svg,
+  .primary-button svg,
+  .secondary-button svg,
+  .danger-button svg,
+  .text-button svg,
+  .planning-card-icon svg,
+  .setting-icon svg,
+  .lucide-chevron-down,
+  .lucide-chevron-right,
+  .lucide-chevron-up,
+  .lucide-chevron-left,
+  .empty-art svg {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .nav-item:hover:not(.active):not(.nav-add) svg,
+  .nav-item.active svg,
+  .nav-add:hover svg,
+  .primary-button:hover svg,
+  .icon-button:hover svg,
+  .text-button:hover svg {
+    transform: none !important;
+  }
+
+  .lucide-loader-2,
+  .lucide-loader-circle,
+  .lucide-loader,
+  svg.spin,
+  .icon-spin {
+    animation: none !important;
+    opacity: 0.7;
+  }
+
+  .lucide-check,
+  .lucide-check-circle,
+  .lucide-check-circle-2,
+  .lucide-circle-check,
+  .icon-success {
+    animation: none !important;
+  }
+}
