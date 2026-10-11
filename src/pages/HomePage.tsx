@@ -30,19 +30,22 @@ const HOME_FALLBACK: Record<string, string> = {
   analyticsPlusBadge: "Montra Plus",
   analyticsPlusTitle: "Unlock Advanced Analytics",
   analyticsPlusBody:
-    "See spending trends, category breakdowns, and clearer patterns in your money \u2014 included with Montra Plus.",
+    "See spending trends, category breakdowns, and clearer patterns in your money — included with Montra Plus.",
   analyticsPlusBenefitTrends: "Spending trends & income vs expenses",
   analyticsPlusBenefitCategories: "Category breakdowns & comparisons",
   analyticsPlusBenefitInsights: "Insights and future forecasting",
   analyticsPlusCta: "Get Montra Plus",
   analyticsPlusComingSoon: "Montra Plus is coming soon.",
+  analyticsPreviewLabel: "Preview",
   balanceAllActivity: "All activity",
   homeGoalOf: "{current} / {target}",
   homeGoalRemaining: "{amount} remaining",
   homeGoalComplete: "Goal reached",
   homeWishlistCount: "{count} items",
+  homeWishlistCountOne: "1 item",
   homeWishlistEmpty: "Save products you want",
   homeGoalsEmpty: "Set a target and track progress",
+  homeGoalsActive: "{count} active",
   noTransactionsYet: "No transactions yet",
   addFirstTransaction: "Add a purchase or money in to see your balance here.",
   planning: "Planning",
@@ -130,6 +133,23 @@ export function HomePage({
     [wishlistItems],
   );
 
+  const activeGoalsCount = useMemo(
+    () => savingsGoals.filter((g) => !goalProgress(g).isComplete).length,
+    [savingsGoals],
+  );
+
+  const wishlistLabel =
+    wishlistItems.length === 0
+      ? t("homeWishlistEmpty")
+      : openWishlistCount === 1
+        ? t("homeWishlistCountOne")
+        : t("homeWishlistCount", { count: openWishlistCount });
+
+  const goalsLabel =
+    savingsGoals.length === 0
+      ? t("homeGoalsEmpty")
+      : t("homeGoalsActive", { count: activeGoalsCount });
+
   return (
     <main className="page-content home-page">
       <div className="page-header">
@@ -163,7 +183,11 @@ export function HomePage({
       </section>
 
       {personalization.showPlanning && (onOpenSavingsGoals || onOpenWishlist) && (
-        <section className="panel section-panel home-planning" style={{ order: personalization.sectionOrder.indexOf("planning") }} aria-label={t("planning")}>
+        <section
+          className="panel section-panel home-planning"
+          style={{ order: personalization.sectionOrder.indexOf("planning") }}
+          aria-label={t("planning")}
+        >
           <div className="section-heading">
             <h2>{t("planning")}</h2>
           </div>
@@ -209,19 +233,13 @@ export function HomePage({
           )}
 
           <div className={`planning-grid ${featuredGoal ? "has-featured-goal" : ""}`}>
-            {onOpenSavingsGoals && !featuredGoal && (
+            {onOpenSavingsGoals && (
               <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
                 <span className="planning-card-icon" aria-hidden="true">
                   <PiggyBank size={18} />
                 </span>
                 <strong>{t("savingsGoals")}</strong>
-                <span>
-                  {savingsGoals.length === 0
-                    ? t("homeGoalsEmpty")
-                    : t("homeGoalsActive", {
-                        count: savingsGoals.filter((g) => !goalProgress(g).isComplete).length,
-                      })}
-                </span>
+                <span>{goalsLabel}</span>
               </button>
             )}
             {onOpenWishlist && (
@@ -230,112 +248,115 @@ export function HomePage({
                   <Gift size={18} />
                 </span>
                 <strong>{t("wishlist")}</strong>
-                <span>
-                  {wishlistItems.length === 0
-                    ? t("homeWishlistEmpty")
-                    : t("homeWishlistCount", { count: openWishlistCount })}
-                </span>
-              </button>
-            )}
-            {featuredGoal && onOpenSavingsGoals && savingsGoals.length > 1 && (
-              <button type="button" className="planning-card" onClick={onOpenSavingsGoals}>
-                <span className="planning-card-icon" aria-hidden="true">
-                  <PiggyBank size={18} />
-                </span>
-                <strong>{t("savingsGoals")}</strong>
-                <span>
-                  {t("homeGoalsActive", {
-                    count: savingsGoals.filter((g) => !goalProgress(g).isComplete).length,
-                  })}
-                </span>
+                <span>{wishlistLabel}</span>
               </button>
             )}
           </div>
         </section>
       )}
 
-      {personalization.showAnalytics && (hasPlus ? (
-        <section className="panel section-panel analytics-unlocked-card" style={{ order: personalization.sectionOrder.indexOf("analytics") }}>
-          <div className="section-heading">
-            <h2>{t("analytics")}</h2>
-          </div>
-          <p className="analytics-hint">{t("analyticsHint")}</p>
-          <button type="button" className="primary-button" onClick={() => onOpenAnalytics?.()}>
-            {t("openAnalytics")}
-          </button>
-        </section>
-      ) : (
-        <section className="panel analytics-plus-card" style={{ order: personalization.sectionOrder.indexOf("analytics") }} aria-label={t("analytics")}>
-          <div className="analytics-plus-preview" aria-hidden="true">
-            <div className="analytics-plus-preview-bars">
-              <span style={{ height: "42%" }} />
-              <span style={{ height: "68%" }} />
-              <span style={{ height: "35%" }} />
-              <span style={{ height: "80%" }} />
-              <span style={{ height: "55%" }} />
+      {personalization.showAnalytics &&
+        (hasPlus ? (
+          <section
+            className="panel section-panel analytics-unlocked-card"
+            style={{ order: personalization.sectionOrder.indexOf("analytics") }}
+          >
+            <div className="section-heading">
+              <h2>{t("analytics")}</h2>
             </div>
-            <div className="analytics-plus-preview-lines">
-              <div />
-              <div />
-              <div />
-            </div>
-          </div>
-          <div className="analytics-plus-overlay">
-            <span className="plus-badge">{t("analyticsPlusBadge")}</span>
-            <div className="analytics-plus-icon" aria-hidden="true">
-              <BarChart3 size={22} />
-              <Lock size={12} className="analytics-plus-lock" />
-            </div>
-            <h2>{t("analyticsPlusTitle")}</h2>
-            <p>{t("analyticsPlusBody")}</p>
-            <ul className="analytics-plus-benefits">
-              <li>
-                <TrendingUp size={16} />
-                {t("analyticsPlusBenefitTrends")}
-              </li>
-              <li>
-                <Sparkles size={16} />
-                {t("analyticsPlusBenefitCategories")}
-              </li>
-              <li>
-                <BarChart3 size={16} />
-                {t("analyticsPlusBenefitInsights")}
-              </li>
-            </ul>
-            <p className="analytics-preview-label">{t("analyticsPreviewLabel")}</p>
-            <button type="button" className="primary-button analytics-plus-cta" onClick={() => onGetPlus?.()}>
-              {t("analyticsPlusCta")}
+            <p className="analytics-hint">{t("analyticsHint")}</p>
+            <button type="button" className="primary-button" onClick={() => onOpenAnalytics?.()}>
+              {t("openAnalytics")}
             </button>
-          </div>
-        </section>
-      ))}
+          </section>
+        ) : (
+          <section
+            className="panel analytics-plus-card"
+            style={{ order: personalization.sectionOrder.indexOf("analytics") }}
+            aria-label={t("analytics")}
+          >
+            <div className="analytics-plus-preview" aria-hidden="true">
+              <div className="analytics-plus-preview-bars">
+                <span style={{ height: "42%" }} />
+                <span style={{ height: "68%" }} />
+                <span style={{ height: "35%" }} />
+                <span style={{ height: "80%" }} />
+                <span style={{ height: "55%" }} />
+              </div>
+              <div className="analytics-plus-preview-lines">
+                <div />
+                <div />
+                <div />
+              </div>
+            </div>
+            <div className="analytics-plus-overlay">
+              <span className="plus-badge">{t("analyticsPlusBadge")}</span>
+              <div className="analytics-plus-icon" aria-hidden="true">
+                <BarChart3 size={22} />
+                <Lock size={12} className="analytics-plus-lock" />
+              </div>
+              <h2>{t("analyticsPlusTitle")}</h2>
+              <p>{t("analyticsPlusBody")}</p>
+              <ul className="analytics-plus-benefits">
+                <li>
+                  <TrendingUp size={16} />
+                  {t("analyticsPlusBenefitTrends")}
+                </li>
+                <li>
+                  <Sparkles size={16} />
+                  {t("analyticsPlusBenefitCategories")}
+                </li>
+                <li>
+                  <BarChart3 size={16} />
+                  {t("analyticsPlusBenefitInsights")}
+                </li>
+              </ul>
+              <button
+                type="button"
+                className="primary-button analytics-plus-cta"
+                onClick={() => onGetPlus?.()}
+              >
+                {t("analyticsPlusCta")}
+              </button>
+            </div>
+          </section>
+        ))}
 
       {personalization.showActivity && (
-      <section className="panel section-panel home-activity" style={{ order: personalization.sectionOrder.indexOf("activity") }} aria-label={t("recentActivity")}>
-        <div className="section-heading">
-          <h2>{t("recentActivity")}</h2>
-          {transactions.length > 0 && (
-            <button type="button" className="text-button" onClick={onViewAll}>
-              {t("viewAll")} <ChevronRight size={16} />
-            </button>
-          )}
-        </div>
-        {transactions.length === 0 ? (
-          <div className="empty-state home-empty">
-            <h3>{t("noTransactionsYet")}</h3>
-            <p>{t("addFirstTransaction")}</p>
-            <button type="button" className="primary-button" onClick={onAdd}>
-              <Plus size={16} /> {t("addTransaction")}
-            </button>
+        <section
+          className="panel section-panel home-activity"
+          style={{ order: personalization.sectionOrder.indexOf("activity") }}
+          aria-label={t("recentActivity")}
+        >
+          <div className="section-heading">
+            <h2>{t("recentActivity")}</h2>
+            {transactions.length > 0 && (
+              <button type="button" className="text-button" onClick={onViewAll}>
+                {t("viewAll")} <ChevronRight size={16} />
+              </button>
+            )}
           </div>
-        ) : (
-          <ul className="transaction-list">
-            {recent.map((tx) => (
-              <TransactionRow key={tx.id} transaction={tx} onClick={onSelect} getImageUrl={getImageUrl} />
-            ))}
-          </ul>
-        )}
-      </section>
+          {transactions.length === 0 ? (
+            <div className="empty-state home-empty">
+              <h3>{t("noTransactionsYet")}</h3>
+              <p>{t("addFirstTransaction")}</p>
+              <button type="button" className="primary-button" onClick={onAdd}>
+                <Plus size={16} /> {t("addTransaction")}
+              </button>
+            </div>
+          ) : (
+            <ul className="transaction-list">
+              {recent.map((tx) => (
+                <TransactionRow
+                  key={tx.id}
+                  transaction={tx}
+                  onClick={onSelect}
+                  getImageUrl={getImageUrl}
+                />
+              ))}
+            </ul>
+          )}
+        </section>
       )}
     </main>
   );
