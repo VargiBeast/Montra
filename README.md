@@ -6,10 +6,12 @@
 </p>
 
 <p align="center">
-  <a href="https://montra.cash"><img src="https://img.shields.io/badge/Live-montra.cash-2d8f6f?style=for-the-badge" alt="Live" /></a>
-  <img src="https://img.shields.io/badge/Status-Private%20%2F%20Proprietary-6b7280?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/Production-Complete-6b7280?style=for-the-badge" alt="Production complete" />
+  <img src="https://img.shields.io/badge/Status-Private%20%2F%20Proprietary-4b5563?style=for-the-badge" alt="Status" />
   <img src="https://img.shields.io/badge/Stack-React%2019%20%2B%20Supabase-367c9b?style=for-the-badge" alt="Stack" />
 </p>
+
+> **📦 Production complete** — Montra er offisielt ferdigstilt som produkt. Aktiv produksjonsutvikling er avsluttet. Repoet bevares som privat referanse og arkiv. Eventuell videre bruk er på eget ansvar.
 
 ---
 
@@ -23,17 +25,36 @@
 | 🐷 | **Sparemål** | Sett target, følg progresjon |
 | 📊 | **Analytics** | Trender & kategorier *(Montra Plus)* |
 | 🌍 | **i18n + valuta** | Språk lokalt, preferert visningsvaluta |
+| ✨ | **Ikon-motion** | Subtile Lucide-animasjoner (hover, active, open, success) |
 
 > 🔒 All brukerdata er isolert per konto. Bilder ligger privat i Storage og ryddes automatisk ved slett/erstat.
 
 ---
 
-## 🚀 Quick start
+## ✨ Icon motion
+
+Alle Lucide-ikoner har lett, konsistent motion i `src/styles/icon-motion.css`:
+
+| Interaksjon | Atferd |
+|-------------|--------|
+| Nav | Løft + scale; aktiv state med soft glow |
+| Plus / legg til | 90° rotasjon på hover |
+| Knapper | Mild translate/scale |
+| Chevron | Roterer ved `aria-expanded` / `.is-open` |
+| Loader | Jevn spin |
+| Check | Pop-in entrance |
+| Trash, search, share, gift, … | Små kontekstuelle hints |
+
+Respekterer `prefers-reduced-motion`. Ingen ekstra JS-avhengigheter.
+
+---
+
+## 🚀 Quick start (arkiv / lokal)
 
 ```bash
 npm install
 cp .env.example .env   # sett VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY
-npm run dev            # → lokal Vite-server
+npm run dev
 ```
 
 | Kommando | Hva |
@@ -43,7 +64,7 @@ npm run dev            # → lokal Vite-server
 | `npm test` | Node-tester |
 | `npm run preview` | Forhåndsvis build lokalt |
 
-**Native (Capacitor):** iOS/Android-prosjektene ligger under `ios/` og `android/`. Native-bygg åpner app-shell på `/app`.
+**Native (Capacitor):** `ios/` og `android/`. Native-bygg åpner app-shell på `/app`.
 
 ---
 
@@ -53,11 +74,11 @@ npm run dev            # → lokal Vite-server
 |-----|-----------|
 | ⚛️ Frontend | React 19 · TypeScript · Vite |
 | 🧭 Routing | React Router |
-| 🎨 Ikoner | Lucide React |
+| 🎨 Ikoner | Lucide React + `icon-motion.css` |
 | 🔐 Backend / Auth | Supabase (Auth, Postgres, Storage) |
 | 👁️ OCR | Tesseract.js (client) |
 | 💳 Plus (prep) | Stripe Checkout via Edge Function |
-| ☁️ Deploy | Vercel → **montra.cash** |
+| ☁️ Deploy (historisk) | Vercel → montra.cash |
 
 ---
 
@@ -78,7 +99,7 @@ Supabase
 
 - Client har **aldri** service-role / secret keys  
 - Alle queries filtreres på `user_id`  
-- Bilde-paths valideres til `{userId}/…` (ingen path traversal)
+- Bilde-paths valideres til `{userId}/…`
 
 ---
 
@@ -92,7 +113,7 @@ src/
   lib/           # supabase, i18n, currency, …
   pages/         # routes
   services/      # Supabase data + Storage
-  styles/        # globals + layout
+  styles/        # globals, layout, icon-motion
 supabase/
   functions/     # Edge Functions
   migrations/    # SQL
@@ -107,7 +128,7 @@ ios/ · android/  # Capacitor
 - ✉️ E-post + passord  
 - 🔗 Magic link / OTP (PKCE)
 
-Se `AUTH_SETUP.md` for redirect-URLer og e-postinnstillinger i Supabase Dashboard.
+Se `AUTH_SETUP.md` for historiske redirect-URLer.
 
 ---
 
@@ -129,8 +150,8 @@ Se `AUTH_SETUP.md` for redirect-URLer og e-postinnstillinger i Supabase Dashboar
 |----|--------|
 | 🔑 | Kun publishable key i browser |
 | 👤 | All data scoped til `user_id` + RLS |
-| 🖼️ | Private buckets + signed URLs (~1t) |
-| 🛡️ | Vercel security headers (XSS, frame, COOP, …) |
+| 🖼️ | Private buckets + signed URLs |
+| 🛡️ | Security headers (XSS, frame, COOP, …) |
 
 ---
 
@@ -141,23 +162,22 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-Aldri commit ekte verdier. Sett samme navn i Vercel for prod/preview.
+Aldri commit ekte verdier.
 
 ---
 
 ## 💎 Montra Plus
 
-Infrastruktur er på plass (Checkout Edge Function, `plus_entitlements`, feature gating).  
-**Live billing er ikke aktivert i klienten ennå** — se `STRIPE_INTEGRATION_TODO.md`.
+Infrastruktur ble forberedt (Checkout Edge Function, `plus_entitlements`, feature gating).  
+Live billing ble **ikke** aktivert før produksjon ble avsluttet. Se `STRIPE_INTEGRATION_TODO.md` for historikk.
 
 ---
 
-## 🗺️ Roadmap (realistisk)
+## 🏁 Prosjektstatus
 
-- [ ] Fullføre Stripe Dashboard + live Checkout-verifisering  
-- [ ] Mer test-dekning på kritiske flows  
-- [ ] Valgfri bildekomprimering før upload  
-- [ ] Fortsatt polish på insights / onboarding / Plus  
+**Produksjon er offisielt ferdigstilt.**  
+Ingen planlagt videre feature-utvikling, Stripe-lansering eller aktiv drift som produkt.  
+Kodebasen beholdes privat som arkiv og personlig referanse.
 
 ---
 
@@ -169,5 +189,5 @@ Ikke distribuer, fork eller republiser uten eksplisitt tillatelse.
 ---
 
 <p align="center">
-  Made with 💚 · <a href="https://montra.cash">montra.cash</a>
+  Made with 💚 · Montra · Production complete
 </p>
