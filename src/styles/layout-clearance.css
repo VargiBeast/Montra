@@ -1,1 +1,474 @@
-PLACEHOLDER
+/* ============================================================
+   Layout clearance & symmetry overrides
+   ============================================================ */
+
+/*
+  Fixed bottom nav is ~68px tall + ~16px offset + safe-area.
+  Content MUST clear it fully when scrolled to the end.
+*/
+.app-shell {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.app-frame {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.page-content {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  box-sizing: border-box;
+}
+
+.plus-page.page-content,
+.more-page.page-content,
+.personalize-page.page-content,
+.analytics-page.page-content,
+.savings-page.page-content {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+/* ---- Feature / compare cards: true equal height ---- */
+.plus-feature-grid,
+.plus-compare-grid,
+.plus-quick-actions,
+.plus-price-cards {
+  align-items: stretch;
+}
+
+.plus-feature-card,
+.plus-compare-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.plus-feature-card p,
+.plus-compare-card .plus-checklist {
+  flex: 1 1 auto;
+}
+
+.plus-feature-card p {
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: normal !important;
+  -webkit-line-clamp: unset !important;
+}
+
+/* ---- Quick actions: equal touch targets ---- */
+.plus-action-btn {
+  min-height: 56px;
+  height: 100%;
+  align-items: center;
+}
+
+/* ---- Theme / appearance buttons: equal size ---- */
+.theme-choices {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.theme-choice {
+  min-height: 80px !important;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ---- Preferences: cleaner rows, no double labels feeling ---- */
+.more-preferences .setting-row.is-static {
+  min-height: 56px;
+  padding-bottom: 4px;
+  border-bottom: 0;
+}
+
+.more-preferences .setting-value {
+  /* Keep current value visible but softer so the dropdown is the control */
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+.more-preferences .preference-field {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding: 0 16px 12px;
+}
+
+.more-preferences .preference-field select {
+  min-height: 48px;
+  width: 100%;
+}
+
+.more-preferences .theme-choices {
+  padding: 4px 16px 16px;
+  margin: 0;
+}
+
+/* ---- Free vs Plus: matched column height ---- */
+.plus-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (min-width: 640px) {
+  .plus-compare-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.plus-compare-card {
+  min-height: 100%;
+}
+
+/* Ensure last section on Plus is fully scrollable above nav */
+.plus-page .plus-pricing,
+.plus-page .plus-quick-actions,
+.plus-page .plus-personalize-cta,
+.plus-page .plus-free-card,
+.plus-page .plus-compare {
+  position: relative;
+  z-index: 0;
+}
+
+/* === Home layout polish (fix/home-layout) === */
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-page > .page-header {
+  order: -2;
+  margin-bottom: 4px;
+}
+
+.home-page > .balance-card {
+  order: -1;
+}
+
+.balance-card {
+  padding: 20px 22px 18px;
+}
+
+.balance-value {
+  display: block;
+  margin: 6px 0 4px;
+  font-size: clamp(1.75rem, 5vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.balance-period {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--muted);
+}
+
+.balance-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.balance-split-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.balance-in {
+  color: var(--green);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.balance-out {
+  color: var(--coral, #c45c4a);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.home-planning .section-heading {
+  margin-bottom: 12px;
+}
+
+.planning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.planning-grid.has-featured-goal {
+  margin-top: 10px;
+}
+
+.planning-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 108px;
+  padding: 14px 14px 16px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+}
+
+.planning-card:hover {
+  background: color-mix(in srgb, var(--surface-raised) 88%, var(--green) 6%);
+  border-color: color-mix(in srgb, var(--line) 70%, var(--green));
+}
+
+.planning-card:active {
+  transform: scale(0.985);
+}
+
+.planning-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--green) 14%, transparent);
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.planning-card strong {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.planning-card span {
+  margin-top: auto;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.home-goal-card {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  margin-bottom: 0;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.home-goal-card:hover {
+  background: color-mix(in srgb, var(--surface-raised) 88%, var(--green) 5%);
+}
+
+.home-goal-card:active {
+  transform: scale(0.99);
+}
+
+.home-goal-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.home-goal-card-copy {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.home-goal-card-copy strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.home-goal-card-copy span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.home-goal-percent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.home-goal-track {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 75%, transparent);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.home-goal-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent, var(--green)) 70%, #8fd4c2),
+    var(--accent, var(--green))
+  );
+  min-width: 4px;
+  transition: width 0.25s ease;
+}
+
+.home-goal-fill.is-complete {
+  background: var(--green);
+}
+
+.home-goal-amounts {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Analytics Plus card — tighter, less washed-out overlay */
+.analytics-plus-card {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0;
+  padding: 0;
+  min-height: 260px;
+  isolation: isolate;
+}
+
+.analytics-plus-preview {
+  position: absolute;
+  inset: 0;
+  padding: 24px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0.38;
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.analytics-plus-overlay {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 20px 18px 22px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface, var(--canvas)) 55%, transparent) 0%,
+    color-mix(in srgb, var(--surface, var(--canvas)) 88%, transparent) 40%,
+    color-mix(in srgb, var(--surface, var(--canvas)) 96%, transparent) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.analytics-plus-overlay h2 {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.analytics-plus-overlay > p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.analytics-plus-benefits {
+  list-style: none;
+  margin: 2px 0 4px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  max-width: 300px;
+  text-align: left;
+}
+
+.analytics-plus-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 8px 11px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-raised) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+}
+
+.analytics-plus-cta {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 6px;
+}
+
+@media (max-width: 420px) {
+  .planning-grid {
+    gap: 8px;
+  }
+  .planning-card {
+    min-height: 100px;
+    padding: 12px;
+  }
+  .analytics-plus-overlay {
+    padding: 18px 14px 20px;
+  }
+  .analytics-plus-benefits {
+    max-width: none;
+  }
+  .analytics-plus-cta {
+    max-width: none;
+  }
+}
