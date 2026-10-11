@@ -1,254 +1,173 @@
-# Montra
+# 💰 Montra
 
-Montra is a modern personal finance and purchase log for tracking income, expenses, receipts, and wishlists. It combines a clean, privacy-conscious web experience with secure cloud sync via Supabase.
+<p align="center">
+  <strong>Privat konto- & kjøpslogg</strong> · web + iOS/Android<br/>
+  Spor inn/ut · kvitteringer · wishlist · sparemål — data isolert per bruker
+</p>
 
-All user data is isolated per account. Images are stored privately and cleaned up automatically when records are deleted or replaced.
-
-**Status:** Private / proprietary product. Not open source.
-
-**Live site:** [https://montra.cash](https://montra.cash)
-
----
-
-## Features
-
-- **Transaction tracking** — Record income and expenses with amount, date, payment method, notes, and optional product links.
-- **Image attachments** — Attach photos to purchases; private signed URLs and automatic Storage cleanup on delete or replace.
-- **Receipts** — Capture and store receipt images with optional merchant, total, currency, and date (OCR-assisted where available).
-- **Wishlist** — Save desired items with price, currency, link, details, images, and optional savings-goal linkage. Shareable lists supported.
-- **Savings goals** — Track progress toward financial targets.
-- **Analytics & insights** — Spending overview and personalization helpers.
-- **Multi-language support** — Interface language preference stored locally (English default).
-- **Multi-currency display** — Preferred currency for amounts and wishlist items.
-- **Authentication** — Google OAuth, email/password, and one-time code / magic-link flows (PKCE).
-- **Montra Plus** — Subscription architecture prepared (Stripe Checkout + entitlements). Payments are not activated as live production billing in the current client.
-- **PWA-ready** — Service worker, manifest, and icons for installable experience.
-- **Responsive design** — Works across desktop and mobile browsers.
+<p align="center">
+  <a href="https://montra.cash"><img src="https://img.shields.io/badge/Live-montra.cash-2d8f6f?style=for-the-badge" alt="Live" /></a>
+  <img src="https://img.shields.io/badge/Status-Private%20%2F%20Proprietary-6b7280?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/Stack-React%2019%20%2B%20Supabase-367c9b?style=for-the-badge" alt="Stack" />
+</p>
 
 ---
 
-## Tech Stack
+## ✨ Hva Montra gjør
 
-| Layer              | Technology                                      |
-|--------------------|-------------------------------------------------|
-| Frontend           | React 19, TypeScript, Vite                      |
-| Routing            | React Router                                    |
-| UI icons           | Lucide React                                    |
-| Backend / Auth     | Supabase (Auth, Postgres, Storage)              |
-| OCR (client)       | Tesseract.js                                    |
-| Payments (prep)    | Stripe Checkout via Supabase Edge Function      |
-| Deployment         | Vercel                                          |
-| Analytics          | Optional GTM / analytics helpers                |
+| 🎯 | Område | Kort |
+|----|--------|------|
+| 💸 | **Transaksjoner** | Inn & ut med beløp, dato, metode, notat, bilde |
+| 🧾 | **Kvitteringer** | Foto + valgfri OCR (Tesseract) |
+| 🎁 | **Wishlist** | Ting du vil ha — pris, lenke, bilde, kobling til sparemål |
+| 🐷 | **Sparemål** | Sett target, følg progresjon |
+| 📊 | **Analytics** | Trender & kategorier *(Montra Plus)* |
+| 🌍 | **i18n + valuta** | Språk lokalt, preferert visningsvaluta |
+
+> 🔒 All brukerdata er isolert per konto. Bilder ligger privat i Storage og ryddes automatisk ved slett/erstat.
 
 ---
 
-## Architecture
+## 🚀 Quick start
+
+```bash
+npm install
+cp .env.example .env   # sett VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY
+npm run dev            # → lokal Vite-server
+```
+
+| Kommando | Hva |
+|----------|-----|
+| `npm run dev` | Utviklingsserver |
+| `npm run build` | Typecheck + produksjonsbuild |
+| `npm test` | Node-tester |
+| `npm run preview` | Forhåndsvis build lokalt |
+
+**Native (Capacitor):** iOS/Android-prosjektene ligger under `ios/` og `android/`. Native-bygg åpner app-shell på `/app`.
+
+---
+
+## 🧱 Tech stack
+
+| Lag | Teknologi |
+|-----|-----------|
+| ⚛️ Frontend | React 19 · TypeScript · Vite |
+| 🧭 Routing | React Router |
+| 🎨 Ikoner | Lucide React |
+| 🔐 Backend / Auth | Supabase (Auth, Postgres, Storage) |
+| 👁️ OCR | Tesseract.js (client) |
+| 💳 Plus (prep) | Stripe Checkout via Edge Function |
+| ☁️ Deploy | Vercel → **montra.cash** |
+
+---
+
+## 🏗️ Arkitektur
 
 ```
 Browser (React SPA)
-    │
-    ├─ Auth (Supabase Auth, PKCE)
-    ├─ Data services (transactions, receipts, wishlist, savings goals)
-    ├─ Signed image URLs (Storage)
-    └─ Plus entitlement check
-         │
-         ▼
+   ├─ Auth (Supabase · PKCE)
+   ├─ Data services (tx, receipts, wishlist, goals)
+   ├─ Signed image URLs
+   └─ Plus entitlement
+        ▼
 Supabase
-    ├─ Postgres (RLS-protected tables)
-    ├─ Storage (user-scoped buckets)
-    └─ Edge Functions (e.g. create-stripe-checkout)
+   ├─ Postgres (RLS per user_id)
+   ├─ Storage (user-scoped buckets)
+   └─ Edge Functions (Stripe Checkout, …)
 ```
 
-- Client never holds service-role or secret keys.
-- All data access is scoped by authenticated `user_id`.
-- Images live under `{userId}/…` paths; the client validates paths before any Storage operation.
+- Client har **aldri** service-role / secret keys  
+- Alle queries filtreres på `user_id`  
+- Bilde-paths valideres til `{userId}/…` (ingen path traversal)
 
 ---
 
-## Project Structure
+## 📂 Prosjektstruktur
 
 ```
-├── public/                 # Static assets, icons, manifest, service worker
-├── src/
-│   ├── components/         # UI components (forms, details, dialogs, etc.)
-│   ├── hooks/              # React hooks (auth, transactions, receipts, wishlist, Plus)
-│   ├── lib/                # Shared utilities (supabase client, i18n, currency, SEO, etc.)
-│   ├── pages/              # Route-level pages
-│   ├── services/           # Supabase data & Storage access layer
-│   ├── styles/             # Global styles
-│   ├── types/              # TypeScript types
-│   ├── App.tsx / AppRoutes.tsx / main.tsx
-├── supabase/
-│   ├── functions/          # Edge Functions (Stripe Checkout, etc.)
-│   └── migrations/         # SQL migrations (savings goals, Plus entitlements)
-├── scripts/                # Build/serve helpers and icon generation
-├── tests/                  # Node test suite
-├── vercel.json             # SPA rewrites and security headers
-├── package.json
-├── vite.config.ts
-└── tsconfig.json
+public/          # ikoner, manifest, service worker
+src/
+  components/    # UI
+  hooks/         # auth, data, Plus
+  lib/           # supabase, i18n, currency, …
+  pages/         # routes
+  services/      # Supabase data + Storage
+  styles/        # globals + layout
+supabase/
+  functions/     # Edge Functions
+  migrations/    # SQL
+ios/ · android/  # Capacitor
 ```
 
 ---
 
-## Authentication
+## 🔑 Auth
 
-Supported methods:
+- 🔵 Google OAuth  
+- ✉️ E-post + passord  
+- 🔗 Magic link / OTP (PKCE)
 
-- Google OAuth (Supabase provider)
-- Email + password (`signInWithPassword` / `signUp`)
-- One-time code / magic link (`signInWithOtp` + `verifyOtp`)
-
-Session handling uses PKCE with automatic refresh and URL detection. Language preference is stored in `localStorage`.
-
-Apple Sign-In has been removed from the UI. Confirm email settings and redirect URLs in the Supabase Dashboard for production (see `AUTH_SETUP.md`).
+Se `AUTH_SETUP.md` for redirect-URLer og e-postinnstillinger i Supabase Dashboard.
 
 ---
 
-## Supabase / Database
+## 🗄️ Storage
 
-Tables used by the application (non-exhaustive; exact schema lives in the Supabase project):
+| Bucket | Bruk | Path |
+|--------|------|------|
+| `purchase-images` | Kjøpsbilder | `{userId}/{uuid}.ext` |
+| `receipts` | Kvitteringer | `{userId}/{uuid}.ext` |
+| `wishlist` | Wishlist-bilder | `{userId}/{uuid}.ext` |
 
-- `transactions` — income/expense records + optional image path
-- `receipts` — receipt metadata + image path
-- `wishlists` — wishlist items + image path
-- Savings goals table(s)
-- `plus_entitlements` (and related Stripe sync tables)
-
-All queries and mutations filter by `user_id`. The client assumes Row Level Security (RLS) is enabled and correctly configured so that users can only read/write their own rows.
-
-Migrations in the repository cover savings goals and Plus entitlements sync. Core table definitions and RLS policies are maintained in the Supabase project.
+**Cleanup:** slett rad → slett objekt · bytt bilde → slett gammelt · feilet upload → rydd orphan.
 
 ---
 
-## Security Model
+## 🔐 Sikkerhet (kort)
 
-- **Keys** — Only the publishable Supabase key (`VITE_SUPABASE_PUBLISHABLE_KEY`) and project URL are used in the browser. Service-role / secret keys must never appear in frontend code or client environment variables.
-- **User isolation** — Every list/insert/update/delete operation includes an explicit `user_id` filter. Image paths are validated to start with the current user’s ID and reject path traversal.
-- **Storage** — Private buckets; access via short-lived signed URLs (typically 1 hour).
-- **Headers** — Vercel configuration sets `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and Cross-Origin-Opener-Policy.
-- **Auth** — PKCE flow; session persistence and auto-refresh handled by the Supabase client.
-
-Confirm RLS policies and Storage policies in the Supabase Dashboard match the path and `user_id` assumptions used by the application.
-
----
-
-## Storage
-
-| Bucket            | Purpose                          | Path pattern          |
-|-------------------|----------------------------------|-----------------------|
-| `purchase-images` | Transaction / purchase photos    | `{userId}/{uuid}.ext` |
-| `receipts`        | Receipt images                   | `{userId}/{uuid}.ext` |
-| `wishlist`        | Wishlist item images             | `{userId}/{uuid}.ext` |
-
-**Cleanup behavior**
-
-- On **delete** of a transaction, receipt, or wishlist item → corresponding Storage object is removed.
-- On **replace** of an image → old object is removed after successful upload and DB update.
-- On **upload failure** after a new object was written → the orphaned object is cleaned up.
-
-The client never trusts a path that does not belong to the authenticated user.
+| ✅ | Regel |
+|----|--------|
+| 🔑 | Kun publishable key i browser |
+| 👤 | All data scoped til `user_id` + RLS |
+| 🖼️ | Private buckets + signed URLs (~1t) |
+| 🛡️ | Vercel security headers (XSS, frame, COOP, …) |
 
 ---
 
-## Local Development
+## 🌱 Environment
 
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Type-check + production build
-npm run build
-
-# Run tests
-npm test
-
-# Preview production build locally
-npm run preview
-# or
-npm start
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-Development server defaults are defined in `vite.config.ts` and the `dev` script.
+Aldri commit ekte verdier. Sett samme navn i Vercel for prod/preview.
 
 ---
 
-## Environment Variables
+## 💎 Montra Plus
 
-Names only (never commit real values):
-
-| Variable                        | Description                              |
-|---------------------------------|------------------------------------------|
-| `VITE_SUPABASE_URL`             | Supabase project URL                     |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable (anon) key          |
-
-Optional analytics / GTM variables may be referenced by the analytics helpers; keep them out of source control.
-
-Create a local `.env` (gitignored) for development. On Vercel, set the same names in the project environment settings.
+Infrastruktur er på plass (Checkout Edge Function, `plus_entitlements`, feature gating).  
+**Live billing er ikke aktivert i klienten ennå** — se `STRIPE_INTEGRATION_TODO.md`.
 
 ---
 
-## Testing
+## 🗺️ Roadmap (realistisk)
 
-```bash
-npm test
-```
-
-Runs the Node test suite (`tests/*.test.mjs`) with TypeScript stripping.
-
-```bash
-npm run build
-```
-
-Performs a full TypeScript check (`tsc --noEmit`) followed by the Vite production build.
+- [ ] Fullføre Stripe Dashboard + live Checkout-verifisering  
+- [ ] Mer test-dekning på kritiske flows  
+- [ ] Valgfri bildekomprimering før upload  
+- [ ] Fortsatt polish på insights / onboarding / Plus  
 
 ---
 
-## Production / Vercel
+## 📜 Lisens
 
-- Deployed as a single-page application on Vercel.
-- `vercel.json` provides:
-  - SPA fallback rewrite to `/index.html` (excluding robots.txt and sitemap.xml)
-  - Security headers
-  - Correct caching for the service worker
-- Domain: **montra.cash**
-- Environment variables must be configured in the Vercel project for production and preview deployments.
-
-Do not change the production domain or Cloudflare DNS/SSL settings from application code.
+**Privat / proprietary.** Alle rettigheter forbeholdt.  
+Ikke distribuer, fork eller republiser uten eksplisitt tillatelse.
 
 ---
 
-## Montra Plus / Stripe Status
-
-Montra Plus subscription infrastructure is prepared:
-
-- Supabase Edge Function `create-stripe-checkout` creates hosted Stripe Checkout sessions (subscription mode, trial, tax, promotion codes, etc.).
-- Customer mapping and `plus_entitlements` table exist.
-- Frontend entitlement hook and portal helpers are present.
-- Feature gating is driven by entitlement status, not hard-coded user lists.
-
-**Current status:** Stripe Checkout and entitlement plumbing exist, but real production payments and live billing are **not** presented as fully activated in the client. Dashboard setup (Stripe Tax, public Terms of Service URL, function deployment, and end-to-end smoke tests) remains a manual operational step. See `STRIPE_INTEGRATION_TODO.md` for the precise remaining checklist.
-
----
-
-## Roadmap
-
-Realistic next steps (not commitments):
-
-- Complete Stripe Dashboard configuration and live Checkout verification.
-- Confirm and document exact RLS + Storage policies in repository migrations if desired.
-- Optional client-side image compression before upload (size vs. quality trade-off).
-- Further test coverage for critical flows.
-- Continued polish of insights, onboarding, and Plus feature surface.
-
----
-
-## License & Project Status
-
-Montra is a **private, proprietary** product.  
-It is not open source. All rights reserved.
-
-Do not distribute, fork, or republish the source without explicit authorization from the owner.
+<p align="center">
+  Made with 💚 · <a href="https://montra.cash">montra.cash</a>
+</p>
