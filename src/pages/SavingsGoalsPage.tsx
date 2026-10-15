@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, CheckCircle2, Lock, PiggyBank, Plus, Target, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronRight, Lock, PiggyBank, Plus, Sparkles, Target, Trash2 } from "lucide-react";
 import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
 import { goalPlanInsight, goalProgress, goalStage } from "../types/savingsGoal";
 import { formatMoney } from "../lib/utils";
@@ -16,6 +16,7 @@ interface SavingsGoalsPageProps {
   onDelete: (goal: SavingsGoal) => Promise<void>;
   onRetry?: () => void;
   hasPlus?: boolean;
+  onGetPlus?: () => void;
 }
 
 const STAGE_KEY = {
@@ -35,6 +36,7 @@ export function SavingsGoalsPage({
   onDelete,
   onRetry,
   hasPlus = false,
+  onGetPlus,
 }: SavingsGoalsPageProps) {
   const translate = useTranslation();
   const t = (key: string, values?: Record<string, string | number>) => translate(key, values);
@@ -248,10 +250,22 @@ export function SavingsGoalsPage({
           );
         })()}
         {!hasPlus && !progress.isComplete && (
-          <p className="savings-goal-plan-hint savings-goal-plus-teaser">
-            <Lock size={14} aria-hidden="true" />
-            <span>{t("plusFeaturePlan")}: {t("plusFeaturePlanBody")}</span>
-          </p>
+          <button
+            type="button"
+            className="savings-goal-plus-teaser"
+            onClick={() => onGetPlus?.()}
+            disabled={!onGetPlus}
+          >
+            <span className="savings-goal-plus-teaser-icons" aria-hidden="true">
+              <Lock size={14} className="icon-lock" strokeWidth={2.25} />
+              <Sparkles size={14} className="icon-sparkles" strokeWidth={2.25} />
+            </span>
+            <span className="savings-goal-plus-teaser-copy">
+              <strong>{t("plusFeaturePlan")}</strong>
+              <span>{t("plusFeaturePlanBody")}</span>
+            </span>
+            <ChevronRight size={16} className="icon-chevron" aria-hidden="true" strokeWidth={2.25} />
+          </button>
         )}
 
         <button type="button" className="secondary-button savings-goal-add-money" onClick={() => openAdd(goal)}>
