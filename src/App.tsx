@@ -515,6 +515,7 @@ function App() {
               onDelete={savings.remove}
               onRetry={savings.refresh}
               hasPlus={plusUnlocked}
+              onGetPlus={() => setPage("plus")}
             />
           )}
           {page === "wishlist" && (
