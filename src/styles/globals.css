@@ -1448,10 +1448,128 @@ a:focus-visible {
   color: var(--muted);
   line-height: 1.45;
 }
+/* Plus upsell teaser — link to /app/plus with subtle Lucide motion */
 .savings-goal-plus-teaser {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent, var(--green)) 22%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent, var(--green)) 8%, var(--surface-raised));
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.18s ease,
+    box-shadow 0.2s ease;
+}
+.savings-goal-plus-teaser:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent, var(--green)) 14%, var(--surface-raised));
+  border-color: color-mix(in srgb, var(--accent, var(--green)) 40%, var(--line));
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent, var(--green)) 12%, transparent);
+  transform: translateY(-1px);
+}
+.savings-goal-plus-teaser:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+  box-shadow: none;
+}
+.savings-goal-plus-teaser:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent, var(--green)) 45%, transparent);
+  outline-offset: 2px;
+}
+.savings-goal-plus-teaser:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.savings-goal-plus-teaser-icons {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent, var(--green)) 16%, transparent);
+  color: var(--accent, var(--green));
+}
+.savings-goal-plus-teaser-icons .icon-lock,
+.savings-goal-plus-teaser-icons .icon-sparkles {
+  grid-area: 1 / 1;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.savings-goal-plus-teaser-icons .icon-sparkles {
+  opacity: 0;
+  transform: scale(0.7) rotate(-12deg);
+}
+.savings-goal-plus-teaser:hover:not(:disabled) .icon-lock,
+.savings-goal-plus-teaser:focus-visible .icon-lock {
+  opacity: 0;
+  transform: scale(0.7) rotate(8deg);
+}
+.savings-goal-plus-teaser:hover:not(:disabled) .icon-sparkles,
+.savings-goal-plus-teaser:focus-visible .icon-sparkles {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.savings-goal-plus-teaser:active:not(:disabled) .icon-sparkles {
+  transform: scale(0.92);
+}
+
+.savings-goal-plus-teaser-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.savings-goal-plus-teaser-copy strong {
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent, var(--green));
+}
+.savings-goal-plus-teaser-copy span {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  font-weight: 550;
+}
+
+.savings-goal-plus-teaser .icon-chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.savings-goal-plus-teaser:hover:not(:disabled) .icon-chevron,
+.savings-goal-plus-teaser:focus-visible .icon-chevron {
+  color: var(--accent, var(--green));
+  transform: translateX(3px);
+}
+.savings-goal-plus-teaser:active:not(:disabled) .icon-chevron {
+  transform: translateX(1px);
+}
+
+/* Success state if Plus unlocks while card is visible (optional class) */
+.savings-goal-plus-teaser.is-success .icon-lock {
+  opacity: 0;
+}
+.savings-goal-plus-teaser.is-success .icon-sparkles {
+  opacity: 1;
+  transform: scale(1);
+  color: var(--green);
+  animation: plus-teaser-success 0.45s ease;
+}
+@keyframes plus-teaser-success {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .text-button {
