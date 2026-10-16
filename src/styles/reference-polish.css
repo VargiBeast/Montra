@@ -1,0 +1,152 @@
+/* ============================================================
+   Reference polish — soft dark fintech cards (structure of the mockups)
+   ============================================================ */
+
+body {
+  background: var(--canvas);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 124, 247, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(109, 94, 240, 0.08), transparent 50%);
+  background-attachment: fixed;
+}
+
+.panel,
+.section-panel,
+.void-section {
+  border-radius: 24px !important;
+  border: 1px solid var(--line) !important;
+  background: var(--surface-raised) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.void-balance {
+  border-radius: 28px !important;
+  padding: 32px 24px 24px !important;
+  background:
+    linear-gradient(165deg, rgba(139, 124, 247, 0.22) 0%, transparent 42%),
+    linear-gradient(180deg, #1a1630 0%, #12101c 100%) !important;
+  border: 1px solid rgba(180, 167, 255, 0.16) !important;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  text-align: left !important;
+}
+
+.void-balance-label {
+  letter-spacing: 0.08em !important;
+  font-size: 11px !important;
+  opacity: 0.7;
+}
+
+.void-balance-value {
+  font-size: clamp(40px, 11vw, 52px) !important;
+  letter-spacing: -0.045em !important;
+  margin-bottom: 20px !important;
+}
+
+.void-balance-split {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.void-balance-split > div {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.void-quick-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 18px !important;
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  color: var(--purple-bright) !important;
+}
+
+.void-quick-item:hover .void-quick-icon {
+  background: var(--purple-soft) !important;
+  border-color: rgba(180, 167, 255, 0.28) !important;
+}
+
+.analytics-stat,
+.metric-card,
+.forecast-stat,
+.void-plan-card {
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--line) !important;
+}
+
+.primary-button,
+button.primary-button {
+  background: linear-gradient(145deg, var(--purple-bright), var(--purple-deep)) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px var(--purple-glow) !important;
+  font-weight: 700 !important;
+}
+
+.primary-button:hover {
+  filter: brightness(1.06);
+}
+
+.secondary-button {
+  border-radius: 16px !important;
+  border: 1px solid var(--line) !important;
+  background: var(--surface-raised) !important;
+  color: var(--ink) !important;
+}
+
+.void-fab {
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, #b4a7ff, #6d5ef0) !important;
+  box-shadow: 0 12px 32px rgba(109, 94, 240, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.transaction-row {
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+}
+
+.transaction-thumb {
+  border-radius: 14px !important;
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.segmented,
+.filter-tabs,
+.activity-filters {
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  padding: 4px !important;
+}
+
+.void-goal-fill,
+.progress-fill {
+  background: linear-gradient(90deg, var(--purple-deep), var(--purple-bright)) !important;
+  border-radius: 999px !important;
+}
+
+input,
+select,
+textarea,
+.search-field,
+.form-field input {
+  border-radius: 14px !important;
+}
+
+.plus-cta,
+.analytics-plus-cta,
+button[class*="peach"],
+.btn-accent-warm {
+  background: linear-gradient(145deg, var(--purple-bright), var(--purple-deep)) !important;
+  color: #fff !important;
+}

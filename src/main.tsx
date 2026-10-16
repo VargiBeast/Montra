@@ -15,6 +15,7 @@ import "./styles/personalize-themes.css";
 import "./styles/plus.css";
 import "./styles/layout-fix.css";
 import "./styles/layout-bugfix.css";
+import "./styles/reference-polish.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
 import "./styles/marketing.css";
@@ -40,7 +41,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 
 function applyTheme(dark: boolean) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#08060f" : "#f4f1fb");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0b0a12" : "#f4f1fb");
 }
 
 function readThemePreference(): "light" | "dark" | "system" {
