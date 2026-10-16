@@ -35,7 +35,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 
 function applyTheme(dark: boolean) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0a1010" : "#e8f2ef");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#070b0a" : "#e6f0ec");
 }
 
 function readThemePreference(): "light" | "dark" | "system" {
