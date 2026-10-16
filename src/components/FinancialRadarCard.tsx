@@ -5,7 +5,6 @@ import {
   PiggyBank,
   Radar,
   TrendingDown,
-  TrendingUp,
   AlertTriangle,
   ChevronRight,
 } from "lucide-react";
