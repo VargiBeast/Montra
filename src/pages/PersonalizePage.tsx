@@ -3,15 +3,19 @@ import {
   ChevronDown,
   ChevronUp,
   LayoutGrid,
+  LayoutList,
   Lock,
   Palette,
   Sparkles,
 } from "lucide-react";
 import {
+  ACCENT_PRESETS,
+  LAYOUT_STYLES,
   applyAccentTheme,
   moveSection,
   normalizeHexColor,
   type AccentTheme,
+  type HomeLayoutStyle,
   type HomeSectionId,
   type PersonalizationSettings,
   writePersonalization,
@@ -28,12 +32,55 @@ interface PersonalizePageProps {
   onOpenPlus: () => void;
 }
 
-const ACCENTS: Exclude<AccentTheme, "custom">[] = ["default", "forest", "dusk", "aurora"];
-
 const SECTION_META: Record<HomeSectionId, { titleKey: string; bodyKey: string }> = {
   planning: { titleKey: "personalizeSectionPlanning", bodyKey: "personalizeSectionPlanningBody" },
   analytics: { titleKey: "personalizeSectionAnalytics", bodyKey: "personalizeSectionAnalyticsBody" },
   activity: { titleKey: "personalizeSectionActivity", bodyKey: "personalizeSectionActivityBody" },
+};
+
+const FALLBACK: Record<string, string> = {
+  personalizeTitle: "Personalize Montra",
+  personalizeSubtitle: "Themes, layout density, and Home sections — Montra Plus.",
+  personalizeLockedTitle: "Personalization is a Plus feature",
+  personalizeLockedBody:
+    "Unlock themes, layout styles, and Home section order with Montra Plus.",
+  personalizeOpenPlus: "Explore Montra Plus",
+  personalizeHomeTitle: "Home sections",
+  personalizeHomeBody: "Balance stays on top. Toggle and reorder the rest.",
+  personalizeSectionPlanning: "Planning",
+  personalizeSectionPlanningBody: "Savings goals and wishlist on Home",
+  personalizeSectionAnalytics: "Analytics card",
+  personalizeSectionAnalyticsBody: "Shortcut to analytics or the Plus preview",
+  personalizeSectionActivity: "Recent activity",
+  personalizeSectionActivityBody: "Latest transactions on Home",
+  personalizeShow: "Show",
+  personalizeHide: "Hide",
+  personalizeMoveUp: "Move up",
+  personalizeMoveDown: "Move down",
+  personalizeAccentTitle: "Color themes",
+  personalizeAccentBody: "Full look-and-feel presets. Emerald matches a modern dark-green fintech vibe.",
+  personalizeAccentDefault: "Void",
+  personalizeAccentEmerald: "Emerald",
+  personalizeAccentForest: "Forest",
+  personalizeAccentOcean: "Ocean",
+  personalizeAccentDusk: "Dusk",
+  personalizeAccentAurora: "Aurora",
+  personalizeAccentRose: "Rose",
+  personalizeAccentSunset: "Sunset",
+  personalizeAccentMidnight: "Midnight",
+  personalizeAccentChampagne: "Champagne",
+  personalizeAccentSlate: "Slate",
+  personalizeAccentNeon: "Neon",
+  personalizeAccentCustom: "Custom color",
+  personalizeAccentCustomBody: "Pick any accent. Glass and gradients follow.",
+  personalizeAccentCustomLabel: "Custom accent color",
+  personalizeLayoutTitle: "Layout style",
+  personalizeLayoutBody: "How Home density and balance card feel.",
+  personalizeLayoutBalanced: "Balanced",
+  personalizeLayoutHero: "Hero",
+  personalizeLayoutCompact: "Compact",
+  personalizeLayoutCards: "Cards",
+  plusBack: "Back",
 };
 
 export function PersonalizePage({
@@ -48,89 +95,71 @@ export function PersonalizePage({
   const { language } = useLanguage();
   const t = (key: string) => {
     let value = fillMissingCopy(key, translate(key), language);
-    if (!value || value === "\u2014" || value === key) {
-      const fallback: Record<string, string> = {
-        personalizeTitle: "Personalize Montra",
-        personalizeSubtitle: "Shape Home and appearance for how you use Montra.",
-        personalizeLockedTitle: "Personalization is a Plus feature",
-        personalizeLockedBody:
-          "Choose which Home sections you see, reorder them, and pick a Liquid Glass accent. Available with Montra Plus.",
-        personalizeOpenPlus: "Explore Montra Plus",
-        personalizeHomeTitle: "Home layout",
-        personalizeHomeBody: "Balance always stays at the top. Toggle and reorder the rest.",
-        personalizeSectionPlanning: "Planning",
-        personalizeSectionPlanningBody: "Savings goals and wishlist on Home",
-        personalizeSectionAnalytics: "Analytics card",
-        personalizeSectionAnalyticsBody: "Shortcut to analytics or the Plus preview",
-        personalizeSectionActivity: "Recent activity",
-        personalizeSectionActivityBody: "Latest transactions on Home",
-        personalizeShow: "Show",
-        personalizeHide: "Hide",
-        personalizeMoveUp: "Move up",
-        personalizeMoveDown: "Move down",
-        personalizeAccentTitle: "Glass accent",
-        personalizeAccentBody: "Subtle Liquid Glass tints — still Montra, never a different product.",
-        personalizeAccentDefault: "Default",
-        personalizeAccentForest: "Forest",
-        personalizeAccentDusk: "Dusk",
-        personalizeAccentAurora: "Aurora",
-        personalizeAccentCustom: "Custom",
-        personalizeAccentCustomBody: "Pick any accent color. Gradients and glass stay Montra.",
-        personalizeAccentCustomLabel: "Custom accent color",
-        personalizeSaved: "Personalization saved",
-        plusBack: "Back",
-      };
-      value = fallback[key] ?? key;
-    }
+    if (!value || value === "\u2014" || value === key) value = FALLBACK[key] ?? key;
     return value;
   };
 
   function persist(next: PersonalizationSettings) {
     onChange(next);
-    if (userId) writePersonalization(userId, next);
     applyAccentTheme(next);
-  }
-
-  function toggleSection(id: HomeSectionId, visible: boolean) {
-    const next = { ...settings };
-    if (id === "planning") next.showPlanning = visible;
-    if (id === "analytics") next.showAnalytics = visible;
-    if (id === "activity") next.showActivity = visible;
-    persist(next);
-  }
-
-  function isVisible(id: HomeSectionId): boolean {
-    if (id === "planning") return settings.showPlanning;
-    if (id === "analytics") return settings.showAnalytics;
-    return settings.showActivity;
+    if (userId) writePersonalization(userId, next);
   }
 
   function setAccent(accent: AccentTheme) {
     if (accent === "custom") {
-      const hex = settings.customColor ?? "#27866d";
+      const hex = settings.customColor ?? "#10b981";
       persist({ ...settings, accent: "custom", customColor: hex });
       return;
     }
     persist({ ...settings, accent, customColor: null });
   }
 
-  function setCustomColor(hex: string) {
-    const normalized = normalizeHexColor(hex) ?? hex;
+  function setCustomColor(raw: string) {
+    const normalized = normalizeHexColor(raw);
+    if (!normalized) return;
     persist({ ...settings, accent: "custom", customColor: normalized });
   }
 
-  function reorder(id: HomeSectionId, direction: "up" | "down") {
+  function setLayout(layoutStyle: HomeLayoutStyle) {
+    persist({ ...settings, layoutStyle });
+  }
+
+  function toggleSection(id: HomeSectionId, visible: boolean) {
+    const key =
+      id === "planning" ? "showPlanning" : id === "analytics" ? "showAnalytics" : "showActivity";
+    persist({ ...settings, [key]: visible });
+  }
+
+  function shiftSection(id: HomeSectionId, direction: "up" | "down") {
     persist({ ...settings, sectionOrder: moveSection(settings.sectionOrder, id, direction) });
   }
 
   const accentLabel = (a: Exclude<AccentTheme, "custom">) => {
     const map: Record<Exclude<AccentTheme, "custom">, string> = {
       default: t("personalizeAccentDefault"),
+      emerald: t("personalizeAccentEmerald"),
       forest: t("personalizeAccentForest"),
+      ocean: t("personalizeAccentOcean"),
       dusk: t("personalizeAccentDusk"),
       aurora: t("personalizeAccentAurora"),
+      rose: t("personalizeAccentRose"),
+      sunset: t("personalizeAccentSunset"),
+      midnight: t("personalizeAccentMidnight"),
+      champagne: t("personalizeAccentChampagne"),
+      slate: t("personalizeAccentSlate"),
+      neon: t("personalizeAccentNeon"),
     };
     return map[a];
+  };
+
+  const layoutLabel = (s: HomeLayoutStyle) => {
+    const map: Record<HomeLayoutStyle, string> = {
+      balanced: t("personalizeLayoutBalanced"),
+      hero: t("personalizeLayoutHero"),
+      compact: t("personalizeLayoutCompact"),
+      cards: t("personalizeLayoutCards"),
+    };
+    return map[s];
   };
 
   if (!hasPlus) {
@@ -165,68 +194,10 @@ export function PersonalizePage({
           <ArrowLeft size={18} />
         </button>
         <div>
-          <p className="greeting">
-            <span className="plus-badge is-active">
-              <Palette size={12} aria-hidden="true" /> Montra Plus
-            </span>
-          </p>
+          <p className="greeting">{t("personalizeSubtitle")}</p>
           <h1 className="page-title">{t("personalizeTitle")}</h1>
-          <p className="plus-subtitle">{t("personalizeSubtitle")}</p>
         </div>
       </div>
-
-      <section className="panel section-panel" aria-label={t("personalizeHomeTitle")}>
-        <div className="section-heading">
-          <h2>
-            <LayoutGrid size={18} aria-hidden="true" /> {t("personalizeHomeTitle")}
-          </h2>
-        </div>
-        <p className="personalize-hint">{t("personalizeHomeBody")}</p>
-        <ul className="personalize-section-list">
-          {settings.sectionOrder.map((id, index) => {
-            const meta = SECTION_META[id];
-            const visible = isVisible(id);
-            return (
-              <li key={id} className={`personalize-section-row ${visible ? "is-on" : "is-off"}`}>
-                <div className="personalize-section-copy">
-                  <strong>{t(meta.titleKey)}</strong>
-                  <span>{t(meta.bodyKey)}</span>
-                </div>
-                <div className="personalize-section-controls">
-                  <div className="personalize-reorder" role="group" aria-label={t(meta.titleKey)}>
-                    <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={t("personalizeMoveUp")}
-                      disabled={index === 0}
-                      onClick={() => reorder(id, "up")}
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={t("personalizeMoveDown")}
-                      disabled={index === settings.sectionOrder.length - 1}
-                      onClick={() => reorder(id, "down")}
-                    >
-                      <ChevronDown size={16} />
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    className={`theme-choice personalize-toggle ${visible ? "active" : ""}`}
-                    aria-pressed={visible}
-                    onClick={() => toggleSection(id, !visible)}
-                  >
-                    {visible ? t("personalizeShow") : t("personalizeHide")}
-                  </button>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
 
       <section className="panel section-panel" aria-label={t("personalizeAccentTitle")}>
         <div className="section-heading">
@@ -235,8 +206,8 @@ export function PersonalizePage({
           </h2>
         </div>
         <p className="personalize-hint">{t("personalizeAccentBody")}</p>
-        <div className="personalize-accent-grid" role="group" aria-label={t("personalizeAccentTitle")}>
-          {ACCENTS.map((accent) => (
+        <div className="personalize-accent-grid personalize-accent-grid-rich" role="group" aria-label={t("personalizeAccentTitle")}>
+          {ACCENT_PRESETS.map((accent) => (
             <button
               key={accent}
               type="button"
@@ -259,7 +230,7 @@ export function PersonalizePage({
             <input
               type="color"
               className="personalize-color-input"
-              value={settings.customColor ?? "#27866d"}
+              value={settings.customColor ?? "#10b981"}
               aria-label={t("personalizeAccentCustomLabel")}
               onChange={(event) => setCustomColor(event.target.value)}
             />
@@ -267,19 +238,98 @@ export function PersonalizePage({
               type="text"
               className="personalize-color-hex"
               value={settings.customColor ?? ""}
-              placeholder="#27866d"
+              placeholder="#10b981"
               spellCheck={false}
               aria-label={t("personalizeAccentCustomLabel")}
               onChange={(event) => {
                 const v = event.target.value;
-                if (normalizeHexColor(v) || v === "" || v.startsWith("#")) {
-                  if (normalizeHexColor(v)) setCustomColor(v);
-                  else if (v === "") setAccent("default");
-                }
+                if (normalizeHexColor(v)) setCustomColor(v);
+                else if (v === "") setAccent("default");
               }}
             />
           </label>
         </div>
+      </section>
+
+      <section className="panel section-panel" aria-label={t("personalizeLayoutTitle")}>
+        <div className="section-heading">
+          <h2>
+            <LayoutList size={18} aria-hidden="true" /> {t("personalizeLayoutTitle")}
+          </h2>
+        </div>
+        <p className="personalize-hint">{t("personalizeLayoutBody")}</p>
+        <div className="personalize-layout-grid" role="group" aria-label={t("personalizeLayoutTitle")}>
+          {LAYOUT_STYLES.map((style) => (
+            <button
+              key={style}
+              type="button"
+              className={`personalize-layout-card layout-preview-${style} ${settings.layoutStyle === style ? "active" : ""}`}
+              aria-pressed={settings.layoutStyle === style}
+              onClick={() => setLayout(style)}
+            >
+              <span className="personalize-layout-icon" aria-hidden="true">
+                <LayoutGrid size={16} />
+              </span>
+              <strong>{layoutLabel(style)}</strong>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel section-panel" aria-label={t("personalizeHomeTitle")}>
+        <div className="section-heading">
+          <h2>
+            <LayoutGrid size={18} aria-hidden="true" /> {t("personalizeHomeTitle")}
+          </h2>
+        </div>
+        <p className="personalize-hint">{t("personalizeHomeBody")}</p>
+        <ul className="personalize-section-list">
+          {settings.sectionOrder.map((id, index) => {
+            const meta = SECTION_META[id];
+            const visible =
+              id === "planning"
+                ? settings.showPlanning
+                : id === "analytics"
+                  ? settings.showAnalytics
+                  : settings.showActivity;
+            return (
+              <li key={id} className="personalize-section-row">
+                <div className="personalize-section-copy">
+                  <strong>{t(meta.titleKey)}</strong>
+                  <span>{t(meta.bodyKey)}</span>
+                </div>
+                <div className="personalize-section-actions">
+                  <button
+                    type="button"
+                    className={`theme-choice personalize-toggle ${visible ? "active" : ""}`}
+                    aria-pressed={visible}
+                    onClick={() => toggleSection(id, !visible)}
+                  >
+                    {visible ? t("personalizeShow") : t("personalizeHide")}
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={t("personalizeMoveUp")}
+                    disabled={index === 0}
+                    onClick={() => shiftSection(id, "up")}
+                  >
+                    <ChevronUp size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={t("personalizeMoveDown")}
+                    disabled={index === settings.sectionOrder.length - 1}
+                    onClick={() => shiftSection(id, "down")}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </main>
   );
