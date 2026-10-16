@@ -16,6 +16,8 @@ import type { Transaction } from "../types/transaction";
 import type { SavingsGoal } from "../types/savingsGoal";
 import { goalProgress } from "../types/savingsGoal";
 import type { WishlistItem } from "../types/wishlist";
+import type { RecurringPayment } from "../types/recurringPayment";
+import { RecurringHomeTeaser } from "../components/RecurringHomeTeaser";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics";
 import { resolveMoneySnapshotCopy, type MoneySnapshotKeys } from "../lib/moneySnapshotCopy";
@@ -108,6 +110,8 @@ interface HomePageProps {
   onOpenMore?: () => void;
   savingsGoals?: SavingsGoal[];
   wishlistItems?: WishlistItem[];
+  recurringPayments?: RecurringPayment[];
+  onOpenRecurring?: () => void;
   personalization?: PersonalizationSettings;
 }
 
@@ -127,6 +131,8 @@ export function HomePage({
   onOpenMore,
   savingsGoals = [],
   wishlistItems = [],
+  recurringPayments = [],
+  onOpenRecurring,
   personalization = DEFAULT_PERSONALIZATION,
 }: HomePageProps) {
   const translate = useTranslation();
@@ -266,6 +272,10 @@ export function HomePage({
           <p className="void-month-empty">{t("thisMonthEmpty")}</p>
         )}
       </section>
+
+      {recurringPayments.length > 0 && (
+        <RecurringHomeTeaser items={recurringPayments} onOpen={onOpenRecurring} />
+      )}
 
       <nav className="void-quick" aria-label={t("mainNavigation")}>
         <button type="button" className="void-quick-item" onClick={onAdd}>
