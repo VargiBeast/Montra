@@ -16,6 +16,7 @@ import "./styles/plus.css";
 import "./styles/layout-fix.css";
 import "./styles/layout-bugfix.css";
 import "./styles/reference-polish.css";
+import "./styles/money-snapshot.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
 import "./styles/marketing.css";
