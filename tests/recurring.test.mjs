@@ -61,7 +61,13 @@ test("yearly leap day source clamps in non-leap", () => {
   assert.equal(next, "2025-02-28");
 });
 
-test("planned payments helpers are pure (no analytics coupling)", () => {
-  assert.equal(typeof computeNextDueDate, "function");
-  assert.equal(typeof advanceAfterOccurrence, "function");
+test("past-due: next due is on or after fromYmd", () => {
+  const next = computeNextDueDate({
+    interval: "monthly",
+    anchor_date: "2025-01-15",
+    schedule_day: 15,
+    fromYmd: "2026-10-16",
+  });
+  assert.ok(next >= "2026-10-16");
+  assert.equal(next, "2026-11-15");
 });
