@@ -13,6 +13,8 @@ import "./styles/visual-refresh-ui.css";
 import "./styles/void-layout.css";
 import "./styles/personalize-themes.css";
 import "./styles/plus.css";
+import "./styles/layout-fix.css";
+import "./styles/layout-bugfix.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
 import "./styles/marketing.css";

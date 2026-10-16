@@ -1,0 +1,70 @@
+/* Layout bugfixes: keep title/subtitle stacks from collapsing inline */
+.transaction-main {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.transaction-name,
+.transaction-sub {
+  display: block !important;
+  max-width: 100%;
+}
+
+.transaction-sub {
+  margin-top: 0 !important;
+}
+
+.transaction-meta-sep {
+  margin: 0 0.35em;
+}
+
+.activity-summary {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px 12px !important;
+}
+
+.activity-summary-totals {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.receipt-choice-card {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  width: 100%;
+  text-align: left;
+}
+
+.receipt-choice-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+.receipt-choice-copy strong,
+.receipt-choice-copy span {
+  display: block !important;
+}
+
+.receipt-card-main {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+
+.receipt-card-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
