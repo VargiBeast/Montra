@@ -8,6 +8,7 @@ import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import "./styles/globals-base.css";
 import "./styles/globals.css";
 import "./styles/financial-radar.css";
+import "./styles/visual-refresh.css";
 import "./styles/plus.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
@@ -34,7 +35,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 
 function applyTheme(dark: boolean) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#111214" : "#f2f0eb");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0a1010" : "#e8f2ef");
 }
 
 function readThemePreference(): "light" | "dark" | "system" {
