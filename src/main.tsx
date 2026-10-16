@@ -9,6 +9,7 @@ import "./styles/globals-base.css";
 import "./styles/globals.css";
 import "./styles/financial-radar.css";
 import "./styles/visual-refresh.css";
+import "./styles/void-layout.css";
 import "./styles/plus.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
