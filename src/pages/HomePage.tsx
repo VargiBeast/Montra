@@ -10,8 +10,6 @@ import {
   PiggyBank,
   Plus,
   Receipt,
-  Sparkles,
-  TrendingUp,
   UserRound,
 } from "lucide-react";
 import type { Transaction } from "../types/transaction";
