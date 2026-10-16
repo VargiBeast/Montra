@@ -21,6 +21,8 @@ import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics"
 import { resolveMoneySnapshotCopy, type MoneySnapshotKeys } from "../lib/moneySnapshotCopy";
 import { TransactionRow } from "../components/TransactionRow";
 import { FinancialRadarCard } from "../components/FinancialRadarCard";
+import { WhatIfCard } from "../components/WhatIfCard";
+import { MoneyJourneyCard } from "../components/MoneyJourneyCard";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
@@ -329,6 +331,12 @@ export function HomePage({
           </div>
         </section>
       )}
+
+      {personalization.showPlanning !== false && (
+        <WhatIfCard goals={savingsGoals} />
+      )}
+
+      <MoneyJourneyCard transactions={transactions} goals={savingsGoals} />
 
       {!hasPlus && personalization.showAnalytics !== false && (
         <section className="panel analytics-plus-card void-plus-teaser">

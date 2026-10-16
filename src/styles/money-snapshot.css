@@ -88,3 +88,148 @@
 :root:not([data-theme="dark"]) .void-balance-note {
   color: rgba(255, 255, 255, 0.7);
 }
+
+/* What If + Money Journey */
+.life-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.life-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.life-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.life-field select,
+.life-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.life-whatif-result {
+  margin-top: 4px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+.life-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.life-result-grid span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.life-result-grid strong {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.life-result-line,
+.life-result-meta {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.life-disclaimer {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.life-journey-months {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.life-journey-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+}
+.life-journey-month {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.life-journey-stat em {
+  font-style: normal;
+  color: var(--muted);
+  margin-right: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.life-journey-stat.pos { color: var(--positive); }
+.life-journey-stat.neg { color: var(--negative); }
+.life-subhead {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.life-milestone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.life-milestone-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+.life-milestone-list strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+.life-milestone-list span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.void-section-head h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 400px) {
+  .life-result-grid,
+  .life-journey-row {
+    grid-template-columns: 1fr;
+  }
+}
