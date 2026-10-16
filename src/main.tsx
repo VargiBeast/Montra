@@ -11,6 +11,7 @@ import "./styles/financial-radar.css";
 import "./styles/visual-refresh.css";
 import "./styles/visual-refresh-ui.css";
 import "./styles/void-layout.css";
+import "./styles/personalize-themes.css";
 import "./styles/plus.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
@@ -18,7 +19,6 @@ import "./styles/marketing.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
 
-// Capacitor native (iOS/Android): open the status bar overlay and hide the splash when ready.
 void (async () => {
   if (!Capacitor.isNativePlatform()) return;
   try {
@@ -26,13 +26,13 @@ void (async () => {
     await StatusBar.setOverlaysWebView({ overlay: true });
     await StatusBar.setStyle({ style: Style.Dark });
   } catch {
-    /* StatusBar plugin optional in web builds */
+    /* optional */
   }
   try {
     const { SplashScreen } = await import("@capacitor/splash-screen");
     await SplashScreen.hide();
   } catch {
-    /* SplashScreen plugin optional in web builds */
+    /* optional */
   }
 })();
 
