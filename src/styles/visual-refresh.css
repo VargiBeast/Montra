@@ -1,44 +1,42 @@
 /* ============================================================
-   MONTRA VOID — full redesign from scratch
-   Softer indigo/violet + warm gold accents. Calmer, less neon.
-   NO green brand color. CSS-only. Functionality unchanged.
+   MONTRA VOID — soft lavender dark fintech
    ============================================================ */
 
 :root {
-  /* Brand — soft indigo/violet + warm gold (calmer, less neon) */
-  --purple: #7c6cf0;
-  --purple-bright: #9b8afb;
-  --purple-deep: #5b4fcf;
-  --purple-soft: rgba(124, 108, 240, 0.12);
-  --purple-glow: rgba(124, 108, 240, 0.28);
-  --lilac: #c4b5fd;
-  --fuchsia: #c084fc;
-  --gold: #d4a853;
-  --gold-bright: #f0d78c;
-  --gold-deep: #b8860b;
-  --gold-soft: rgba(212, 168, 83, 0.16);
+  /* Brand — soft lavender purple (reference fintech mood) */
+  --purple: #8b7cf7;
+  --purple-bright: #b4a7ff;
+  --purple-deep: #6d5ef0;
+  --purple-soft: rgba(139, 124, 247, 0.14);
+  --purple-glow: rgba(139, 124, 247, 0.32);
+  --lilac: #d4c9ff;
+  --fuchsia: #c4b5fd;
+  --gold: #c9b8ff;
+  --gold-bright: #e8e0ff;
+  --gold-deep: #8b7cf7;
+  --gold-soft: rgba(139, 124, 247, 0.14);
 
-  /* Map legacy accent tokens away from green */
-  --green: #7c6cf0;
-  --green-mid: #6b5ce0;
-  --green-deep: #5b4fcf;
-  --green-soft: rgba(124, 108, 240, 0.12);
-  --green-glow: rgba(124, 108, 240, 0.28);
-  --accent: #7c6cf0;
-  --accent-soft: rgba(124, 108, 240, 0.12);
+  /* Map legacy accent tokens to soft purple */
+  --green: #8b7cf7;
+  --green-mid: #7c6cf0;
+  --green-deep: #6d5ef0;
+  --green-soft: rgba(139, 124, 247, 0.14);
+  --green-glow: rgba(139, 124, 247, 0.32);
+  --accent: #8b7cf7;
+  --accent-soft: rgba(139, 124, 247, 0.14);
 
-  /* Surfaces — deep charcoal with soft violet tint */
-  --canvas: #0a0910;
-  --surface: rgba(22, 20, 34, 0.78);
-  --surface-solid: #12111a;
-  --surface-raised: rgba(28, 26, 42, 0.94);
-  --ink: #f2f0f8;
-  --muted: #9a94ae;
-  --subtle: #6e6882;
-  --line: rgba(155, 138, 251, 0.10);
-  --line-strong: rgba(255, 255, 255, 0.06);
+  /* Surfaces — near-black with soft violet lift */
+  --canvas: #0b0a12;
+  --surface: rgba(24, 22, 38, 0.82);
+  --surface-solid: #14121f;
+  --surface-raised: rgba(32, 28, 48, 0.96);
+  --ink: #f5f3fb;
+  --muted: #a39bb8;
+  --subtle: #756d8c;
+  --line: rgba(180, 167, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.07);
 
-  /* Semantic (keep readable, not brand green) */
+  /* Semantic */
   --positive: #34d399;
   --positive-soft: rgba(52, 211, 153, 0.12);
   --negative: #fb7185;
@@ -67,7 +65,6 @@
   color-scheme: dark;
 }
 
-/* Light mode: soft lilac, still no green brand */
 :root:not([data-theme="dark"]) {
   --canvas: #f4f1fb;
   --surface: rgba(255, 255, 255, 0.82);
@@ -83,15 +80,6 @@
   --purple-deep: #5b4fcf;
   --purple-soft: rgba(107, 92, 224, 0.1);
   --purple-glow: rgba(107, 92, 224, 0.2);
-  --gold: #c9a227;
-  --gold-bright: #e8c547;
-  --gold-deep: #9a7209;
-  --gold-soft: rgba(201, 162, 39, 0.12);
-  --green: #6b5ce0;
-  --green-mid: #5b4fcf;
-  --green-deep: #4c41b0;
-  --green-soft: rgba(107, 92, 224, 0.1);
-  --green-glow: rgba(107, 92, 224, 0.2);
   --accent: #6b5ce0;
   --accent-soft: rgba(107, 92, 224, 0.1);
   --positive: #059669;
@@ -102,30 +90,20 @@
 }
 
 :root[data-theme="dark"] {
-  --canvas: #08060f;
-  --surface: rgba(20, 16, 36, 0.78);
-  --surface-solid: #100e1a;
-  --surface-raised: rgba(28, 22, 46, 0.95);
-  --ink: #f5f2ff;
-  --muted: #a39bbd;
-  --subtle: #6e6688;
-  --line: rgba(155, 138, 251, 0.12);
-  --purple: #9b8afb;
-  --purple-bright: #b5a8fc;
-  --purple-deep: #7c6cf0;
-  --purple-soft: rgba(155, 138, 251, 0.14);
-  --purple-glow: rgba(155, 138, 251, 0.28);
-  --gold: #d4a853;
-  --gold-bright: #f0d78c;
-  --gold-deep: #b8860b;
-  --gold-soft: rgba(212, 168, 83, 0.14);
-  --green: #9b8afb;
-  --green-mid: #7c6cf0;
-  --green-deep: #6b5ce0;
-  --green-soft: rgba(155, 138, 251, 0.14);
-  --green-glow: rgba(155, 138, 251, 0.28);
-  --accent: #9b8afb;
-  --accent-soft: rgba(155, 138, 251, 0.14);
+  --canvas: #0b0a12;
+  --surface: rgba(24, 22, 38, 0.82);
+  --surface-solid: #14121f;
+  --surface-raised: rgba(32, 28, 48, 0.96);
+  --ink: #f5f3fb;
+  --muted: #a39bb8;
+  --line: rgba(180, 167, 255, 0.12);
+  --purple: #8b7cf7;
+  --purple-bright: #b4a7ff;
+  --purple-deep: #6d5ef0;
+  --purple-soft: rgba(139, 124, 247, 0.14);
+  --purple-glow: rgba(139, 124, 247, 0.32);
+  --accent: #8b7cf7;
+  --accent-soft: rgba(139, 124, 247, 0.14);
   color-scheme: dark;
 }
 
@@ -135,24 +113,8 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
-    radial-gradient(ellipse 90% 55% at 50% -18%, rgba(124, 108, 240, 0.14), transparent 52%),
-    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(212, 168, 83, 0.05), transparent 48%),
-    radial-gradient(ellipse 50% 40% at 0% 85%, rgba(99, 102, 241, 0.06), transparent 45%),
+    radial-gradient(ellipse 90% 55% at 50% -18%, rgba(139, 124, 247, 0.16), transparent 52%),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(109, 94, 240, 0.08), transparent 48%),
     var(--canvas);
   background-attachment: fixed;
-}
-
-:root:not([data-theme="dark"]) body {
-  background:
-    radial-gradient(ellipse 80% 50% at 30% -10%, rgba(124, 108, 240, 0.1), transparent 50%),
-    radial-gradient(ellipse 50% 40% at 100% 40%, rgba(212, 168, 83, 0.04), transparent 45%),
-    var(--canvas);
-}
-
-:root[data-theme="dark"] body {
-  background:
-    radial-gradient(ellipse 100% 50% at 50% -12%, rgba(124, 108, 240, 0.14), transparent 50%),
-    radial-gradient(ellipse 70% 45% at 110% 40%, rgba(88, 28, 135, 0.12), transparent 50%),
-    radial-gradient(ellipse 40% 35% at -5% 90%, rgba(212, 168, 83, 0.04), transparent 42%),
-    #08060f;
 }
