@@ -162,8 +162,10 @@ export function HomePage({
       ? t("homeGoalsEmpty")
       : t("homeGoalsActive", { count: activeGoalsCount });
 
+  const layout = personalization.layoutStyle ?? "balanced";
+
   return (
-    <main className="page-content void-home">
+    <main className={`page-content void-home layout-${layout}`}>
       <header className="void-welcome">
         <div className="void-welcome-text">
           <p className="void-welcome-label">{t("welcomeBack")}</p>
@@ -172,29 +174,10 @@ export function HomePage({
       </header>
 
       <section className="void-balance" aria-label={t("currentBalance")}>
-        <span className="void-balance-coin" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="coinFace" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#f5e6a8"/>
-                <stop offset="0.45" stopColor="#d4a853"/>
-                <stop offset="1" stopColor="#9a7209"/>
-              </linearGradient>
-              <linearGradient id="coinEdge" x1="8" y1="32" x2="56" y2="32" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#c9a227"/>
-                <stop offset="1" stopColor="#8a6a0a"/>
-              </linearGradient>
-              <radialGradient id="coinShine" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22 18) rotate(40) scale(28)">
-                <stop stopColor="#fff8dc" stopOpacity="0.55"/>
-                <stop offset="1" stopColor="#d4a853" stopOpacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="32" cy="32" r="28" fill="url(#coinEdge)"/>
-            <circle cx="32" cy="32" r="24" fill="url(#coinFace)"/>
-            <circle cx="32" cy="32" r="24" fill="url(#coinShine)"/>
-            <circle cx="32" cy="32" r="18" stroke="rgba(154,114,9,0.35)" strokeWidth="1.5" fill="none"/>
-            <text x="32" y="38" textAnchor="middle" fontFamily="system-ui,Segoe UI,sans-serif" fontWeight="700" fontSize="20" fill="#7a5a08">$</text>
-          </svg>
+        <span className="void-balance-deco" aria-hidden="true">
+          <span className="void-deco-ring" />
+          <span className="void-deco-dot" />
+          <span className="void-deco-spark" />
         </span>
         <p className="void-balance-label">{t("totalBalance")}</p>
         <p className="void-balance-value">{money(summary.balance)}</p>
