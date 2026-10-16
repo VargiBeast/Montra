@@ -18,6 +18,7 @@ import { goalProgress } from "../types/savingsGoal";
 import type { WishlistItem } from "../types/wishlist";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics";
+import { resolveMoneySnapshotCopy, type MoneySnapshotKeys } from "../lib/moneySnapshotCopy";
 import { TransactionRow } from "../components/TransactionRow";
 import { FinancialRadarCard } from "../components/FinancialRadarCard";
 import { useDisplayCurrency } from "../lib/currency";
@@ -79,6 +80,16 @@ const HOME_FALLBACK: Record<string, string> = {
   mainNavigation: "Main navigation",
 };
 
+const SNAPSHOT_KEYS = new Set<string>([
+  "totalBalance",
+  "trackedBalanceNote",
+  "thisMonth",
+  "thisMonthIncome",
+  "thisMonthSpending",
+  "thisMonthNet",
+  "thisMonthEmpty",
+]);
+
 interface HomePageProps {
   transactions: Transaction[];
   getImageUrl: (path: string) => Promise<string>;
@@ -119,8 +130,14 @@ export function HomePage({
   const translate = useTranslation();
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
-    let value = fillMissingCopy(key, translate(key, values), language);
-    if (value === "\u2014" || value === key) value = HOME_FALLBACK[key] ?? key;
+    let value: string | null = null;
+    if (SNAPSHOT_KEYS.has(key)) {
+      value = resolveMoneySnapshotCopy(language, key as MoneySnapshotKeys);
+    }
+    if (!value) {
+      value = fillMissingCopy(key, translate(key, values), language);
+    }
+    if (!value || value === "\u2014" || value === key) value = HOME_FALLBACK[key] ?? key;
     if (values) {
       value = value.replace(/\{(\w+)\}/g, (m, n) =>
         Object.hasOwn(values, n) ? String(values[n]) : m,
