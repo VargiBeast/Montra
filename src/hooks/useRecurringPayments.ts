@@ -70,14 +70,5 @@ export function useRecurringPayments(userId: string | undefined) {
     [userId, refresh],
   );
 
-  const logCompleted = useCallback(
-    async (item: RecurringPayment, occurredOn: string) => {
-      if (!userId || !supabase) throw new Error("Sign in before logging.");
-      await service.logRecurringAsCompleted(supabase, userId, item, occurredOn);
-      await refresh();
-    },
-    [userId, refresh],
-  );
-
-  return { items, isLoading, error, refresh, save, remove, setActive, logCompleted };
+  return { items, isLoading, error, refresh, save, remove, setActive };
 }
