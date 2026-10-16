@@ -7,6 +7,7 @@ import { ConsentBanner } from "./components/ConsentBanner";
 import { AnalyticsTracker } from "./components/AnalyticsTracker";
 import "./styles/globals-base.css";
 import "./styles/globals.css";
+import "./styles/financial-radar.css";
 import "./styles/plus.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";

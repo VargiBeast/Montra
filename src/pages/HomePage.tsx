@@ -17,6 +17,7 @@ import { goalProgress } from "../types/savingsGoal";
 import type { WishlistItem } from "../types/wishlist";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
 import { TransactionRow } from "../components/TransactionRow";
+import { FinancialRadarCard } from "../components/FinancialRadarCard";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
@@ -257,18 +258,14 @@ export function HomePage({
 
       {personalization.showAnalytics &&
         (hasPlus ? (
-          <section
-            className="panel section-panel analytics-unlocked-card"
-            style={{ order: personalization.sectionOrder.indexOf("analytics") }}
-          >
-            <div className="section-heading">
-              <h2>{t("analytics")}</h2>
-            </div>
-            <p className="analytics-hint">{t("analyticsHint")}</p>
-            <button type="button" className="primary-button" onClick={() => onOpenAnalytics?.()}>
-              {t("openAnalytics")}
-            </button>
-          </section>
+          <div style={{ order: personalization.sectionOrder.indexOf("analytics") }}>
+            <FinancialRadarCard
+              transactions={transactions}
+              savingsGoals={savingsGoals}
+              onOpenAnalytics={onOpenAnalytics}
+              onOpenSavingsGoals={onOpenSavingsGoals}
+            />
+          </div>
         ) : (
           <section
             className="panel analytics-plus-card"
