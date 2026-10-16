@@ -646,12 +646,14 @@ function App() {
               if (!alreadyLinked) {
                 const amountInBase = Math.round(convertToBase(fields.totalAmount, fields.currency) * 100) / 100;
                 await data.save({
-                  type: "expense",
+                  type: "out",
                   name: fields.merchant || t("receipt"),
                   amount: amountInBase,
                   date: fields.receiptDate || new Date().toISOString().slice(0, 10),
                   method: "other",
+                  link: null,
                   note: marker,
+                  image: null,
                 });
               }
             }
