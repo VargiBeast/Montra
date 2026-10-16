@@ -135,7 +135,7 @@ export function HomePage({
 
   const monthSummary = useMemo(() => {
     const range = rangeForPeriod("this_month");
-    const monthTx = filterTransactions(transactions, range, "all");
+    const monthTx = filterTransactions(transactions, range, "all", null);
     return summarize(monthTx);
   }, [transactions]);
 
