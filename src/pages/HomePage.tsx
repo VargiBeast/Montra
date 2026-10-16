@@ -17,6 +17,7 @@ import type { SavingsGoal } from "../types/savingsGoal";
 import { goalProgress } from "../types/savingsGoal";
 import type { WishlistItem } from "../types/wishlist";
 import { formatMoney, getBalanceSummary } from "../lib/utils";
+import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics";
 import { TransactionRow } from "../components/TransactionRow";
 import { FinancialRadarCard } from "../components/FinancialRadarCard";
 import { useDisplayCurrency } from "../lib/currency";
@@ -64,11 +65,18 @@ const HOME_FALLBACK: Record<string, string> = {
   homeTitle: "Home",
   hello: "Hello",
   welcomeBack: "Welcome back",
-  totalBalance: "Total balance",
+  totalBalance: "Tracked balance",
+  trackedBalanceNote: "From transactions you logged in Montra — not a bank balance.",
+  thisMonth: "This month",
+  thisMonthIncome: "Income",
+  thisMonthSpending: "Spending",
+  thisMonthNet: "Net",
+  thisMonthEmpty: "No activity logged this month yet.",
   quickAdd: "Add",
   quickActivity: "Activity",
   quickReceipts: "Receipts",
   quickMore: "More",
+  mainNavigation: "Main navigation",
 };
 
 interface HomePageProps {
@@ -112,7 +120,7 @@ export function HomePage({
   const { language } = useLanguage();
   const t = (key: string, values?: Record<string, string | number>) => {
     let value = fillMissingCopy(key, translate(key, values), language);
-    if (value === "\u2014") value = HOME_FALLBACK[key] ?? key;
+    if (value === "\u2014" || value === key) value = HOME_FALLBACK[key] ?? key;
     if (values) {
       value = value.replace(/\{(\w+)\}/g, (m, n) =>
         Object.hasOwn(values, n) ? String(values[n]) : m,
@@ -124,6 +132,12 @@ export function HomePage({
   const summary = getBalanceSummary(transactions);
   const money = (value: number) =>
     formatMoney(value, currency, language, convertFromBase(value, currency));
+
+  const monthSummary = useMemo(() => {
+    const range = rangeForPeriod("this_month");
+    const monthTx = filterTransactions(transactions, range, "all");
+    return summarize(monthTx);
+  }, [transactions]);
 
   const recent = useMemo(() => transactions.slice(0, 5), [transactions]);
 
@@ -163,6 +177,13 @@ export function HomePage({
       : t("homeGoalsActive", { count: activeGoalsCount });
 
   const layout = personalization.layoutStyle ?? "balanced";
+  const monthHasActivity = monthSummary.transactionCount > 0;
+  const netClass =
+    monthSummary.netChange > 0
+      ? "void-month-net is-positive"
+      : monthSummary.netChange < 0
+        ? "void-month-net is-negative"
+        : "void-month-net";
 
   return (
     <main className={`page-content void-home layout-${layout}`}>
@@ -181,6 +202,7 @@ export function HomePage({
         </span>
         <p className="void-balance-label">{t("totalBalance")}</p>
         <p className="void-balance-value">{money(summary.balance)}</p>
+        <p className="void-balance-note">{t("trackedBalanceNote")}</p>
         <div className="void-balance-split">
           <div>
             <span className="void-balance-split-label">
@@ -197,6 +219,33 @@ export function HomePage({
             <strong className="void-balance-out">{money(summary.totalOut)}</strong>
           </div>
         </div>
+      </section>
+
+      <section className="void-month" aria-label={t("thisMonth")}>
+        <div className="void-month-head">
+          <h2 className="void-month-title">{t("thisMonth")}</h2>
+        </div>
+        {monthHasActivity ? (
+          <div className="void-month-grid">
+            <div className="void-month-stat">
+              <span className="void-month-stat-label">{t("thisMonthIncome")}</span>
+              <strong className="void-month-stat-value is-in">{money(monthSummary.totalIncome)}</strong>
+            </div>
+            <div className="void-month-stat">
+              <span className="void-month-stat-label">{t("thisMonthSpending")}</span>
+              <strong className="void-month-stat-value is-out">{money(monthSummary.totalSpending)}</strong>
+            </div>
+            <div className={`void-month-stat void-month-stat-net ${netClass}`}>
+              <span className="void-month-stat-label">{t("thisMonthNet")}</span>
+              <strong className="void-month-stat-value">
+                {monthSummary.netChange > 0 ? "+" : monthSummary.netChange < 0 ? "\u2212" : ""}
+                {money(Math.abs(monthSummary.netChange))}
+              </strong>
+            </div>
+          </div>
+        ) : (
+          <p className="void-month-empty">{t("thisMonthEmpty")}</p>
+        )}
       </section>
 
       <nav className="void-quick" aria-label={t("mainNavigation")}>
