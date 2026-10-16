@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ArrowDownUp, Home, Moon, Plus, Receipt, UserRound, BarChart3, Heart, Target } from "lucide-react";
+import { Menu, X, ArrowDownUp, Home, Plus, Receipt, UserRound, BarChart3, Heart, Target } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
 import { useReceipts } from "./hooks/useReceipts";
@@ -469,29 +469,17 @@ function App() {
             onWishlist={() => setPage("wishlist")}
           />}
           {page === "receipts" && (
-            captureOpen ? (
-              <Suspense fallback={null}>
-                <ReceiptCapture
-                  open={captureOpen}
-                  busy={uploadingReceipt}
-                  onClose={() => setCaptureOpen(false)}
-                  onSave={async (input) => {
-                    setUploadingReceipt(true);
-                    try {
-                      await receipts.save(input);
-                      setCaptureOpen(false);
-                      setToast(t("receiptSaved"));
-                    } finally {
-                      setUploadingReceipt(false);
-                    }
-                  }}
-                />
-              </Suspense>
+            receipts.error ? (
+              <div className="error-screen">
+                <section className="panel error-card">
+                  <h2>{t("receiptsDidNotLoad")}</h2>
+                  <p>{t("receiptError")}</p>
+                  <button className="primary-button" type="button" onClick={() => void receipts.refresh()}>{t("tryAgain")}</button>
+                </section>
+              </div>
             ) : (
               <ReceiptsPage
                 receipts={receipts.receipts}
-                isLoading={receipts.isLoading}
-                error={receipts.error}
                 getImageUrl={receipts.getImageUrl}
                 uploading={uploadingReceipt}
                 onAdd={() => setCaptureOpen(true)}
@@ -622,6 +610,56 @@ function App() {
         onCancel={() => setPendingDeleteReceipt(null)}
       />
       <ReceiptDetail receipt={selectedReceipt} getImageUrl={receipts.getImageUrl} onClose={() => setSelectedReceipt(null)} onDelete={requestDeleteReceipt} deleting={deletingReceipt} />
+
+      <Suspense fallback={null}>
+        <ReceiptCapture
+          open={captureOpen}
+          currency={currency}
+          onClose={() => setCaptureOpen(false)}
+          onUpload={async (file) => {
+            setUploadingReceipt(true);
+            try {
+              return await receipts.upload(file);
+            } finally {
+              setUploadingReceipt(false);
+            }
+          }}
+          onSave={async (receipt, fields) => {
+            await receipts.update(receipt, {
+              merchant: fields.merchant || null,
+              total_amount: fields.totalAmount,
+              currency: fields.currency,
+              receipt_date: fields.receiptDate || null,
+              status: fields.status,
+            });
+            if (
+              fields.status === "confirmed" &&
+              fields.deductFromBalance &&
+              fields.totalAmount != null &&
+              Number.isFinite(fields.totalAmount) &&
+              fields.totalAmount > 0
+            ) {
+              const marker = `montra:receipt:${receipt.id}`;
+              const alreadyLinked = data.transactions.some(
+                (transaction) => typeof transaction.note === "string" && transaction.note.includes(marker),
+              );
+              if (!alreadyLinked) {
+                const amountInBase = Math.round(convertToBase(fields.totalAmount, fields.currency) * 100) / 100;
+                await data.save({
+                  type: "expense",
+                  name: fields.merchant || t("receipt"),
+                  amount: amountInBase,
+                  date: fields.receiptDate || new Date().toISOString().slice(0, 10),
+                  method: "other",
+                  note: marker,
+                });
+              }
+            }
+            setCaptureOpen(false);
+            setToast(t("receiptSaved"));
+          }}
+        />
+      </Suspense>
     </div>
   );
 }
