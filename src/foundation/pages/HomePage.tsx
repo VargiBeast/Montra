@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useTransactions } from "../../hooks/useTransactions";
 import { usePlusEntitlement } from "../../hooks/usePlusEntitlement";
 import { useDisplayCurrency } from "../../lib/currency";
+import { readLanguage } from "../../lib/i18n";
 import { formatMoney, formatDate, getBalanceSummary } from "../../lib/utils";
 import type { Transaction } from "../../types/transaction";
 import { Card } from "../ui/Card";
@@ -21,8 +22,9 @@ function RecentRow({
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
 }) {
   const isIn = tx.type === "in";
+  const locale = readLanguage();
   const displayAmount = convertFromBase(Number(tx.amount), currency);
-  const amountLabel = formatMoney(Number(tx.amount), currency, undefined, displayAmount);
+  const amountLabel = formatMoney(Number(tx.amount), currency, locale, displayAmount);
 
   return (
     <div
@@ -93,6 +95,7 @@ export function HomePage() {
   const { currency, convertFromBase, ratesReady } = useDisplayCurrency();
   const plus = usePlusEntitlement(auth.user?.id);
   const navigate = useNavigate();
+  const locale = readLanguage();
 
   const summary = useMemo(() => getBalanceSummary(transactions), [transactions]);
   const recent = useMemo(() => transactions.slice(0, 5), [transactions]);
@@ -109,7 +112,7 @@ export function HomePage() {
 
   const hasData = transactions.length > 0;
   const balanceDisplay = hasData
-    ? formatMoney(summary.balance, currency, undefined, convertFromBase(summary.balance, currency))
+    ? formatMoney(summary.balance, currency, locale, convertFromBase(summary.balance, currency))
     : null;
 
   return (
@@ -178,13 +181,13 @@ export function HomePage() {
               <div>
                 <span style={{ color: "var(--m-text-muted)" }}>In </span>
                 <span style={{ color: "var(--m-positive)", fontWeight: 600 }}>
-                  {formatMoney(summary.totalIn, currency, undefined, convertFromBase(summary.totalIn, currency))}
+                  {formatMoney(summary.totalIn, currency, locale, convertFromBase(summary.totalIn, currency))}
                 </span>
               </div>
               <div>
                 <span style={{ color: "var(--m-text-muted)" }}>Out </span>
                 <span style={{ color: "var(--m-text)", fontWeight: 600 }}>
-                  {formatMoney(summary.totalOut, currency, undefined, convertFromBase(summary.totalOut, currency))}
+                  {formatMoney(summary.totalOut, currency, locale, convertFromBase(summary.totalOut, currency))}
                 </span>
               </div>
             </div>

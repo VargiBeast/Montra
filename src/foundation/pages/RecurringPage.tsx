@@ -1,6 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { useRecurringPayments } from "../../hooks/useRecurringPayments";
 import { useDisplayCurrency } from "../../lib/currency";
+import { readLanguage } from "../../lib/i18n";
 import { formatMoney, formatDate } from "../../lib/utils";
 import type { RecurringPayment } from "../../types/recurringPayment";
 import { PageHeader } from "../ui/PageHeader";
@@ -24,10 +25,11 @@ function RecurringRow({
   currency: string;
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
 }) {
+  const locale = readLanguage();
   const amountLabel = formatMoney(
     item.amount,
     currency,
-    undefined,
+    locale,
     convertFromBase(Number(item.amount), currency),
   );
   const isIn = item.type === "in";

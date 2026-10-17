@@ -1,6 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { useSavingsGoals } from "../../hooks/useSavingsGoals";
 import { useDisplayCurrency } from "../../lib/currency";
+import { readLanguage } from "../../lib/i18n";
 import { formatMoney, formatDate } from "../../lib/utils";
 import { goalProgress, type SavingsGoal } from "../../types/savingsGoal";
 import { PageHeader } from "../ui/PageHeader";
@@ -19,16 +20,17 @@ function GoalCard({
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
 }) {
   const progress = goalProgress(goal);
+  const locale = readLanguage();
   const currentLabel = formatMoney(
     goal.current_amount,
     currency,
-    undefined,
+    locale,
     convertFromBase(goal.current_amount, currency),
   );
   const targetLabel = formatMoney(
     goal.target_amount,
     currency,
-    undefined,
+    locale,
     convertFromBase(goal.target_amount, currency),
   );
 

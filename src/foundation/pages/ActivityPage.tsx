@@ -1,6 +1,7 @@
 import { useAuth } from "../../hooks/useAuth";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useDisplayCurrency } from "../../lib/currency";
+import { readLanguage } from "../../lib/i18n";
 import { formatDate, formatMoney } from "../../lib/utils";
 import type { Transaction } from "../../types/transaction";
 import { PageHeader } from "../ui/PageHeader";
@@ -15,8 +16,9 @@ function TransactionRow({ tx, currency, convertFromBase }: {
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
 }) {
   const isIn = tx.type === "in";
+  const locale = readLanguage();
   const displayAmount = convertFromBase(Number(tx.amount), currency);
-  const amountLabel = formatMoney(Number(tx.amount), currency, undefined, displayAmount);
+  const amountLabel = formatMoney(Number(tx.amount), currency, locale, displayAmount);
 
   return (
     <div
