@@ -20,6 +20,7 @@ import "./styles/money-snapshot.css";
 import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
 import "./styles/marketing.css";
+import "./styles/emerald-vault.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
 
@@ -42,7 +43,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 
 function applyTheme(dark: boolean) {
   document.documentElement.dataset.theme = dark ? "dark" : "light";
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0b0a12" : "#f4f1fb");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#050806" : "#f3faf6");
 }
 
 function readThemePreference(): "light" | "dark" | "system" {
@@ -79,35 +80,26 @@ function SystemThemeSync() {
 
 function RepairLiteralEscapes() {
   useEffect(() => {
-    const repair = () => {
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      let node = walker.nextNode();
-      while (node) {
-        const value = node.nodeValue ?? "";
-        if (value.includes("\\u2013") || value.includes("\\u2014")) {
-          node.nodeValue = value.replaceAll("\\u2013", "\u2013").replaceAll("\\u2014", "\u2014");
-        }
-        node = walker.nextNode();
-      }
-    };
-    repair();
-    const observer = new MutationObserver(repair);
-    observer.observe(document.body, { subtree: true, childList: true, characterData: true });
-    return () => observer.disconnect();
+    /* no-op placeholder kept for parity with prior main */
   }, []);
   return null;
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root");
+if (!root) {
+  throw new Error("Montra root element missing");
+}
+
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
         <CurrencyProvider>
           <SystemThemeSync />
           <RepairLiteralEscapes />
-          <AnalyticsTracker />
-          <ConsentBanner />
           <AppRoutes />
+          <ConsentBanner />
+          <AnalyticsTracker />
         </CurrencyProvider>
       </LanguageProvider>
     </BrowserRouter>
