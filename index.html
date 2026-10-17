@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f2f0eb" />
+    <meta name="theme-color" content="#070a08" />
     <meta name="application-name" content="Montra" />
     <meta name="description" content="Montra is a personal money journal for tracking spending, receipts, savings goals and wishlists." />
     <meta name="robots" content="index, follow" />
@@ -25,6 +25,9 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/icons/favicon.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <title>Montra — personal money management</title>
     <script>
       (function () {
@@ -34,14 +37,11 @@
           var dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
           document.documentElement.dataset.theme = dark ? "dark" : "light";
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute("content", dark ? "#111214" : "#f2f0eb");
-        } catch (e) {
-          /* theme still applied later by the app shell */
-        }
+          if (meta) meta.setAttribute("content", dark ? "#070a08" : "#f4f7f5");
+        } catch (e) {}
       })();
     </script>
     <script>
-      /* Home-screen / installed PWA: open the app shell, not the marketing site. */
       (function () {
         try {
           var standalone =
@@ -53,12 +53,9 @@
           if (path === "/" || path === "") {
             window.location.replace("/app" + window.location.search + window.location.hash);
           }
-        } catch (e) {
-          /* stay on current page */
-        }
+        } catch (e) {}
       })();
     </script>
-    <!-- Consent Mode v2 defaults BEFORE GTM. All storage denied until user accepts. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -81,7 +78,6 @@
         }
       } catch (e) {}
     </script>
-    <!-- Google Tag Manager: GTM-M7PLP5TK → GA4 G-F4G8LGHZSH (configured in GTM UI) -->
     <script>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -91,10 +87,10 @@
     </script>
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M7PLP5TK"
     height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <!-- New foundation entry — does not load the previous main.tsx cascade -->
+    <script type="module" src="/src/foundation/main-entry.tsx"></script>
   </body>
 </html>
