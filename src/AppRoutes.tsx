@@ -142,6 +142,8 @@ export function AppRoutes() {
       <Route path="/receipts" element={<ProtectedApp />} />
       <Route path="/wishlist" element={<ProtectedApp />} />
       <Route path="/goals" element={<ProtectedApp />} />
+      <Route path="/recurring" element={<ProtectedApp />} />
+      <Route path="/planned" element={<ProtectedApp />} />
       <Route path="/more" element={<ProtectedApp />} />
       <Route path="/settings" element={<ProtectedApp />} />
       <Route path="/profile" element={<ProtectedApp />} />
