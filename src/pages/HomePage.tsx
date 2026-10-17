@@ -22,6 +22,7 @@ import { FinancialRadarCard } from "../components/FinancialRadarCard";
 import { WhatIfCard } from "../components/WhatIfCard";
 import { MoneyJourneyCard } from "../components/MoneyJourneyCard";
 import { TransactionRow } from "../components/TransactionRow";
+import { UserAvatar } from "../components/UserAvatar";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
@@ -107,6 +108,9 @@ interface HomePageProps {
   recurringPayments?: RecurringPayment[];
   onOpenRecurring?: () => void;
   personalization?: PersonalizationSettings;
+  onOpenProfile?: () => void;
+  user?: { id?: string; user_metadata?: Record<string, unknown>; email?: string | null } | null;
+  initials?: string;
 }
 
 export function HomePage({
@@ -128,6 +132,9 @@ export function HomePage({
   recurringPayments = [],
   onOpenRecurring,
   personalization = DEFAULT_PERSONALIZATION,
+  onOpenProfile,
+  user = null,
+  initials = "",
 }: HomePageProps) {
   const translate = useTranslation();
   const { language } = useLanguage();
@@ -206,11 +213,19 @@ export function HomePage({
 
   return (
     <main className="page-content mv-home">
-      <header className="mv-header">
-        <div className="mv-header-text">
-          <p className="mv-kicker">{t("welcomeBack")}</p>
-          <h1 className="mv-name">{name || t("hello")}</h1>
-        </div>
+      <header className="mv-top">
+        <button type="button" className="mv-top-user" onClick={() => onOpenProfile?.()} aria-label={name || t("hello")}>
+          <span className="mv-top-avatar">
+            <UserAvatar user={user as never} fallback={initials || (name || "?").slice(0, 1)} />
+          </span>
+          <span className="mv-top-text">
+            <span className="mv-kicker">{t("welcomeBack")}</span>
+            <span className="mv-name">{name || t("hello")}</span>
+          </span>
+        </button>
+        <button type="button" className="mv-top-more" onClick={() => onOpenMore?.()} aria-label={t("quickMore")}>
+          <UserRound size={18} />
+        </button>
       </header>
 
       <section className="mv-hero" aria-label={t("currentBalance")}>
