@@ -6,24 +6,25 @@ import { ActivityPage } from "./pages/ActivityPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { MorePage } from "./pages/MorePage";
-import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MarketingHome } from "./pages/MarketingHome";
 import { RecurringPage } from "./pages/RecurringPage";
+import { FeaturePlusPage } from "./pages/FeaturePlusPage";
+import { FeatureWishlistPage } from "./pages/FeatureWishlistPage";
+import { FeatureReceiptsPage } from "./pages/FeatureReceiptsPage";
+import { FeatureProfilePage } from "./pages/FeatureProfilePage";
+import { FeaturePersonalizePage } from "./pages/FeaturePersonalizePage";
 
 /**
- * Completely new route tree for the recreated frontend.
- * Does not import or wrap the previous AppRoutes / App.tsx page hierarchy.
+ * New route tree with real feature pages wired in.
  */
 export function FoundationRoutes() {
   return (
     <Routes>
-      {/* Public */}
       <Route path="/" element={<MarketingHome />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<LoginPage />} />
 
-      {/* Authenticated app shell */}
       <Route
         path="/app"
         element={
@@ -37,16 +38,15 @@ export function FoundationRoutes() {
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="goals" element={<GoalsPage />} />
         <Route path="more" element={<MorePage />} />
-        <Route path="wishlist" element={<PlaceholderPage title="Wishlist" subtitle="Save and share what you want" />} />
+        <Route path="wishlist" element={<FeatureWishlistPage />} />
         <Route path="recurring" element={<RecurringPage />} />
-        <Route path="receipts" element={<PlaceholderPage title="Receipts" subtitle="Capture and confirm before creating transactions" />} />
-        <Route path="personalize" element={<PlaceholderPage title="Personalize" subtitle="Themes, language, currency" />} />
-        <Route path="plus" element={<PlaceholderPage title="Montra Plus" subtitle="Entitlement is verified from the backend" />} />
-        <Route path="profile" element={<PlaceholderPage title="Profile" subtitle="Account and preferences" />} />
+        <Route path="receipts" element={<FeatureReceiptsPage />} />
+        <Route path="personalize" element={<FeaturePersonalizePage />} />
+        <Route path="plus" element={<FeaturePlusPage />} />
+        <Route path="profile" element={<FeatureProfilePage />} />
         <Route path="*" element={<Navigate to="/app" replace />} />
       </Route>
 
-      {/* Legacy path redirects into the new shell */}
       <Route path="/home" element={<Navigate to="/app" replace />} />
       <Route path="/activity" element={<Navigate to="/app/activity" replace />} />
       <Route path="/transactions/*" element={<Navigate to="/app/activity" replace />} />
@@ -60,8 +60,8 @@ export function FoundationRoutes() {
       <Route path="/settings" element={<Navigate to="/app/profile" replace />} />
       <Route path="/profile" element={<Navigate to="/app/profile" replace />} />
       <Route path="/personalize" element={<Navigate to="/app/personalize" replace />} />
+      <Route path="/plus" element={<Navigate to="/app/plus" replace />} />
 
-      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
