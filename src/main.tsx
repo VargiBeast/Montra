@@ -21,11 +21,10 @@ import "./styles/layout-clearance.css";
 import "./styles/icon-motion.css";
 import "./styles/marketing.css";
 import "./styles/emerald-vault.css";
+import "./styles/montra-vault.css";
 import { CurrencyProvider } from "./lib/currency";
 import { LanguageProvider } from "./lib/i18n";
 
-// Capacitor native (iOS/Android): open the app shell at /app, not the marketing homepage.
-// Browser visits and non-standalone web remain on /. Installed-PWA redirect stays in index.html.
 if (Capacitor.isNativePlatform()) {
   const path = window.location.pathname || "/";
   if (path === "/" || path === "") {
@@ -55,18 +54,15 @@ function readThemePreference(): "light" | "dark" | "system" {
   }
 }
 
-/** Keeps marketing (and any route outside App) on system light/dark when preference is system. */
 function SystemThemeSync() {
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-
     function sync() {
       const mode = readThemePreference();
       if (mode === "light") applyTheme(false);
       else if (mode === "dark") applyTheme(true);
       else applyTheme(media.matches);
     }
-
     sync();
     media.addEventListener("change", sync);
     window.addEventListener("storage", sync);

@@ -1,7 +1,5 @@
 import { useMemo } from "react";
 import {
-  ArrowDownLeft,
-  ArrowUpRight,
   ArrowDownUp,
   BarChart3,
   ChevronRight,
@@ -11,25 +9,42 @@ import {
   Plus,
   Receipt,
   UserRound,
+  TrendingUp,
+  TrendingDown,
+  CalendarClock,
 } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import type { SavingsGoal } from "../types/savingsGoal";
-import { goalProgress } from "../types/savingsGoal";
 import type { WishlistItem } from "../types/wishlist";
 import type { RecurringPayment } from "../types/recurringPayment";
 import { RecurringHomeTeaser } from "../components/RecurringHomeTeaser";
-import { formatMoney, getBalanceSummary } from "../lib/utils";
-import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics";
-import { resolveMoneySnapshotCopy, type MoneySnapshotKeys } from "../lib/moneySnapshotCopy";
-import { TransactionRow } from "../components/TransactionRow";
 import { FinancialRadarCard } from "../components/FinancialRadarCard";
 import { WhatIfCard } from "../components/WhatIfCard";
 import { MoneyJourneyCard } from "../components/MoneyJourneyCard";
+import { TransactionRow } from "../components/TransactionRow";
 import { useDisplayCurrency } from "../lib/currency";
 import { useLanguage, useTranslation } from "../lib/i18n";
 import { fillMissingCopy } from "../lib/missingCopy";
-import type { PersonalizationSettings } from "../lib/personalization";
-import { DEFAULT_PERSONALIZATION } from "../lib/personalization";
+import { formatMoney, getBalanceSummary } from "../lib/utils";
+import { goalProgress } from "../types/savingsGoal";
+import { filterTransactions, rangeForPeriod, summarize } from "../lib/analytics";
+import {
+  DEFAULT_PERSONALIZATION,
+  type PersonalizationSettings,
+} from "../lib/personalization";
+import {
+  resolveMoneySnapshotCopy,
+  type MoneySnapshotKeys,
+} from "../lib/moneySnapshotCopy";
+
+const SNAPSHOT_KEYS = new Set([
+  "trackedBalanceNote",
+  "thisMonth",
+  "thisMonthIncome",
+  "thisMonthSpending",
+  "thisMonthNet",
+  "thisMonthEmpty",
+]);
 
 const HOME_FALLBACK: Record<string, string> = {
   analytics: "Analytics",
@@ -39,14 +54,7 @@ const HOME_FALLBACK: Record<string, string> = {
   analyticsPlusTitle: "Unlock Advanced Analytics",
   analyticsPlusBody:
     "See spending trends, category breakdowns, and clearer patterns in your money — included with Montra Plus.",
-  analyticsPlusBenefitTrends: "Spending trends & income vs expenses",
-  analyticsPlusBenefitCategories: "Category breakdowns & comparisons",
-  analyticsPlusBenefitInsights: "Insights and future forecasting",
   analyticsPlusCta: "Get Montra Plus",
-  analyticsPlusComingSoon: "Montra Plus is coming soon.",
-  analyticsPreviewLabel: "Preview",
-  balanceAllActivity: "All activity",
-  homeGoalOf: "{current} / {target}",
   homeGoalRemaining: "{amount} remaining",
   homeGoalComplete: "Goal reached",
   homeWishlistCount: "{count} items",
@@ -58,16 +66,11 @@ const HOME_FALLBACK: Record<string, string> = {
   addFirstTransaction: "Add a purchase or money in to see your balance here.",
   planning: "Planning",
   savingsGoals: "Savings goals",
-  savingsGoalsHint: "Track progress toward a target",
   wishlist: "Wishlist",
-  wishlistHint: "Save products you want",
   recentActivity: "Recent activity",
   viewAll: "View all",
   addTransaction: "Add transaction",
   currentBalance: "Current balance",
-  moneyIn: "Money in",
-  moneyOut: "Money out",
-  homeTitle: "Home",
   hello: "Hello",
   welcomeBack: "Welcome back",
   totalBalance: "Tracked balance",
@@ -81,18 +84,9 @@ const HOME_FALLBACK: Record<string, string> = {
   quickActivity: "Activity",
   quickReceipts: "Receipts",
   quickMore: "More",
-  mainNavigation: "Main navigation",
+  mainNavigation: "Quick actions",
+  transactions: "Transactions",
 };
-
-const SNAPSHOT_KEYS = new Set<string>([
-  "totalBalance",
-  "trackedBalanceNote",
-  "thisMonth",
-  "thisMonthIncome",
-  "thisMonthSpending",
-  "thisMonthNet",
-  "thisMonthEmpty",
-]);
 
 interface HomePageProps {
   transactions: Transaction[];
@@ -164,7 +158,7 @@ export function HomePage({
     return summarize(monthTx);
   }, [transactions]);
 
-  const recent = useMemo(() => transactions.slice(0, 5), [transactions]);
+  const recent = useMemo(() => transactions.slice(0, 6), [transactions]);
 
   const featuredGoal = useMemo(() => {
     const active = savingsGoals
@@ -201,190 +195,187 @@ export function HomePage({
       ? t("homeGoalsEmpty")
       : t("homeGoalsActive", { count: activeGoalsCount });
 
-  const layout = personalization.layoutStyle ?? "balanced";
   const monthHasActivity = monthSummary.transactionCount > 0;
-  const netClass =
-    monthSummary.netChange > 0
-      ? "void-month-net is-positive"
-      : monthSummary.netChange < 0
-        ? "void-month-net is-negative"
-        : "void-month-net";
+  const netPositive = monthSummary.netChange > 0;
+  const netNegative = monthSummary.netChange < 0;
+
+  const activeRecurring = useMemo(
+    () => (recurringPayments ?? []).filter((p) => p.active !== false),
+    [recurringPayments],
+  );
 
   return (
-    <main className={`page-content void-home layout-${layout}`}>
-      <header className="void-welcome">
-        <div className="void-welcome-text">
-          <p className="void-welcome-label">{t("welcomeBack")}</p>
-          <h1 className="void-welcome-name">{name || t("hello")}</h1>
+    <main className="page-content mv-home">
+      <header className="mv-header">
+        <div className="mv-header-text">
+          <p className="mv-kicker">{t("welcomeBack")}</p>
+          <h1 className="mv-name">{name || t("hello")}</h1>
         </div>
       </header>
 
-      <section className="void-balance" aria-label={t("currentBalance")}>
-        <span className="void-balance-deco" aria-hidden="true">
-          <span className="void-deco-ring" />
-          <span className="void-deco-dot" />
-          <span className="void-deco-spark" />
-        </span>
-        <p className="void-balance-label">{t("totalBalance")}</p>
-        <p className="void-balance-value">{money(summary.balance)}</p>
-        <p className="void-balance-note">{t("trackedBalanceNote")}</p>
-        <div className="void-balance-split">
-          <div>
-            <span className="void-balance-split-label">
-              <ArrowDownLeft size={14} aria-hidden="true" />
-              {t("moneyIn")}
+      <section className="mv-hero" aria-label={t("currentBalance")}>
+        <div className="mv-hero-glow" aria-hidden="true" />
+        <p className="mv-hero-label">{t("totalBalance")}</p>
+        <p className="mv-hero-value">{money(summary.balance)}</p>
+        {monthHasActivity && (
+          <p
+            className={
+              netPositive
+                ? "mv-hero-delta is-up"
+                : netNegative
+                  ? "mv-hero-delta is-down"
+                  : "mv-hero-delta"
+            }
+          >
+            {netPositive ? <TrendingUp size={14} /> : netNegative ? <TrendingDown size={14} /> : null}
+            <span>
+              {netPositive ? "+" : ""}
+              {money(monthSummary.netChange)} · {t("thisMonth")}
             </span>
-            <strong className="void-balance-in">{money(summary.totalIn)}</strong>
-          </div>
-          <div>
-            <span className="void-balance-split-label">
-              <ArrowUpRight size={14} aria-hidden="true" />
-              {t("moneyOut")}
-            </span>
-            <strong className="void-balance-out">{money(summary.totalOut)}</strong>
-          </div>
-        </div>
+          </p>
+        )}
+        <p className="mv-hero-note">{t("trackedBalanceNote")}</p>
       </section>
 
-      <section className="void-month" aria-label={t("thisMonth")}>
-        <div className="void-month-head">
-          <h2 className="void-month-title">{t("thisMonth")}</h2>
+      <nav className="mv-actions" aria-label={t("mainNavigation")}>
+        <button type="button" className="mv-action" onClick={onAdd}>
+          <span className="mv-action-orb"><Plus size={22} /></span>
+          <span className="mv-action-label">{t("quickAdd")}</span>
+        </button>
+        <button type="button" className="mv-action" onClick={onViewAll}>
+          <span className="mv-action-orb"><ArrowDownUp size={20} /></span>
+          <span className="mv-action-label">{t("quickActivity")}</span>
+        </button>
+        <button type="button" className="mv-action" onClick={() => onOpenReceipts?.()}>
+          <span className="mv-action-orb"><Receipt size={20} /></span>
+          <span className="mv-action-label">{t("quickReceipts")}</span>
+        </button>
+        <button type="button" className="mv-action" onClick={() => onOpenMore?.()}>
+          <span className="mv-action-orb"><UserRound size={20} /></span>
+          <span className="mv-action-label">{t("quickMore")}</span>
+        </button>
+      </nav>
+
+      <section className="mv-card mv-month" aria-label={t("thisMonth")}>
+        <div className="mv-card-head">
+          <h2>{t("thisMonth")}</h2>
         </div>
         {monthHasActivity ? (
-          <div className="void-month-grid">
-            <div className="void-month-stat">
-              <span className="void-month-stat-label">{t("thisMonthIncome")}</span>
-              <strong className="void-month-stat-value is-in">{money(monthSummary.totalIncome)}</strong>
+          <div className="mv-month-grid">
+            <div className="mv-stat">
+              <span>{t("thisMonthIncome")}</span>
+              <strong className="is-in">{money(monthSummary.totalIncome)}</strong>
             </div>
-            <div className="void-month-stat">
-              <span className="void-month-stat-label">{t("thisMonthSpending")}</span>
-              <strong className="void-month-stat-value is-out">{money(monthSummary.totalSpending)}</strong>
+            <div className="mv-stat">
+              <span>{t("thisMonthSpending")}</span>
+              <strong className="is-out">{money(monthSummary.totalSpending)}</strong>
             </div>
-            <div className={`void-month-stat void-month-stat-net ${netClass}`}>
-              <span className="void-month-stat-label">{t("thisMonthNet")}</span>
-              <strong className="void-month-stat-value">
-                {monthSummary.netChange > 0 ? "+" : monthSummary.netChange < 0 ? "\u2212" : ""}
-                {money(Math.abs(monthSummary.netChange))}
+            <div className="mv-stat">
+              <span>{t("thisMonthNet")}</span>
+              <strong className={netPositive ? "is-in" : netNegative ? "is-out" : ""}>
+                {money(monthSummary.netChange)}
               </strong>
             </div>
           </div>
         ) : (
-          <p className="void-month-empty">{t("thisMonthEmpty")}</p>
+          <p className="mv-empty-line">{t("thisMonthEmpty")}</p>
         )}
       </section>
 
-      {recurringPayments.length > 0 && (
-        <RecurringHomeTeaser items={recurringPayments} onOpen={onOpenRecurring} />
-      )}
-
-      <nav className="void-quick" aria-label={t("mainNavigation")}>
-        <button type="button" className="void-quick-item" onClick={onAdd}>
-          <span className="void-quick-icon"><Plus size={20} /></span>
-          <span>{t("quickAdd")}</span>
-        </button>
-        <button type="button" className="void-quick-item" onClick={onViewAll}>
-          <span className="void-quick-icon"><ArrowDownUp size={20} /></span>
-          <span>{t("quickActivity")}</span>
-        </button>
-        <button type="button" className="void-quick-item" onClick={() => onOpenReceipts?.()}>
-          <span className="void-quick-icon"><Receipt size={20} /></span>
-          <span>{t("quickReceipts")}</span>
-        </button>
-        <button type="button" className="void-quick-item" onClick={() => onOpenMore?.()}>
-          <span className="void-quick-icon"><UserRound size={20} /></span>
-          <span>{t("quickMore")}</span>
-        </button>
-      </nav>
-
-      {hasPlus && personalization.showAnalytics !== false && (
-        <div className="void-radar-wrap" style={{ order: personalization.sectionOrder?.indexOf("analytics") ?? 0 }}>
-          <FinancialRadarCard
-            transactions={transactions}
-            savingsGoals={savingsGoals}
-            onOpenAnalytics={onOpenAnalytics}
-            onOpenSavingsGoals={onOpenSavingsGoals}
-          />
-        </div>
-      )}
-
       {personalization.showPlanning !== false && (
-        <section className="void-section" aria-label={t("planning")}>
-          <div className="void-section-head">
-            <h2>{t("planning")}</h2>
-          </div>
-          {featuredGoal && (
-            <button type="button" className="void-goal-card" onClick={onOpenSavingsGoals}>
-              <div className="void-goal-top">
-                <span className="void-goal-icon"><PiggyBank size={18} /></span>
-                <div>
-                  <strong>{featuredGoal.goal.name}</strong>
-                  <span>{featuredGoal.progress.isComplete ? t("homeGoalComplete") : t("homeGoalRemaining", { amount: money(featuredGoal.progress.remaining) })}</span>
-                </div>
+        <section className="mv-card mv-feature" aria-label={t("planning")}>
+          {featuredGoal ? (
+            <button type="button" className="mv-feature-btn" onClick={onOpenSavingsGoals}>
+              <div className="mv-feature-copy">
+                <span className="mv-feature-badge">{t("savingsGoals")}</span>
+                <strong>{featuredGoal.goal.name}</strong>
+                <span>
+                  {featuredGoal.progress.isComplete
+                    ? t("homeGoalComplete")
+                    : t("homeGoalRemaining", { amount: money(featuredGoal.progress.remaining) })}
+                </span>
+              </div>
+              <div className="mv-feature-ring" aria-hidden="true">
                 <em>{Math.round(featuredGoal.progress.percent)}%</em>
               </div>
-              <div className="void-goal-track">
-                <span className="void-goal-fill" style={{ width: `${Math.min(100, featuredGoal.progress.percent)}%` }} />
+            </button>
+          ) : (
+            <button type="button" className="mv-feature-btn" onClick={onOpenSavingsGoals}>
+              <div className="mv-feature-copy">
+                <span className="mv-feature-badge">{t("planning")}</span>
+                <strong>{t("savingsGoals")}</strong>
+                <span>{t("homeGoalsEmpty")}</span>
               </div>
+              <span className="mv-feature-icon"><PiggyBank size={28} /></span>
             </button>
           )}
-          <div className="void-planning-grid">
-            <button type="button" className="void-plan-card" onClick={onOpenSavingsGoals}>
-              <span className="void-plan-icon"><PiggyBank size={18} /></span>
-              <strong>{t("savingsGoals")}</strong>
-              <span>{goalsLabel}</span>
+          <div className="mv-feature-links">
+            <button type="button" onClick={onOpenSavingsGoals}>
+              <PiggyBank size={16} /> {goalsLabel}
             </button>
-            <button type="button" className="void-plan-card" onClick={onOpenWishlist}>
-              <span className="void-plan-icon"><Gift size={18} /></span>
-              <strong>{t("wishlist")}</strong>
-              <span>{wishlistLabel}</span>
+            <button type="button" onClick={onOpenWishlist}>
+              <Gift size={16} /> {wishlistLabel}
             </button>
+            {onOpenRecurring && (
+              <button type="button" onClick={onOpenRecurring}>
+                <CalendarClock size={16} /> {t("planning")}
+              </button>
+            )}
           </div>
         </section>
       )}
 
-      {personalization.showPlanning !== false && (
-        <WhatIfCard goals={savingsGoals} />
+      {onOpenRecurring && (
+        <RecurringHomeTeaser items={activeRecurring} onOpen={onOpenRecurring} />
       )}
 
+      {hasPlus && personalization.showAnalytics !== false && (
+        <FinancialRadarCard
+          transactions={transactions}
+          savingsGoals={savingsGoals}
+          onOpenAnalytics={onOpenAnalytics}
+          onOpenSavingsGoals={onOpenSavingsGoals}
+        />
+      )}
+
+      {personalization.showPlanning !== false && <WhatIfCard goals={savingsGoals} />}
       <MoneyJourneyCard transactions={transactions} goals={savingsGoals} />
 
       {!hasPlus && personalization.showAnalytics !== false && (
-        <section className="panel analytics-plus-card void-plus-teaser">
-          <div className="analytics-plus-overlay">
-            <span className="plus-badge">{t("analyticsPlusBadge")}</span>
-            <div className="analytics-plus-icon" aria-hidden="true">
-              <BarChart3 size={22} />
-              <Lock size={12} className="analytics-plus-lock" />
-            </div>
-            <h2>{t("analyticsPlusTitle")}</h2>
-            <p>{t("analyticsPlusBody")}</p>
-            <button type="button" className="primary-button analytics-plus-cta" onClick={() => onGetPlus?.()}>
-              {t("analyticsPlusCta")}
-            </button>
+        <section className="mv-card mv-plus">
+          <span className="mv-feature-badge">{t("analyticsPlusBadge")}</span>
+          <div className="mv-plus-icon" aria-hidden="true">
+            <BarChart3 size={22} />
+            <Lock size={12} />
           </div>
+          <h2>{t("analyticsPlusTitle")}</h2>
+          <p>{t("analyticsPlusBody")}</p>
+          <button type="button" className="mv-cta" onClick={() => onGetPlus?.()}>
+            {t("analyticsPlusCta")}
+          </button>
         </section>
       )}
 
       {personalization.showActivity !== false && (
-        <section className="void-section void-activity" aria-label={t("recentActivity")}>
-          <div className="void-section-head">
-            <h2>{t("recentActivity")}</h2>
+        <section className="mv-card mv-tx" aria-label={t("recentActivity")}>
+          <div className="mv-card-head">
+            <h2>{t("transactions")}</h2>
             {transactions.length > 0 && (
-              <button type="button" className="text-button" onClick={onViewAll}>
+              <button type="button" className="mv-link" onClick={onViewAll}>
                 {t("viewAll")} <ChevronRight size={16} />
               </button>
             )}
           </div>
           {transactions.length === 0 ? (
-            <div className="empty-state home-empty">
+            <div className="mv-empty">
               <h3>{t("noTransactionsYet")}</h3>
               <p>{t("addFirstTransaction")}</p>
-              <button type="button" className="primary-button" onClick={onAdd}>
+              <button type="button" className="mv-cta" onClick={onAdd}>
                 <Plus size={16} /> {t("addTransaction")}
               </button>
             </div>
           ) : (
-            <ul className="transaction-list void-tx-list">
+            <ul className="mv-tx-list">
               {recent.map((tx) => (
                 <TransactionRow
                   key={tx.id}
