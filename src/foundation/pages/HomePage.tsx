@@ -7,12 +7,56 @@ import { useDisplayCurrency } from "../../lib/currency";
 import { readLanguage } from "../../lib/i18n";
 import { formatMoney, formatDate, getBalanceSummary } from "../../lib/utils";
 import type { Transaction } from "../../types/transaction";
-import { Card } from "../ui/Card";
-import { PageHeader } from "../ui/PageHeader";
-import { Button } from "../ui/Button";
 import { LoadingState } from "../ui/LoadingState";
 
-function RecentRow({
+function QuickAction({
+  label,
+  onClick,
+  icon,
+}: {
+  label: string;
+  onClick: () => void;
+  icon: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 8,
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        color: "var(--m-text-secondary)",
+        padding: 0,
+        minWidth: 64,
+      }}
+    >
+      <span
+        style={{
+          width: 52,
+          height: 52,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          display: "grid",
+          placeItems: "center",
+          fontSize: 20,
+          color: "#e8f5ef",
+        }}
+        aria-hidden
+      >
+        {icon}
+      </span>
+      <span style={{ fontSize: 12, fontWeight: 500 }}>{label}</span>
+    </button>
+  );
+}
+
+function TransactionRow({
   tx,
   currency,
   convertFromBase,
@@ -32,20 +76,20 @@ function RecentRow({
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "10px 0",
-        borderBottom: "1px solid var(--m-border)",
+        padding: "14px 0",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
       }}
     >
       <div
         style={{
-          width: 32,
-          height: 32,
-          borderRadius: "var(--m-radius-full)",
-          background: isIn ? "rgba(52, 211, 153, 0.12)" : "rgba(248, 113, 113, 0.1)",
-          color: isIn ? "var(--m-positive)" : "var(--m-negative)",
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: isIn ? "rgba(52, 211, 153, 0.15)" : "rgba(255,255,255,0.06)",
+          color: isIn ? "#34d399" : "#9fb3a6",
           display: "grid",
           placeItems: "center",
-          fontSize: 12,
+          fontSize: 14,
           fontWeight: 700,
           flexShrink: 0,
         }}
@@ -57,7 +101,8 @@ function RecentRow({
         <div
           style={{
             fontWeight: 600,
-            fontSize: "var(--m-text-sm)",
+            fontSize: 14,
+            color: "#f0f7f2",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -65,16 +110,18 @@ function RecentRow({
         >
           {tx.name}
         </div>
-        <div style={{ fontSize: "var(--m-text-xs)", color: "var(--m-text-muted)" }}>
-          {formatDate(tx.date)}
+        <div style={{ fontSize: 12, color: "#6b7f72", marginTop: 2 }}>
+          {isIn ? "Receive" : "Send"}
+          {tx.method ? ` · ${tx.method}` : ""}
         </div>
       </div>
       <div
         style={{
           fontWeight: 600,
-          fontSize: "var(--m-text-sm)",
-          color: isIn ? "var(--m-positive)" : "var(--m-text)",
+          fontSize: 14,
+          color: isIn ? "#34d399" : "#f0f7f2",
           fontVariantNumeric: "tabular-nums",
+          whiteSpace: "nowrap",
         }}
       >
         {isIn ? "+" : "−"}
@@ -85,14 +132,13 @@ function RecentRow({
 }
 
 /**
- * New Home — truthful financial summary from real user transactions only.
- * Balance = totalIn − totalOut (journal net), not a bank connection.
- * No fabricated numbers; empty state when there is no data.
+ * Home — reference layout (welcome, balance, quick actions, transactions)
+ * with Montra data: journal net, real transactions, Plus entitlement.
  */
 export function HomePage() {
   const auth = useAuth();
   const { transactions, isLoading, error, refresh } = useTransactions(auth.user?.id);
-  const { currency, convertFromBase, ratesReady } = useDisplayCurrency();
+  const { currency, convertFromBase } = useDisplayCurrency();
   const plus = usePlusEntitlement(auth.user?.id);
   const navigate = useNavigate();
   const locale = readLanguage();
@@ -110,144 +156,241 @@ export function HomePage() {
     auth.user?.email?.split("@")[0] ??
     "there";
 
+  const avatarUrl =
+    typeof auth.user?.user_metadata?.avatar_url === "string"
+      ? auth.user.user_metadata.avatar_url
+      : typeof auth.user?.user_metadata?.picture === "string"
+        ? auth.user.user_metadata.picture
+        : null;
+
   const hasData = transactions.length > 0;
   const balanceDisplay = hasData
     ? formatMoney(summary.balance, currency, locale, convertFromBase(summary.balance, currency))
-    : null;
+    : formatMoney(0, currency, locale, 0);
 
   return (
-    <div>
-      <PageHeader
-        title={`Welcome back, ${displayName}`}
-        subtitle={ratesReady ? `Display currency: ${currency}` : "Loading rates…"}
-        action={
-          plus.hasPlus ? undefined : (
-            <Button size="sm" variant="secondary" onClick={() => navigate("/app/plus")}>
-              Get Plus
-            </Button>
-          )
-        }
-      />
-
-      <Card
-        padding="lg"
+    <div style={{ maxWidth: 480, marginInline: "auto" }}>
+      {/* Header — avatar + welcome + more */}
+      <header
         style={{
-          background: "linear-gradient(160deg, #0e1a14 0%, #0a120e 60%, #0d1511 100%)",
-          borderColor: "rgba(16, 185, 129, 0.2)",
-          marginBottom: "var(--m-space-4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 28,
+          gap: 12,
         }}
       >
-        <p style={{ margin: 0, fontSize: "var(--m-text-sm)", color: "var(--m-text-secondary)" }}>
-          Journal balance
-        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              overflow: "hidden",
+              background: "rgba(16,185,129,0.2)",
+              flexShrink: 0,
+              display: "grid",
+              placeItems: "center",
+              fontWeight: 700,
+              color: "#10b981",
+            }}
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" width={44} height={44} style={{ objectFit: "cover" }} />
+            ) : (
+              displayName.slice(0, 1).toUpperCase()
+            )}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 12, color: "#6b7f72" }}>Welcome Back</p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#f0f7f2",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {displayName}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate("/app/more")}
+          aria-label="More"
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,0.04)",
+            color: "#9fb3a6",
+            cursor: "pointer",
+            fontSize: 16,
+          }}
+        >
+          ⌂
+        </button>
+      </header>
+
+      {/* Total Balance — centered like reference */}
+      <section style={{ textAlign: "center", marginBottom: 28 }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#9fb3a6", fontWeight: 500 }}>Total Balance</p>
         {isLoading ? (
-          <p style={{ margin: "12px 0 0", color: "var(--m-text-muted)", fontSize: "var(--m-text-sm)" }}>
-            Loading…
-          </p>
+          <p style={{ margin: "8px 0 0", color: "#6b7f72" }}>Loading…</p>
         ) : error ? (
-          <div style={{ marginTop: 12 }}>
-            <p role="alert" style={{ margin: 0, color: "var(--m-negative)", fontSize: "var(--m-text-sm)" }}>
+          <div style={{ marginTop: 8 }}>
+            <p role="alert" style={{ margin: 0, color: "#f87171", fontSize: 13 }}>
               {error}
             </p>
-            <Button size="sm" variant="ghost" onClick={() => void refresh()} style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => void refresh()}
+              style={{
+                marginTop: 8,
+                background: "none",
+                border: "none",
+                color: "#10b981",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
               Retry
-            </Button>
+            </button>
           </div>
-        ) : hasData ? (
+        ) : (
           <>
             <p
               style={{
-                margin: "8px 0 0",
-                fontSize: "var(--m-text-4xl)",
+                margin: "6px 0 0",
+                fontSize: "clamp(2rem, 8vw, 2.5rem)",
                 fontWeight: 700,
                 letterSpacing: "-0.03em",
-                color: "var(--m-text)",
+                color: "#f5faf7",
                 fontVariantNumeric: "tabular-nums",
               }}
             >
               {balanceDisplay}
             </p>
-            <p style={{ margin: "8px 0 0", fontSize: "var(--m-text-xs)", color: "var(--m-text-muted)" }}>
-              Net of recorded income and expenses · not a bank balance
-            </p>
-            <div
-              style={{
-                display: "flex",
-                gap: "var(--m-space-4)",
-                marginTop: "var(--m-space-4)",
-                fontSize: "var(--m-text-sm)",
-              }}
-            >
-              <div>
-                <span style={{ color: "var(--m-text-muted)" }}>In </span>
-                <span style={{ color: "var(--m-positive)", fontWeight: 600 }}>
-                  {formatMoney(summary.totalIn, currency, locale, convertFromBase(summary.totalIn, currency))}
-                </span>
-              </div>
-              <div>
-                <span style={{ color: "var(--m-text-muted)" }}>Out </span>
-                <span style={{ color: "var(--m-text)", fontWeight: 600 }}>
-                  {formatMoney(summary.totalOut, currency, locale, convertFromBase(summary.totalOut, currency))}
-                </span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <p
-              style={{
-                margin: "8px 0 0",
-                fontSize: "var(--m-text-2xl)",
-                fontWeight: 600,
-                color: "var(--m-text-muted)",
-              }}
-            >
-              No activity yet
-            </p>
-            <p style={{ margin: "8px 0 0", fontSize: "var(--m-text-sm)", color: "var(--m-text-muted)" }}>
-              Add your first transaction to see a journal balance here.
-            </p>
+            {hasData ? (
+              <p
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  margin: "10px 0 0",
+                  padding: "4px 10px",
+                  borderRadius: 9999,
+                  background: "rgba(52,211,153,0.12)",
+                  color: "#34d399",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                Journal net · not a bank balance
+              </p>
+            ) : (
+              <p style={{ margin: "10px 0 0", fontSize: 12, color: "#6b7f72" }}>
+                Add transactions to build your balance
+              </p>
+            )}
           </>
         )}
-      </Card>
+      </section>
 
+      {/* Quick actions — Montra functions, circular like reference */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-          gap: "var(--m-space-3)",
-          marginBottom: "var(--m-space-6)",
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          marginBottom: 24,
+          padding: "0 4px",
         }}
       >
-        {[
-          { label: "Activity", path: "/app/activity" },
-          { label: "Receipts", path: "/app/receipts" },
-          { label: "Goals", path: "/app/goals" },
-          { label: "More", path: "/app/more" },
-        ].map((item) => (
-          <Button
-            key={item.path}
-            variant="secondary"
-            fullWidth
-            onClick={() => navigate(item.path)}
-            style={{ paddingBlock: 16 }}
-          >
-            {item.label}
-          </Button>
-        ))}
+        <QuickAction label="Add" icon="＋" onClick={() => navigate("/app/activity")} />
+        <QuickAction label="Receipt" icon="▤" onClick={() => navigate("/app/receipts")} />
+        <QuickAction label="Goals" icon="◎" onClick={() => navigate("/app/goals")} />
+        <QuickAction label="More" icon="⋯" onClick={() => navigate("/app/more")} />
       </div>
 
-      <Card>
+      {/* Plus promo — maps to Share & Earn slot in reference */}
+      {!plus.hasPlus && !plus.isLoading ? (
+        <div
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: 20,
+            padding: "20px 18px",
+            marginBottom: 20,
+            background: "linear-gradient(135deg, #0e1f16 0%, #0a1610 60%, #0c1812 100%)",
+            border: "1px solid rgba(16,185,129,0.2)",
+          }}
+        >
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              right: -20,
+              top: -20,
+              width: 120,
+              height: 120,
+              borderRadius: "40%",
+              background: "radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)",
+              transform: "rotate(25deg)",
+            }}
+          />
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 16, color: "#f0f7f2", position: "relative" }}>
+            Montra Plus
+          </p>
+          <p style={{ margin: "6px 0 14px", fontSize: 13, color: "#9fb3a6", position: "relative", maxWidth: "70%" }}>
+            Unlock analytics depth, planning tools, and premium personalization.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/app/plus")}
+            style={{
+              position: "relative",
+              padding: "10px 18px",
+              borderRadius: 9999,
+              border: "none",
+              background: "linear-gradient(135deg, #10b981, #059669)",
+              color: "#04110a",
+              fontWeight: 600,
+              fontSize: 13,
+              cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(16,185,129,0.35)",
+            }}
+          >
+            Get Plus
+          </button>
+        </div>
+      ) : null}
+
+      {/* Transactions */}
+      <section
+        style={{
+          borderRadius: 20,
+          padding: "16px 18px 8px",
+          background: "rgba(18, 26, 21, 0.9)",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-          <h2 style={{ margin: 0, fontSize: "var(--m-text-base)", fontWeight: 600 }}>Recent activity</h2>
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#f0f7f2" }}>Transactions</h2>
           <button
             type="button"
             onClick={() => navigate("/app/activity")}
             style={{
               background: "none",
               border: "none",
-              color: "var(--m-accent)",
-              fontSize: "var(--m-text-sm)",
+              color: "#10b981",
+              fontSize: 13,
               cursor: "pointer",
               fontWeight: 500,
             }}
@@ -256,21 +399,21 @@ export function HomePage() {
           </button>
         </div>
         {isLoading ? (
-          <p style={{ margin: "12px 0 0", color: "var(--m-text-muted)", fontSize: "var(--m-text-sm)" }}>Loading…</p>
+          <p style={{ margin: "16px 0", color: "#6b7f72", fontSize: 13 }}>Loading…</p>
         ) : recent.length === 0 ? (
-          <p style={{ margin: "12px 0 0", color: "var(--m-text-muted)", fontSize: "var(--m-text-sm)" }}>
-            No transactions yet.
+          <p style={{ margin: "16px 0", color: "#6b7f72", fontSize: 13 }}>
+            No transactions yet. Tap Add to record income or expenses.
           </p>
         ) : (
           <div role="list">
             {recent.map((tx) => (
               <div key={tx.id} role="listitem">
-                <RecentRow tx={tx} currency={currency} convertFromBase={convertFromBase} />
+                <TransactionRow tx={tx} currency={currency} convertFromBase={convertFromBase} />
               </div>
             ))}
           </div>
         )}
-      </Card>
+      </section>
     </div>
   );
 }
