@@ -1,0 +1,110 @@
+/**
+ * Montra — new design system tokens
+ * Visual direction from supplied reference images:
+ * - Mobile: deep charcoal/emerald, gold accents, soft green glows
+ * - Desktop: dark purple slate, violet accents, elevated cards
+ * Not derived from the previous CSS layers.
+ */
+
+:root {
+  /* Core surfaces */
+  --m-bg: #070a08;
+  --m-bg-elevated: #0e1410;
+  --m-bg-card: #121a15;
+  --m-bg-card-hover: #18201a;
+  --m-bg-input: #0b100d;
+
+  /* Text */
+  --m-text: #f0f7f2;
+  --m-text-secondary: #9fb3a6;
+  --m-text-muted: #6b7f72;
+  --m-text-inverse: #070a08;
+
+  /* Brand / accent — emerald */
+  --m-accent: #10b981;
+  --m-accent-soft: rgba(16, 185, 129, 0.14);
+  --m-accent-strong: #059669;
+  --m-accent-glow: rgba(16, 185, 129, 0.35);
+
+  /* Gold highlight (from coin/onboarding reference) */
+  --m-gold: #e8c547;
+  --m-gold-soft: rgba(232, 197, 71, 0.12);
+
+  /* Desktop / analytics purple accent */
+  --m-violet: #8b5cf6;
+  --m-violet-soft: rgba(139, 92, 246, 0.16);
+  --m-violet-strong: #7c3aed;
+
+  /* Semantic */
+  --m-positive: #34d399;
+  --m-negative: #f87171;
+  --m-warning: #fbbf24;
+  --m-info: #60a5fa;
+
+  /* Borders & dividers */
+  --m-border: rgba(255, 255, 255, 0.06);
+  --m-border-strong: rgba(255, 255, 255, 0.12);
+  --m-ring: rgba(16, 185, 129, 0.45);
+
+  /* Radius */
+  --m-radius-sm: 10px;
+  --m-radius-md: 14px;
+  --m-radius-lg: 20px;
+  --m-radius-xl: 28px;
+  --m-radius-full: 9999px;
+
+  /* Spacing scale */
+  --m-space-1: 4px;
+  --m-space-2: 8px;
+  --m-space-3: 12px;
+  --m-space-4: 16px;
+  --m-space-5: 20px;
+  --m-space-6: 24px;
+  --m-space-8: 32px;
+  --m-space-10: 40px;
+  --m-space-12: 48px;
+
+  /* Typography */
+  --m-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --m-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --m-text-xs: 0.75rem;
+  --m-text-sm: 0.875rem;
+  --m-text-base: 1rem;
+  --m-text-lg: 1.125rem;
+  --m-text-xl: 1.25rem;
+  --m-text-2xl: 1.5rem;
+  --m-text-3xl: 1.875rem;
+  --m-text-4xl: 2.25rem;
+
+  /* Shadows */
+  --m-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --m-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --m-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --m-shadow-glow: 0 0 32px var(--m-accent-glow);
+
+  /* Layout */
+  --m-nav-height: 64px;
+  --m-side-width: 240px;
+  --m-content-max: 1200px;
+
+  /* Motion */
+  --m-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --m-duration: 180ms;
+}
+
+/* Light theme override (kept for preference support) */
+[data-theme="light"] {
+  --m-bg: #f4f7f5;
+  --m-bg-elevated: #ffffff;
+  --m-bg-card: #ffffff;
+  --m-bg-card-hover: #f0f4f1;
+  --m-bg-input: #eef2ef;
+  --m-text: #0c1210;
+  --m-text-secondary: #4a5c52;
+  --m-text-muted: #7a8c82;
+  --m-border: rgba(0, 0, 0, 0.06);
+  --m-border-strong: rgba(0, 0, 0, 0.12);
+  --m-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --m-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --m-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1);
+}
