@@ -5,7 +5,7 @@ import { useTransactions } from "../../hooks/useTransactions";
 import { usePlusEntitlement } from "../../hooks/usePlusEntitlement";
 import { useDisplayCurrency } from "../../lib/currency";
 import { readLanguage } from "../../lib/i18n";
-import { formatMoney, formatDate, getBalanceSummary } from "../../lib/utils";
+import { formatMoney, getBalanceSummary } from "../../lib/utils";
 import type { Transaction } from "../../types/transaction";
 import { LoadingState } from "../ui/LoadingState";
 
