@@ -14,10 +14,12 @@ import {
   Sun,
   UserRound,
   Laptop,
+  CalendarClock,
 } from "lucide-react";
 import type { Transaction } from "../types/transaction";
 import { isImportableTransaction, validateProductUrl } from "../lib/utils";
 import { useLanguage, useTranslation } from "../lib/i18n";
+import { resolveRecurringCopy } from "../lib/recurringCopy";
 import { fillMissingCopy } from "../lib/missingCopy";
 import { useDisplayCurrency } from "../lib/currency";
 import {
@@ -57,6 +59,7 @@ interface MorePageProps {
   onProfile: () => void;
   onSignOut: () => Promise<void>;
   onSavingsGoals?: () => void;
+  onRecurring?: () => void;
   onWishlist?: () => void;
   onOpenPlus?: () => void;
   hasPlus?: boolean;
@@ -71,6 +74,7 @@ export function MorePage({
   onProfile,
   onSignOut,
   onSavingsGoals,
+  onRecurring,
   onWishlist,
   onOpenPlus,
   hasPlus = false,
@@ -188,7 +192,6 @@ export function MorePage({
         setMessage(t("backupInvalid"));
         return;
       }
-      // Show preview — do not write until the user confirms.
       setPendingImport(records);
     } catch {
       setMessage(t("backupReadFailed"));
@@ -378,10 +381,22 @@ export function MorePage({
         </div>
       </section>
 
-      {(onSavingsGoals || onWishlist) && (
+      {(onSavingsGoals || onWishlist || onRecurring) && (
         <>
           <p className="section-label">{t("planning")}</p>
           <section className="panel settings-list more-planning" aria-label={t("planning")}>
+            {onRecurring && (
+              <button className="setting-row" type="button" onClick={onRecurring}>
+                <span className="setting-icon" aria-hidden="true">
+                  <CalendarClock size={18} />
+                </span>
+                <span className="setting-copy">
+                  <strong>{resolveRecurringCopy(language, "title")}</strong>
+                  <span>{resolveRecurringCopy(language, "hint")}</span>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </button>
+            )}
             {onSavingsGoals && (
               <button className="setting-row" type="button" onClick={onSavingsGoals}>
                 <span className="setting-icon" aria-hidden="true">
@@ -465,7 +480,6 @@ export function MorePage({
           </section>
         </>
       )}
-
 
       <p className="section-label">{t("consentManage")}</p>
       <section className="panel settings-list more-consent" aria-label={t("consentManage")}>

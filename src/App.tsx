@@ -5,6 +5,8 @@ import { useAuth } from "./hooks/useAuth";
 import { useTransactions } from "./hooks/useTransactions";
 import { useReceipts } from "./hooks/useReceipts";
 import { useSavingsGoals } from "./hooks/useSavingsGoals";
+import { useRecurringPayments } from "./hooks/useRecurringPayments";
+import { RecurringPaymentsPage } from "./pages/RecurringPaymentsPage";
 import { useWishlist } from "./hooks/useWishlist";
 import type { Transaction, TransactionInput } from "./types/transaction";
 import { HomePage } from "./pages/HomePage";
@@ -48,7 +50,7 @@ import {
   readGuestTransactions,
 } from "./lib/onboarding";
 
-type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist" | "plus" | "personalize";
+type Page = "home" | "transactions" | "more" | "profile" | "receipts" | "analytics" | "savings" | "wishlist" | "plus" | "personalize" | "recurring";
 type Theme = "light" | "dark" | "system";
 
 function initialTheme(): Theme {
@@ -79,6 +81,7 @@ function App() {
   const auth = useAuth();
   const data = useTransactions(auth.user?.id);
   const savings = useSavingsGoals(auth.user?.id);
+  const recurring = useRecurringPayments(auth.user?.id);
   const wishlist = useWishlist(auth.user?.id);
   const plusEntitlement = usePlusEntitlement(auth.user?.id);
   const plusUnlocked = plusEntitlement.hasPlus;
@@ -91,6 +94,7 @@ function App() {
     if (pathname.startsWith("/receipts")) return "receipts";
     if (pathname.startsWith("/wishlist")) return "wishlist";
     if (pathname.startsWith("/goals")) return "savings";
+    if (pathname.startsWith("/recurring") || pathname.startsWith("/planned")) return "recurring";
     if (pathname.startsWith("/profile")) return "profile";
     if (pathname.startsWith("/personalize") || pathname.startsWith("/app/personalize")) return "personalize";
     if (pathname.startsWith("/plus") || pathname.startsWith("/app/plus")) return "plus";
@@ -109,6 +113,7 @@ function App() {
       receipts: "/receipts",
       analytics: "/analytics",
       savings: "/goals",
+      recurring: "/recurring",
       wishlist: "/wishlist",
       plus: "/app/plus",
       personalize: "/app/personalize",
@@ -452,6 +457,8 @@ function App() {
             onOpenReceipts={() => setPage("receipts")}
             onOpenMore={() => setPage("more")}
             savingsGoals={savings.goals}
+            recurringPayments={recurring.items}
+            onOpenRecurring={() => setPage("recurring")}
             wishlistItems={wishlist.items}
             personalization={personalization}
           />}
@@ -466,31 +473,26 @@ function App() {
             onSignOut={doSignOut}
             onOpenPlus={() => setPage("plus")}
             onSavingsGoals={() => setPage("savings")}
+            onRecurring={() => setPage("recurring")}
             onWishlist={() => setPage("wishlist")}
+            hasPlus={plusUnlocked}
           />}
           {page === "receipts" && (
-            receipts.error ? (
-              <div className="error-screen">
-                <section className="panel error-card">
-                  <h2>{t("receiptsDidNotLoad")}</h2>
-                  <p>{t("receiptError")}</p>
-                  <button className="primary-button" type="button" onClick={() => void receipts.refresh()}>{t("tryAgain")}</button>
-                </section>
-              </div>
-            ) : (
-              <ReceiptsPage
-                receipts={receipts.receipts}
-                getImageUrl={receipts.getImageUrl}
-                uploading={uploadingReceipt}
-                onAdd={() => setCaptureOpen(true)}
-                onSelect={setSelectedReceipt}
-              />
-            )
+            <ReceiptsPage
+              receipts={receipts.receipts}
+              isLoading={receipts.isLoading}
+              error={receipts.error}
+              onBack={() => setPage("home")}
+              onSelect={setSelectedReceipt}
+              onCapture={() => setCaptureOpen(true)}
+              onRetry={receipts.refresh}
+              getImageUrl={receipts.getImageUrl}
+            />
           )}
           {page === "analytics" &&
             (plusUnlocked ? (
-              <Suspense fallback={null}>
-                <AnalyticsPage transactions={data.transactions} />
+              <Suspense fallback={<div className="loading-block" style={{ height: 280, borderRadius: 28 }} />}>
+                <AnalyticsPage transactions={data.transactions} onBack={() => setPage("home")} />
               </Suspense>
             ) : (
               <PlusPage hasPlus={false} entitlementLoading={plusEntitlement.isLoading} entitlementStatus={plusEntitlement.entitlement?.status ?? null} onRefreshEntitlement={plusEntitlement.refresh} onBack={() => setPage("home")} onOpenAnalytics={() => setPage("analytics")} onOpenSavings={() => setPage("savings")} onOpenPersonalize={() => setPage("personalize")} />
@@ -500,12 +502,23 @@ function App() {
           )}
           {page === "personalize" && (
             <PersonalizePage
-              hasPlus={plusUnlocked}
               userId={auth.user.id}
               settings={personalization}
-              onChange={setPersonalization}
+              onChange={(next) => { setPersonalization(next); applyAccentTheme(next); }}
               onBack={() => setPage("plus")}
               onOpenPlus={() => setPage("plus")}
+            />
+          )}
+          {page === "recurring" && (
+            <RecurringPaymentsPage
+              items={recurring.items}
+              isLoading={recurring.isLoading}
+              error={recurring.error}
+              onBack={() => setPage("home")}
+              onSave={recurring.save}
+              onDelete={recurring.remove}
+              onSetActive={recurring.setActive}
+              onRetry={recurring.refresh}
             />
           )}
           {page === "savings" && (
@@ -524,144 +537,110 @@ function App() {
           {page === "wishlist" && (
             <WishlistPage
               items={wishlist.items}
-              goals={savings.goals}
               isLoading={wishlist.isLoading}
               error={wishlist.error}
               onBack={() => setPage("home")}
               onSave={wishlist.save}
               onDelete={wishlist.remove}
-              getImageUrl={wishlist.getImageUrl}
               onRetry={wishlist.refresh}
+              savingsGoals={savings.goals}
             />
           )}
-          {page === "profile" && <ProfilePage user={auth.user} busy={signingOut} onBack={() => setPage("more")} onSignOut={doSignOut} />}
+          {page === "profile" && (
+            <ProfilePage
+              user={auth.user}
+              onBack={() => setPage("more")}
+              onSignOut={doSignOut}
+              signingOut={signingOut}
+            />
+          )}
         </>}
       </div>
-
-      <button type="button" className="void-fab" aria-label={t("addTransaction")} onClick={startAdd}>
-        <Plus size={24} />
-      </button>
-
-      {menuOpen && (
-        <div className="void-menu-backdrop" role="presentation" onClick={() => setMenuOpen(false)}>
-          <nav className="void-menu" aria-label={t("mainNavigation")} onClick={(e) => e.stopPropagation()}>
-            <div className="void-menu-head">
-              <strong>MONTRA</strong>
-              <button type="button" className="icon-button" aria-label="Close" onClick={() => setMenuOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-            <div className="void-menu-list">
-              <button type="button" className={page === "home" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("home"); setMenuOpen(false); }}>
-                <Home size={20} /><span>{t("home")}</span>
-              </button>
-              <button type="button" className={page === "transactions" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("transactions"); setMenuOpen(false); }}>
-                <ArrowDownUp size={20} /><span>{t("activity")}</span>
-              </button>
-              <button type="button" className={page === "receipts" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("receipts"); setMenuOpen(false); }}>
-                <Receipt size={20} /><span>{t("receipts")}</span>
-              </button>
-              <button type="button" className={page === "analytics" || page === "plus" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage(plusUnlocked ? "analytics" : "plus"); setMenuOpen(false); }}>
-                <BarChart3 size={20} /><span>{t("analytics")}</span>
-              </button>
-              <button type="button" className={page === "savings" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("savings"); setMenuOpen(false); }}>
-                <Target size={20} /><span>{t("savingsGoals")}</span>
-              </button>
-              <button type="button" className={page === "wishlist" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("wishlist"); setMenuOpen(false); }}>
-                <Heart size={20} /><span>{t("wishlist")}</span>
-              </button>
-              <button type="button" className={page === "more" || page === "profile" || page === "personalize" ? "void-menu-item active" : "void-menu-item"} onClick={() => { setPage("more"); setMenuOpen(false); }}>
-                <UserRound size={20} /><span>{t("more")}</span>
-              </button>
-            </div>
-          </nav>
-        </div>
-      )}
 
       {formOpen && (
         <TransactionForm
           open={formOpen}
-          existing={editing}
-          busy={saving}
+          initial={editing}
+          saving={saving}
           onClose={() => setFormOpen(false)}
-          onSave={(input) => saveTransaction(input, editing ?? undefined)}
+          onSubmit={saveTransaction}
+          displayCurrency={currency}
+          convertToBase={convertToBase}
         />
       )}
-      <TransactionDetail transaction={selected} getImageUrl={data.getImageUrl} onClose={() => setSelected(null)} onEdit={startEdit} onDelete={requestDeleteTransaction} deleting={deleting} />
-      {toast && <div className="toast" role="status">{toast}</div>}
-      <ConfirmDialog
-        open={Boolean(pendingDeleteTx)}
-        title={t("deleteTransactionTitle")}
-        body={t("deleteTransactionBody")}
-        confirmLabel={t("delete")}
-        cancelLabel={t("cancel")}
-        busy={deleting}
-        onConfirm={() => void confirmDeleteTransaction()}
-        onCancel={() => setPendingDeleteTx(null)}
-      />
-      <ConfirmDialog
-        open={Boolean(pendingDeleteReceipt)}
-        title={t("deleteReceiptTitle")}
-        body={t("deleteReceiptBody")}
-        confirmLabel={t("delete")}
-        cancelLabel={t("cancel")}
-        busy={deletingReceipt}
-        onConfirm={() => void confirmDeleteReceipt()}
-        onCancel={() => setPendingDeleteReceipt(null)}
-      />
-      <ReceiptDetail receipt={selectedReceipt} getImageUrl={receipts.getImageUrl} onClose={() => setSelectedReceipt(null)} onDelete={requestDeleteReceipt} deleting={deletingReceipt} />
-
-      <Suspense fallback={null}>
-        <ReceiptCapture
-          open={captureOpen}
-          currency={currency}
-          onClose={() => setCaptureOpen(false)}
-          onUpload={async (file) => {
-            setUploadingReceipt(true);
-            try {
-              return await receipts.upload(file);
-            } finally {
-              setUploadingReceipt(false);
-            }
-          }}
-          onSave={async (receipt, fields) => {
-            await receipts.update(receipt, {
-              merchant: fields.merchant || null,
-              total_amount: fields.totalAmount,
-              currency: fields.currency,
-              receipt_date: fields.receiptDate || null,
-              status: fields.status,
-            });
-            if (
-              fields.status === "confirmed" &&
-              fields.deductFromBalance &&
-              fields.totalAmount != null &&
-              Number.isFinite(fields.totalAmount) &&
-              fields.totalAmount > 0
-            ) {
-              const marker = `montra:receipt:${receipt.id}`;
-              const alreadyLinked = data.transactions.some(
-                (transaction) => typeof transaction.note === "string" && transaction.note.includes(marker),
-              );
-              if (!alreadyLinked) {
-                const amountInBase = Math.round(convertToBase(fields.totalAmount, fields.currency) * 100) / 100;
-                await data.save({
-                  type: "out",
-                  name: fields.merchant || t("receipt"),
-                  amount: amountInBase,
-                  date: fields.receiptDate || new Date().toISOString().slice(0, 10),
-                  method: "other",
-                  link: null,
-                  note: marker,
-                  image: null,
-                });
-              }
-            }
-            setCaptureOpen(false);
-            setToast(t("receiptSaved"));
-          }}
+      {selected && (
+        <TransactionDetail
+          transaction={selected}
+          getImageUrl={data.getImageUrl}
+          onClose={() => setSelected(null)}
+          onEdit={startEdit}
+          onDelete={requestDeleteTransaction}
+          deleting={deleting}
         />
-      </Suspense>
+      )}
+      {selectedReceipt && (
+        <ReceiptDetail
+          receipt={selectedReceipt}
+          getImageUrl={receipts.getImageUrl}
+          onClose={() => setSelectedReceipt(null)}
+          onDelete={requestDeleteReceipt}
+          deleting={deletingReceipt}
+        />
+      )}
+      {captureOpen && (
+        <Suspense fallback={null}>
+          <ReceiptCapture
+            open={captureOpen}
+            onClose={() => setCaptureOpen(false)}
+            onSaved={() => { setCaptureOpen(false); void receipts.refresh(); }}
+            upload={receipts.upload}
+            uploading={uploadingReceipt}
+            setUploading={setUploadingReceipt}
+          />
+        </Suspense>
+      )}
+      {pendingDeleteTx && (
+        <ConfirmDialog
+          open
+          title={t("deleteTransactionTitle")}
+          body={t("deleteTransactionBody")}
+          confirmLabel={t("delete")}
+          cancelLabel={t("cancel")}
+          busy={deleting}
+          onConfirm={() => void confirmDeleteTransaction()}
+          onCancel={() => setPendingDeleteTx(null)}
+        />
+      )}
+      {pendingDeleteReceipt && (
+        <ConfirmDialog
+          open
+          title={t("deleteReceiptTitle")}
+          body={t("deleteReceiptBody")}
+          confirmLabel={t("delete")}
+          cancelLabel={t("cancel")}
+          busy={deletingReceipt}
+          onConfirm={() => void confirmDeleteReceipt()}
+          onCancel={() => setPendingDeleteReceipt(null)}
+        />
+      )}
+      {menuOpen && (
+        <div className="void-drawer-backdrop" role="presentation" onClick={() => setMenuOpen(false)}>
+          <nav className="void-drawer" role="dialog" aria-label={t("mainNavigation")} onClick={(e) => e.stopPropagation()}>
+            <div className="void-drawer-head">
+              <strong>MONTRA</strong>
+              <button type="button" className="icon-button" aria-label={t("close")} onClick={() => setMenuOpen(false)}><X size={18} /></button>
+            </div>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("home"); setMenuOpen(false); }}><Home size={18} /> {t("homeTitle")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("transactions"); setMenuOpen(false); }}><ArrowDownUp size={18} /> {t("quickActivity")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("receipts"); setMenuOpen(false); }}><Receipt size={18} /> {t("quickReceipts")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("savings"); setMenuOpen(false); }}><Target size={18} /> {t("savingsGoals")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("wishlist"); setMenuOpen(false); }}><Heart size={18} /> {t("wishlist")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("analytics"); setMenuOpen(false); }}><BarChart3 size={18} /> {t("analytics")}</button>
+            <button type="button" className="void-drawer-item" onClick={() => { setPage("more"); setMenuOpen(false); }}><UserRound size={18} /> {t("more")}</button>
+          </nav>
+        </div>
+      )}
+      {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   );
 }
