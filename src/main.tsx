@@ -80,26 +80,35 @@ function SystemThemeSync() {
 
 function RepairLiteralEscapes() {
   useEffect(() => {
-    /* no-op placeholder kept for parity with prior main */
+    const repair = () => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+      while (node) {
+        const value = node.nodeValue ?? "";
+        if (value.includes("\\u2013") || value.includes("\\u2014")) {
+          node.nodeValue = value.replaceAll("\\u2013", "\u2013").replaceAll("\\u2014", "\u2014");
+        }
+        node = walker.nextNode();
+      }
+    };
+    repair();
+    const observer = new MutationObserver(repair);
+    observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+    return () => observer.disconnect();
   }, []);
   return null;
 }
 
-const root = document.getElementById("root");
-if (!root) {
-  throw new Error("Montra root element missing");
-}
-
-ReactDOM.createRoot(root).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <LanguageProvider>
         <CurrencyProvider>
           <SystemThemeSync />
           <RepairLiteralEscapes />
-          <AppRoutes />
-          <ConsentBanner />
           <AnalyticsTracker />
+          <ConsentBanner />
+          <AppRoutes />
         </CurrencyProvider>
       </LanguageProvider>
     </BrowserRouter>
