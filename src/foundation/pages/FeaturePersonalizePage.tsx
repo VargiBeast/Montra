@@ -4,7 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { usePlusEntitlement } from "../../hooks/usePlusEntitlement";
 import {
   applyAccentTheme,
-  defaultPersonalization,
+  DEFAULT_PERSONALIZATION,
   readPersonalization,
   type PersonalizationSettings,
 } from "../../lib/personalization";
@@ -16,7 +16,7 @@ export function FeaturePersonalizePage() {
   const auth = useAuth();
   const plus = usePlusEntitlement(auth.user?.id);
   const navigate = useNavigate();
-  const [settings, setSettings] = useState<PersonalizationSettings>(defaultPersonalization);
+  const [settings, setSettings] = useState<PersonalizationSettings>(DEFAULT_PERSONALIZATION);
 
   useEffect(() => {
     if (!auth.user?.id) return;
