@@ -170,7 +170,7 @@ export function HomePage() {
 
   return (
     <div style={{ maxWidth: 480, marginInline: "auto" }}>
-      {/* Header — avatar + welcome + bell */}
+      {/* Header — avatar + welcome + more */}
       <header
         style={{
           display: "flex",
@@ -221,7 +221,7 @@ export function HomePage() {
         <button
           type="button"
           onClick={() => navigate("/app/more")}
-          aria-label="Notifications and more"
+          aria-label="More"
           style={{
             width: 40,
             height: 40,
@@ -314,7 +314,7 @@ export function HomePage() {
         }}
       >
         <QuickAction label="Add" icon="＋" onClick={() => navigate("/app/activity")} />
-        <QuickAction label="Receipt" icon="收據" onClick={() => navigate("/app/receipts")} />
+        <QuickAction label="Receipt" icon="▤" onClick={() => navigate("/app/receipts")} />
         <QuickAction label="Goals" icon="◎" onClick={() => navigate("/app/goals")} />
         <QuickAction label="More" icon="⋯" onClick={() => navigate("/app/more")} />
       </div>
