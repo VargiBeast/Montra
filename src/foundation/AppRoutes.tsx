@@ -9,6 +9,7 @@ import { MorePage } from "./pages/MorePage";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MarketingHome } from "./pages/MarketingHome";
+import { RecurringPage } from "./pages/RecurringPage";
 
 /**
  * Completely new route tree for the recreated frontend.
@@ -37,7 +38,7 @@ export function FoundationRoutes() {
         <Route path="goals" element={<GoalsPage />} />
         <Route path="more" element={<MorePage />} />
         <Route path="wishlist" element={<PlaceholderPage title="Wishlist" subtitle="Save and share what you want" />} />
-        <Route path="recurring" element={<PlaceholderPage title="Recurring" subtitle="Planned payments (not auto-applied to balances)" />} />
+        <Route path="recurring" element={<RecurringPage />} />
         <Route path="receipts" element={<PlaceholderPage title="Receipts" subtitle="Capture and confirm before creating transactions" />} />
         <Route path="personalize" element={<PlaceholderPage title="Personalize" subtitle="Themes, language, currency" />} />
         <Route path="plus" element={<PlaceholderPage title="Montra Plus" subtitle="Entitlement is verified from the backend" />} />
@@ -54,12 +55,11 @@ export function FoundationRoutes() {
       <Route path="/more" element={<Navigate to="/app/more" replace />} />
       <Route path="/wishlist" element={<Navigate to="/app/wishlist" replace />} />
       <Route path="/recurring" element={<Navigate to="/app/recurring" replace />} />
+      <Route path="/planned" element={<Navigate to="/app/recurring" replace />} />
       <Route path="/receipts" element={<Navigate to="/app/receipts" replace />} />
       <Route path="/settings" element={<Navigate to="/app/profile" replace />} />
       <Route path="/profile" element={<Navigate to="/app/profile" replace />} />
       <Route path="/personalize" element={<Navigate to="/app/personalize" replace />} />
-      <Route path="/app/plus" element={<Navigate to="/app/plus" replace />} />
-      <Route path="/app/personalize" element={<Navigate to="/app/personalize" replace />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
