@@ -1,19 +1,32 @@
+import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useDisplayCurrency } from "../../lib/currency";
 import { readLanguage } from "../../lib/i18n";
 import { formatDate, formatMoney } from "../../lib/utils";
-import type { Transaction } from "../../types/transaction";
+import type { Transaction, TransactionInput, TransactionType } from "../../types/transaction";
 import { PageHeader } from "../ui/PageHeader";
 import { Card } from "../ui/Card";
 import { EmptyState } from "../ui/EmptyState";
 import { LoadingState } from "../ui/LoadingState";
 import { Button } from "../ui/Button";
 
-function TransactionRow({ tx, currency, convertFromBase }: {
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function TransactionRow({
+  tx,
+  currency,
+  convertFromBase,
+  onEdit,
+  onDelete,
+}: {
   tx: Transaction;
   currency: string;
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   const isIn = tx.type === "in";
   const locale = readLanguage();
@@ -22,24 +35,24 @@ function TransactionRow({ tx, currency, convertFromBase }: {
 
   return (
     <div
+      className="m-anim-in"
       style={{
         display: "flex",
         alignItems: "center",
         gap: 12,
-        padding: "12px 0",
+        padding: "14px 0",
         borderBottom: "1px solid var(--m-border)",
       }}
     >
       <div
         style={{
-          width: 36,
-          height: 36,
-          borderRadius: "var(--m-radius-full)",
-          background: isIn ? "rgba(52, 211, 153, 0.12)" : "rgba(248, 113, 113, 0.1)",
-          color: isIn ? "var(--m-positive)" : "var(--m-negative)",
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: isIn ? "rgba(52, 211, 153, 0.15)" : "rgba(255,255,255,0.06)",
+          color: isIn ? "var(--m-positive)" : "var(--m-text-secondary)",
           display: "grid",
           placeItems: "center",
-          fontSize: 14,
           fontWeight: 700,
           flexShrink: 0,
         }}
@@ -47,12 +60,24 @@ function TransactionRow({ tx, currency, convertFromBase }: {
       >
         {isIn ? "↓" : "↑"}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <button
+        type="button"
+        onClick={onEdit}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          textAlign: "left",
+          background: "none",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          color: "inherit",
+        }}
+      >
         <div
           style={{
             fontWeight: 600,
             fontSize: "var(--m-text-sm)",
-            color: "var(--m-text)",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -64,39 +89,234 @@ function TransactionRow({ tx, currency, convertFromBase }: {
           {formatDate(tx.date)}
           {tx.method ? ` · ${tx.method}` : ""}
           {" · "}
-          {isIn ? "Received" : "Sent"}
+          {isIn ? "Receive" : "Send"}
         </div>
-      </div>
+      </button>
       <div
         style={{
           fontWeight: 600,
           fontSize: "var(--m-text-sm)",
           color: isIn ? "var(--m-positive)" : "var(--m-text)",
           fontVariantNumeric: "tabular-nums",
-          whiteSpace: "nowrap",
         }}
       >
-        {isIn ? "+" : "−"}{amountLabel.replace(/^[^\d-]*/, "")}
+        {isIn ? "+" : "−"}
+        {amountLabel.replace(/^[^\d-]*/, "")}
       </div>
+      <button
+        type="button"
+        aria-label="Delete"
+        onClick={onDelete}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--m-text-muted)",
+          cursor: "pointer",
+          padding: 4,
+          fontSize: 16,
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 }
 
-/**
- * Real Activity page — uses verified useTransactions + transaction service.
- * Data is RLS-scoped to the authenticated user. No fabricated rows.
- */
 export function ActivityPage() {
   const auth = useAuth();
-  const { transactions, isLoading, error, refresh } = useTransactions(auth.user?.id);
-  const { currency, convertFromBase, ratesReady } = useDisplayCurrency();
+  const { transactions, isLoading, error, refresh, save, remove } = useTransactions(auth.user?.id);
+  const { currency, convertFromBase, convertToBase, ratesReady } = useDisplayCurrency();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Transaction | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const [type, setType] = useState<TransactionType>("out");
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState(todayISO());
+  const [method, setMethod] = useState("");
+  const [note, setNote] = useState("");
+
+  function openCreate() {
+    setEditing(null);
+    setType("out");
+    setName("");
+    setAmount("");
+    setDate(todayISO());
+    setMethod("");
+    setNote("");
+    setFormError(null);
+    setShowForm(true);
+  }
+
+  function openEdit(tx: Transaction) {
+    setEditing(tx);
+    setType(tx.type);
+    setName(tx.name);
+    setAmount(String(convertFromBase(Number(tx.amount), currency)));
+    setDate(tx.date.slice(0, 10));
+    setMethod(tx.method ?? "");
+    setNote(tx.note ?? "");
+    setFormError(null);
+    setShowForm(true);
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setFormError(null);
+    const num = Number(amount);
+    if (!name.trim()) {
+      setFormError("Name is required.");
+      return;
+    }
+    if (!Number.isFinite(num) || num <= 0) {
+      setFormError("Enter a valid amount greater than zero.");
+      return;
+    }
+    const amountInBase = convertToBase(num, currency);
+    const input: TransactionInput = {
+      type,
+      name: name.trim(),
+      amount: amountInBase,
+      date,
+      method: method.trim() || null,
+      link: editing?.link ?? null,
+      note: note.trim() || null,
+      image: null,
+    };
+    setBusy(true);
+    try {
+      await save(input, editing ?? undefined);
+      setShowForm(false);
+      setEditing(null);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleDelete(tx: Transaction) {
+    if (!window.confirm(`Delete “${tx.name}”?`)) return;
+    setBusy(true);
+    try {
+      await remove(tx);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Could not delete.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
-    <div>
+    <div className="m-anim-in">
       <PageHeader
         title="Activity"
-        subtitle="Your transactions and history"
+        subtitle="Your transactions"
+        action={
+          <Button size="sm" onClick={openCreate}>
+            + Add
+          </Button>
+        }
       />
+
+      {showForm ? (
+        <Card padding="lg" className="m-anim-scale" style={{ marginBottom: 16 }}>
+          <h2 style={{ margin: "0 0 16px", fontSize: 16 }}>{editing ? "Edit transaction" : "New transaction"}</h2>
+          <form onSubmit={(e) => void submit(e)}>
+            <div className="m-field" style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setType("in")}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 12,
+                  border: type === "in" ? "1px solid var(--m-accent)" : "1px solid var(--m-border)",
+                  background: type === "in" ? "var(--m-accent-soft)" : "transparent",
+                  color: type === "in" ? "var(--m-positive)" : "var(--m-text-muted)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Income
+              </button>
+              <button
+                type="button"
+                onClick={() => setType("out")}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 12,
+                  border: type === "out" ? "1px solid var(--m-border-strong)" : "1px solid var(--m-border)",
+                  background: type === "out" ? "rgba(255,255,255,0.06)" : "transparent",
+                  color: "var(--m-text)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Expense
+              </button>
+            </div>
+            <div className="m-field">
+              <label className="m-label" htmlFor="tx-name">
+                Name
+              </label>
+              <input id="tx-name" className="m-input" value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
+            </div>
+            <div className="m-field" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label className="m-label" htmlFor="tx-amount">
+                  Amount ({currency})
+                </label>
+                <input
+                  id="tx-amount"
+                  className="m-input"
+                  type="number"
+                  inputMode="decimal"
+                  min="0.01"
+                  step="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="m-label" htmlFor="tx-date">
+                  Date
+                </label>
+                <input id="tx-date" className="m-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+              </div>
+            </div>
+            <div className="m-field">
+              <label className="m-label" htmlFor="tx-method">
+                Method (optional)
+              </label>
+              <input id="tx-method" className="m-input" value={method} onChange={(e) => setMethod(e.target.value)} placeholder="Card, cash…" />
+            </div>
+            <div className="m-field">
+              <label className="m-label" htmlFor="tx-note">
+                Note (optional)
+              </label>
+              <input id="tx-note" className="m-input" value={note} onChange={(e) => setNote(e.target.value)} />
+            </div>
+            {formError ? (
+              <p role="alert" style={{ color: "var(--m-negative)", fontSize: 13, margin: "0 0 12px" }}>
+                {formError}
+              </p>
+            ) : null}
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} disabled={busy}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Saving…" : "Save"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      ) : null}
 
       {isLoading ? (
         <LoadingState label="Loading your transactions…" />
@@ -111,18 +331,21 @@ export function ActivityPage() {
             </Button>
           </div>
         </Card>
-      ) : transactions.length === 0 ? (
+      ) : transactions.length === 0 && !showForm ? (
         <Card>
           <EmptyState
             title="No transactions yet"
-            description="When you add income or expenses they will appear here. Nothing is created automatically."
+            description="Add income or expenses. Nothing is created automatically."
+            action={
+              <Button onClick={openCreate}>Add first transaction</Button>
+            }
           />
         </Card>
       ) : (
-        <Card padding="md">
+        <Card padding="md" className="m-anim-in m-anim-delay-1">
           {!ratesReady ? (
             <p style={{ margin: "0 0 8px", fontSize: "var(--m-text-xs)", color: "var(--m-text-muted)" }}>
-              Using fallback exchange rates until live rates load.
+              Using fallback rates until live rates load.
             </p>
           ) : null}
           <div role="list" aria-label="Transactions">
@@ -132,6 +355,8 @@ export function ActivityPage() {
                   tx={tx}
                   currency={currency}
                   convertFromBase={convertFromBase}
+                  onEdit={() => openEdit(tx)}
+                  onDelete={() => void handleDelete(tx)}
                 />
               </div>
             ))}

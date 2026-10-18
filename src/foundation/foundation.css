@@ -1,6 +1,5 @@
 /**
- * Montra foundation base styles
- * Independent of previous globals-*.css / emerald-vault / void-layout layers.
+ * Montra foundation base styles + motion system
  */
 
 @import "./design-tokens.css";
@@ -59,7 +58,128 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Utility primitives used by the new shell */
+/* ——— Motion ——— */
+@keyframes m-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes m-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes m-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 36px rgba(16, 185, 129, 0.45);
+  }
+}
+
+@keyframes m-bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes m-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.m-anim-in {
+  animation: m-fade-up 0.45s var(--m-ease) both;
+}
+
+.m-anim-scale {
+  animation: m-scale-in 0.4s var(--m-ease) both;
+}
+
+.m-anim-delay-1 {
+  animation-delay: 0.06s;
+}
+.m-anim-delay-2 {
+  animation-delay: 0.12s;
+}
+.m-anim-delay-3 {
+  animation-delay: 0.18s;
+}
+.m-anim-delay-4 {
+  animation-delay: 0.24s;
+}
+
+.m-glow-btn {
+  animation: m-glow-pulse 2.8s ease-in-out infinite;
+}
+
+.m-bar {
+  transform-origin: bottom;
+  animation: m-bar-grow 0.6s var(--m-ease) both;
+}
+
+.m-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: m-shimmer 1.4s linear infinite;
+  border-radius: var(--m-radius-md);
+}
+
+/* Form controls in foundation pages */
+.m-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--m-radius-md);
+  border: 1px solid var(--m-border-strong);
+  background: var(--m-bg-input);
+  color: var(--m-text);
+  outline: none;
+  transition: border-color var(--m-duration), box-shadow var(--m-duration);
+}
+
+.m-input:focus {
+  border-color: var(--m-accent);
+  box-shadow: 0 0 0 3px var(--m-accent-soft);
+}
+
+.m-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--m-text-sm);
+  color: var(--m-text-secondary);
+  font-weight: 500;
+}
+
+.m-field {
+  margin-bottom: var(--m-space-3);
+}
+
 .m-sr-only {
   position: absolute;
   width: 1px;
@@ -82,5 +202,15 @@ a:hover {
 @media (min-width: 768px) {
   .m-container {
     padding-inline: var(--m-space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-anim-in,
+  .m-anim-scale,
+  .m-glow-btn,
+  .m-bar,
+  .m-skeleton {
+    animation: none !important;
   }
 }
