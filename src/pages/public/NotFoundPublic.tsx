@@ -16,19 +16,19 @@ export function NotFoundPublic() {
 
   return (
     <main className="marketing-main">
-      <section className="panel marketing-simple">
-        <p className="eyebrow">404</p>
+      <section className="mkt-simple">
+        <p className="mkt-eyebrow">404</p>
         <h1>{t("notFoundTitle") !== "\u2014" ? t("notFoundTitle") : "Page not found"}</h1>
-        <p className="marketing-lead">
+        <p className="mkt-lead">
           {t("notFoundBody") !== "\u2014"
             ? t("notFoundBody")
             : "That address is not a public Montra page. Try the home page or use the links below."}
         </p>
-        <div className="marketing-cta-row">
-          <Link to="/" className="primary-button">
+        <div className="mkt-cta-row" style={{ marginTop: 20 }}>
+          <Link to="/" className="mkt-btn mkt-btn-primary">
             {t("publicWishlistHome") !== "\u2014" ? t("publicWishlistHome") : "Go to Montra"}
           </Link>
-          <Link to="/contact" className="secondary-button">
+          <Link to="/contact" className="mkt-btn mkt-btn-secondary">
             {t("navContact")}
           </Link>
         </div>
