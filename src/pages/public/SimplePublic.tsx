@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 
@@ -42,40 +41,19 @@ export function SimplePublic({ page }: { page: PageKey }) {
 
   return (
     <main className="marketing-main">
-      <section className="panel marketing-simple">
+      <section className="mkt-simple">
         <h1>{t(`${page}Title`)}</h1>
         {paragraphs.map((para, i) => (
-          <p key={i} className={i === 0 ? "marketing-lead" : "marketing-policy-p"}>
+          <p key={i} className={i === 0 ? "mkt-lead" : undefined}>
             {para}
           </p>
         ))}
         {page === "contact" && (
           <p>
-            <a className="text-button" href="mailto:contact@montra.cash">
+            <a className="mkt-btn mkt-btn-ghost" href="mailto:contact@montra.cash">
               contact@montra.cash
             </a>
           </p>
-        )}
-        {page === "refund" && (
-          <p className="marketing-policy-p">
-            <Link to="/contact" className="text-button">
-              {t("navContact")}
-            </Link>
-            {" · "}
-            <a className="text-button" href="mailto:contact@montra.cash">
-              contact@montra.cash
-            </a>
-          </p>
-        )}
-        {(page === "faq" || page === "help") && (
-          <div className="marketing-cta-row">
-            <Link to="/contact" className="secondary-button">
-              {t("navContact")}
-            </Link>
-            <Link to="/app" className="primary-button">
-              {t("navGetStarted")}
-            </Link>
-          </div>
         )}
       </section>
     </main>

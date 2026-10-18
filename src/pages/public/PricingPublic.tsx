@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Check, Lock, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { languageForCopy, useLanguage, useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
 import { PLUS_PRICING } from "../../lib/plus";
@@ -66,10 +65,9 @@ export function PricingPublic() {
 
       setLoading(true);
       try {
-        const { data, error: invokeError } = await supabase.functions.invoke(
-          "create-stripe-checkout",
-          { body: { plan } },
-        );
+        const { data, error: invokeError } = await supabase.functions.invoke("create-stripe-checkout", {
+          body: { plan },
+        });
 
         if (invokeError) {
           console.error("create-stripe-checkout invoke error:", invokeError);
@@ -105,117 +103,85 @@ export function PricingPublic() {
 
   return (
     <main className="marketing-main">
-      <section className="marketing-hero panel">
-        <p className="eyebrow accent-green">{t("navPricing")}</p>
+      <section className="mkt-hero">
+        <div className="mkt-hero-glow" aria-hidden />
+        <p className="mkt-eyebrow">{t("navPricing")}</p>
         <h1>{t("pricingHeroTitle")}</h1>
-        <p className="marketing-lead">{t("pricingHeroBody")}</p>
+        <p className="mkt-lead">{t("pricingHeroBody")}</p>
       </section>
 
-      <section className="pricing-compare-grid">
-        <article className="panel pricing-plan-card">
-          <p className="eyebrow">{t("plusCompareFree")}</p>
+      <section className="mkt-price-grid">
+        <article className="mkt-price-card">
+          <p className="mkt-eyebrow">{t("plusCompareFree")}</p>
           <h2>{t("plusCompareFree")}</h2>
-          <p className="pricing-plan-price">{t("pricingFreeLabel")}</p>
-          <ul className="plus-checklist">
+          <p className="mkt-price-amount">{t("pricingFreeLabel")}</p>
+          <ul className="mkt-checklist">
             {freeItems.map((item) => (
-              <li key={item}>
-                <Check size={16} aria-hidden="true" />
-                <span>{item}</span>
-              </li>
+              <li key={item}>{item}</li>
             ))}
           </ul>
-          <Link
-            to="/app"
-            className="secondary-button wide"
-            onClick={() => trackEvent("get_started", { surface: "pricing" })}
-          >
+          <button type="button" className="mkt-btn mkt-btn-secondary" style={{ width: "100%" }} onClick={() => navigate("/app")}>
             {t("navGetStarted")}
-          </Link>
+          </button>
         </article>
 
-        <article className="panel pricing-plan-card is-featured">
-          <p className="eyebrow accent-green">Montra Plus</p>
+        <article className="mkt-price-card is-featured">
+          <p className="mkt-eyebrow">{t("plusComparePlus")}</p>
           <h2>{t("plusComparePlus")}</h2>
-          <div className="plus-trial-banner" role="status">
-            <span className="plus-trial-badge">{t("plusTrialBadge")}</span>
-            <span className="plus-trial-then">
-              {t("plusTrialThen")} {PLUS_PRICING.monthlyLabel}/{t("plusPriceMonthlyLabel").replace(/^per\s+/i, "")}
-            </span>
-          </div>
-
-          <div className="plus-price-cards" role="radiogroup" aria-label={t("plusPricingTitle")}>
+          <div className="mkt-plan-toggle" role="radiogroup" aria-label={t("plusPricingTitle")}>
             <button
               type="button"
               role="radio"
               aria-checked={selectedPlan === "monthly"}
-              className={`plus-price-card ${selectedPlan === "monthly" ? "is-selected" : ""}`}
+              className={selectedPlan === "monthly" ? "is-selected" : ""}
               onClick={() => setSelectedPlan("monthly")}
+              disabled={loading}
             >
-              <strong className="plus-price-amount">{PLUS_PRICING.monthlyLabel}</strong>
-              <span className="plus-price-label">{t("plusPriceMonthlyLabel")}</span>
+              {PLUS_PRICING.monthlyLabel}
+              <span style={{ display: "block", fontSize: 11, fontWeight: 500, opacity: 0.8 }}>
+                {t("plusPriceMonthlyLabel")}
+              </span>
             </button>
             <button
               type="button"
               role="radio"
               aria-checked={selectedPlan === "yearly"}
-              className={`plus-price-card is-featured ${selectedPlan === "yearly" ? "is-selected" : ""}`}
+              className={selectedPlan === "yearly" ? "is-selected" : ""}
               onClick={() => setSelectedPlan("yearly")}
-            >
-              <strong className="plus-price-amount">{PLUS_PRICING.yearlyLabel}</strong>
-              <span className="plus-price-label">{t("plusPriceYearlyLabel")}</span>
-              <span className="plus-price-note">{t("plusPriceYearlyNote")}</span>
-            </button>
-          </div>
-
-          <ul className="plus-checklist">
-            {plusItems.map((item) => (
-              <li key={item}>
-                <Check size={16} aria-hidden="true" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="pricing-cta-row">
-            <button
-              type="button"
-              className={`primary-button wide ${loading ? "is-loading" : ""}`}
               disabled={loading}
-              aria-busy={loading}
-              onClick={() => void startCheckout(selectedPlan)}
             >
-              {!auth.user ? <Lock size={16} aria-hidden="true" /> : <Sparkles size={16} aria-hidden="true" />}
-              {ctaLabel}
-              <span className="pricing-cta-plan">
-                {selectedPlan === "yearly" ? PLUS_PRICING.yearlyLabel : PLUS_PRICING.monthlyLabel}
+              {PLUS_PRICING.yearlyLabel}
+              <span style={{ display: "block", fontSize: 11, fontWeight: 500, opacity: 0.8 }}>
+                {t("plusPriceYearlyLabel")}
               </span>
             </button>
-            <div className="pricing-plan-ctas">
-              <button
-                type="button"
-                className="secondary-button"
-                disabled={loading}
-                onClick={() => void startCheckout("monthly")}
-              >
-                {PLUS_PRICING.monthlyLabel} · {t("plusPriceMonthlyLabel")}
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                disabled={loading}
-                onClick={() => void startCheckout("yearly")}
-              >
-                {PLUS_PRICING.yearlyLabel} · {t("plusPriceYearlyLabel")}
-              </button>
-            </div>
           </div>
-
-          {error && (
-            <p className="plus-cta-error" role="alert">
+          <p className="mkt-price-amount">
+            {selectedPlan === "yearly" ? PLUS_PRICING.yearlyLabel : PLUS_PRICING.monthlyLabel}
+          </p>
+          <p className="mkt-note" style={{ marginTop: -8, marginBottom: 12 }}>
+            {selectedPlan === "yearly" ? t("plusPriceYearlyNote") : t("plusTrialThen")}
+          </p>
+          <ul className="mkt-checklist">
+            {plusItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="mkt-btn mkt-btn-primary"
+            style={{ width: "100%" }}
+            disabled={loading}
+            onClick={() => void startCheckout(selectedPlan)}
+          >
+            {ctaLabel}
+          </button>
+          {error ? (
+            <p className="mkt-error" role="alert">
               {error}
             </p>
-          )}
-          <p className="plus-cta-note">{t("plusCtaNote")}</p>
+          ) : null}
+          <p className="mkt-note">{t("plusCtaNote")}</p>
         </article>
       </section>
     </main>

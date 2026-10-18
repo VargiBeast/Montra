@@ -1,0 +1,477 @@
+/**
+ * Public marketing site — aligned with foundation design tokens.
+ * Loaded alongside foundation; does not depend on old marketing.css alone.
+ */
+
+.marketing-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #050806;
+  color: #f0f7f2;
+  font-family: var(--m-font, Inter, system-ui, sans-serif);
+}
+
+.marketing-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: rgba(5, 8, 6, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.marketing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f5faf7;
+  text-decoration: none;
+}
+
+.marketing-brand:hover {
+  text-decoration: none;
+  color: #34d399;
+}
+
+.marketing-brand .brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.marketing-brand .brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.marketing-brand .mark-light {
+  display: none;
+}
+
+.marketing-nav {
+  display: none;
+  gap: 8px;
+}
+
+.marketing-nav a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9fb3a6;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+}
+
+.marketing-nav a:hover,
+.marketing-nav a.active {
+  color: #f0f7f2;
+  background: rgba(16, 185, 129, 0.12);
+  text-decoration: none;
+}
+
+.marketing-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.mkt-btn:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.mkt-btn-primary {
+  background: linear-gradient(135deg, #34d399, #10b981 45%, #059669);
+  color: #04110a;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
+}
+
+.mkt-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f0f7f2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mkt-btn-ghost {
+  background: transparent;
+  color: #10b981;
+}
+
+.mkt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.marketing-body {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 24px 20px 48px;
+}
+
+.marketing-main {
+  animation: mkt-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mkt-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mkt-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 40px 28px;
+  margin-bottom: 32px;
+  background: radial-gradient(ellipse at 30% 0%, #1a2e22 0%, #0a100c 45%, #050806 100%);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.mkt-hero-glow {
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 197, 71, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+.mkt-eyebrow {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #10b981;
+}
+
+.mkt-hero h1 {
+  margin: 0 0 14px;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #f5faf7;
+  max-width: 18ch;
+}
+
+.mkt-lead {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #9fb3a6;
+  max-width: 42ch;
+}
+
+.mkt-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mkt-section {
+  margin-bottom: 40px;
+}
+
+.mkt-section h2 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mkt-section-lead {
+  margin: 0 0 20px;
+  color: #9fb3a6;
+  font-size: 14px;
+  max-width: 50ch;
+}
+
+.mkt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.mkt-card {
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(18, 26, 21, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.mkt-card:hover {
+  border-color: rgba(16, 185, 129, 0.25);
+  transform: translateY(-2px);
+}
+
+.mkt-card-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+.mkt-card h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mkt-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #9fb3a6;
+}
+
+.mkt-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0e1f16, #0a1610);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  margin-bottom: 32px;
+}
+
+.mkt-banner h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.mkt-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: #9fb3a6;
+  max-width: 36ch;
+}
+
+/* Pricing */
+.mkt-price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mkt-price-card {
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(18, 26, 21, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mkt-price-card.is-featured {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: linear-gradient(160deg, #0e1a14, #0a120e);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.12);
+}
+
+.mkt-price-card h2 {
+  margin: 8px 0;
+  font-size: 1.25rem;
+}
+
+.mkt-price-amount {
+  margin: 0 0 16px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f5faf7;
+}
+
+.mkt-checklist {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.mkt-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: #c5d4cb;
+}
+
+.mkt-checklist li::before {
+  content: "✓";
+  color: #34d399;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mkt-plan-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mkt-plan-toggle button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #9fb3a6;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mkt-plan-toggle button.is-selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.14);
+  color: #f0f7f2;
+}
+
+.mkt-error {
+  color: #f87171;
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.mkt-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: #6b7f72;
+}
+
+/* Simple legal pages */
+.mkt-simple {
+  padding: 28px;
+  border-radius: 20px;
+  background: rgba(18, 26, 21, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mkt-simple h1 {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+}
+
+.mkt-simple p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #9fb3a6;
+}
+
+/* Footer */
+.marketing-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 32px 20px 40px;
+  background: #070a08;
+}
+
+.marketing-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.marketing-footer strong {
+  display: block;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+.marketing-footer p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7f72;
+}
+
+.marketing-footer .eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7f72;
+}
+
+.marketing-footer a {
+  display: block;
+  padding: 4px 0;
+  font-size: 13px;
+  color: #9fb3a6;
+  text-decoration: none;
+}
+
+.marketing-footer a:hover {
+  color: #10b981;
+}
+
+.marketing-footer-copy {
+  max-width: 1100px;
+  margin: 28px auto 0;
+  font-size: 12px;
+  color: #6b7f72;
+}
+
+@media (min-width: 800px) {
+  .marketing-nav {
+    display: flex;
+  }
+
+  .mkt-hero {
+    padding: 56px 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-main {
+    animation: none;
+  }
+}

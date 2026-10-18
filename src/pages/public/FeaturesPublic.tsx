@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowDownUp, Gift, Globe2, Home, PiggyBank, Receipt, Sparkles, Wallet,
+  ArrowDownUp,
+  Gift,
+  Globe2,
+  Home,
+  PiggyBank,
+  Receipt,
+  Sparkles,
+  Wallet,
 } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
 import { useDocumentMeta } from "../../lib/seo";
@@ -27,23 +34,33 @@ export function FeaturesPublic() {
 
   return (
     <main className="marketing-main">
-      <section className="marketing-hero panel">
-        <p className="eyebrow accent-green">{t("navFeatures")}</p>
+      <section className="mkt-hero">
+        <div className="mkt-hero-glow" aria-hidden />
+        <p className="mkt-eyebrow">{t("navFeatures")}</p>
         <h1>{t("featuresHeroTitle")}</h1>
-        <p className="marketing-lead">{t("featuresHeroBody")}</p>
-        <div className="marketing-cta-row">
-          <Link to="/app" className="primary-button">{t("navGetStarted")}</Link>
-          <Link to="/pricing" className="secondary-button">{t("navPricing")}</Link>
+        <p className="mkt-lead">{t("featuresHeroBody")}</p>
+        <div className="mkt-cta-row">
+          <Link to="/app" className="mkt-btn mkt-btn-primary">
+            {t("navGetStarted")}
+          </Link>
+          <Link to="/pricing" className="mkt-btn mkt-btn-secondary">
+            {t("navPricing")}
+          </Link>
         </div>
       </section>
-      <section className="marketing-feature-grid marketing-section">
-        {features.map((f) => (
-          <article key={f.title} className="panel marketing-card">
-            <span className="marketing-card-icon" aria-hidden="true">{f.icon}</span>
-            <h3>{f.title}</h3>
-            <p>{f.body}</p>
-          </article>
-        ))}
+
+      <section className="mkt-section">
+        <div className="mkt-grid">
+          {features.map((f) => (
+            <article key={f.title} className="mkt-card">
+              <span className="mkt-card-icon" aria-hidden="true">
+                {f.icon}
+              </span>
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </main>
   );

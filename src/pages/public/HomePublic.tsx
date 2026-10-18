@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowDownUp, Gift, Globe2, PiggyBank, Receipt, Sparkles, Wallet,
+  ArrowDownUp,
+  Gift,
+  Globe2,
+  PiggyBank,
+  Receipt,
+  Sparkles,
+  Wallet,
 } from "lucide-react";
 import { useTranslation } from "../../lib/i18n";
 import { trackEvent } from "../../lib/gtm";
@@ -26,24 +32,37 @@ export function HomePublic() {
 
   return (
     <main className="marketing-main">
-      <section className="marketing-hero panel">
-        <p className="eyebrow accent-green">{t("homeHeroEyebrow")}</p>
+      <section className="mkt-hero">
+        <div className="mkt-hero-glow" aria-hidden />
+        <p className="mkt-eyebrow">{t("homeHeroEyebrow")}</p>
         <h1>{t("homeHeroTitle")}</h1>
-        <p className="marketing-lead">{t("homeHeroBody")}</p>
-        <div className="marketing-cta-row">
-          <Link to="/app" className="primary-button" onClick={() => trackEvent("get_started", { surface: "home" })}>{t("navGetStarted")}</Link>
-          <Link to="/login" className="secondary-button">{t("navSignIn")}</Link>
-          <Link to="/plus" className="text-button">{t("navExplorePlus")}</Link>
+        <p className="mkt-lead">{t("homeHeroBody")}</p>
+        <div className="mkt-cta-row">
+          <Link
+            to="/app"
+            className="mkt-btn mkt-btn-primary"
+            onClick={() => trackEvent("get_started", { surface: "home" })}
+          >
+            {t("navGetStarted")}
+          </Link>
+          <Link to="/login" className="mkt-btn mkt-btn-secondary">
+            {t("navSignIn")}
+          </Link>
+          <Link to="/plus" className="mkt-btn mkt-btn-ghost">
+            {t("navExplorePlus")}
+          </Link>
         </div>
       </section>
 
-      <section className="marketing-section" aria-label={t("homeWhatTitle")}>
+      <section className="mkt-section" aria-label={t("homeWhatTitle")}>
         <h2>{t("homeWhatTitle")}</h2>
-        <p className="marketing-section-lead">{t("homeWhatBody")}</p>
-        <div className="marketing-feature-grid">
+        <p className="mkt-section-lead">{t("homeWhatBody")}</p>
+        <div className="mkt-grid">
           {pillars.map((item) => (
-            <article key={item.title} className="panel marketing-card">
-              <span className="marketing-card-icon" aria-hidden="true">{item.icon}</span>
+            <article key={item.title} className="mkt-card">
+              <span className="mkt-card-icon" aria-hidden="true">
+                {item.icon}
+              </span>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
             </article>
@@ -51,25 +70,30 @@ export function HomePublic() {
         </div>
       </section>
 
-      <section className="panel marketing-plus-banner">
+      <section className="mkt-banner">
         <div>
-          <p className="eyebrow accent-green">Montra Plus</p>
-          <h2>{t("homePlusBannerTitle")}</h2>
-          <p>{t("homePlusBannerBody")}</p>
+          <h2>{t("homePillarPlusTitle")}</h2>
+          <p>{t("homePillarPlusBody")}</p>
         </div>
-        <div className="marketing-cta-row">
-          <Link to="/pricing" className="primary-button">{t("navPricing")}</Link>
-          <Link to="/plus" className="secondary-button">{t("navExplorePlus")}</Link>
+        <div className="mkt-cta-row">
+          <Link to="/pricing" className="mkt-btn mkt-btn-primary">
+            {t("navPricing")}
+          </Link>
+          <Link to="/features" className="mkt-btn mkt-btn-secondary">
+            {t("navFeatures")}
+          </Link>
         </div>
       </section>
 
-      <section className="marketing-section">
-        <div className="panel marketing-activity-preview">
-          <span className="marketing-card-icon" aria-hidden="true"><ArrowDownUp size={22} /></span>
-          <h2>{t("homeActivityTitle")}</h2>
-          <p>{t("homeActivityBody")}</p>
-          <Link to="/features" className="text-button">{t("navFeatures")}</Link>
-        </div>
+      <section className="mkt-section">
+        <h2>
+          <ArrowDownUp size={18} style={{ display: "inline", verticalAlign: "-3px", marginRight: 8 }} />
+          {t("featActivityTitle")}
+        </h2>
+        <p className="mkt-section-lead">{t("featActivityBody")}</p>
+        <Link to="/app" className="mkt-btn mkt-btn-primary" onClick={() => trackEvent("get_started", { surface: "home_activity" })}>
+          {t("navGetStarted")}
+        </Link>
       </section>
     </main>
   );

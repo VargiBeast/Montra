@@ -2,19 +2,16 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { useTranslation } from "../../lib/i18n";
 import { PublicFooter } from "../../components/PublicFooter";
 
-/**
- * Shared shell for every public marketing route (home, legal, pricing, public wishlist, …).
- * Header + Outlet + PublicFooter so the footer cannot be omitted by a child page.
- */
+/** Shared shell for every public marketing route. */
 export function MarketingLayout() {
   const t = useTranslation();
   return (
     <div className="marketing-shell">
       <header className="marketing-header">
-        <Link to="/" className="brand marketing-brand" aria-label="Montra home">
+        <Link to="/" className="marketing-brand" aria-label="Montra home">
           <span className="brand-mark" aria-hidden="true">
-            <img className="mark-light" src="/branding/mark-light.png" alt="" />
             <img className="mark-dark" src="/branding/mark-dark.png" alt="" />
+            <img className="mark-light" src="/branding/mark-light.png" alt="" />
           </span>
           MONTRA
         </Link>
@@ -25,10 +22,10 @@ export function MarketingLayout() {
           <NavLink to="/about">{t("navAbout")}</NavLink>
         </nav>
         <div className="marketing-header-actions">
-          <Link to="/login" className="secondary-button">
+          <Link to="/login" className="mkt-btn mkt-btn-secondary">
             {t("navSignIn")}
           </Link>
-          <Link to="/app" className="primary-button">
+          <Link to="/app" className="mkt-btn mkt-btn-primary">
             {t("navGetStarted")}
           </Link>
         </div>

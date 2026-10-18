@@ -1,5 +1,5 @@
 /**
- * Application entry — foundation shell + legacy feature CSS for wired pages.
+ * Application entry — foundation shell + marketing + feature CSS.
  */
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
@@ -9,12 +9,11 @@ import { FoundationRoutes } from "./AppRoutes";
 import { CurrencyProvider } from "../lib/currency";
 import { LanguageProvider } from "../lib/i18n";
 import "./foundation.css";
-/* Feature pages still use the established component class names */
+import "../styles/marketing-v2.css";
 import "../styles/globals-base.css";
 import "../styles/globals.css";
 import "../styles/plus.css";
 import "../styles/personalize-themes.css";
-import "../styles/marketing.css";
 
 if (Capacitor.isNativePlatform()) {
   const path = window.location.pathname || "/";
