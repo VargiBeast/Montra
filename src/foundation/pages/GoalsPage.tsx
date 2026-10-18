@@ -11,7 +11,7 @@ import { EmptyState } from "../ui/EmptyState";
 import { LoadingState } from "../ui/LoadingState";
 import { Button } from "../ui/Button";
 
-function goalProgress(goal: SavingsGoal) {
+function goalProgressPct(goal: SavingsGoal) {
   const target = Number(goal.target_amount) || 0;
   const current = Number(goal.current_amount) || 0;
   if (target <= 0) return 0;
@@ -55,9 +55,7 @@ export function GoalsPage() {
       name: name.trim(),
       target_amount: convertToBase(t, currency),
       current_amount: Number.isFinite(c) && c >= 0 ? convertToBase(c, currency) : 0,
-      currency,
       deadline: null,
-      note: null,
     };
     setBusy(true);
     try {
@@ -156,13 +154,14 @@ export function GoalsPage() {
           <EmptyState
             title="No goals yet"
             description="Set a savings target and track progress."
-            action={<Button onClick={openCreate}>Create a goal</Button>}
+            actionLabel="Create a goal"
+            onAction={openCreate}
           />
         </Card>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {goals.map((goal, i) => {
-            const pct = goalProgress(goal);
+            const pct = goalProgressPct(goal);
             const cur = convertFromBase(Number(goal.current_amount) || 0, currency);
             const tgt = convertFromBase(Number(goal.target_amount) || 0, currency);
             return (

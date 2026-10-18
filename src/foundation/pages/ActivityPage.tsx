@@ -336,9 +336,8 @@ export function ActivityPage() {
           <EmptyState
             title="No transactions yet"
             description="Add income or expenses. Nothing is created automatically."
-            action={
-              <Button onClick={openCreate}>Add first transaction</Button>
-            }
+            actionLabel="Add first transaction"
+            onAction={openCreate}
           />
         </Card>
       ) : (
