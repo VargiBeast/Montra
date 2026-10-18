@@ -20,8 +20,6 @@ function classifyError(message: string): LoadState {
   if (m.includes("disabled") || m.includes("not enabled")) {
     return { status: "error", kind: "disabled" };
   }
-  // Edge Function failures for bad/unknown tokens often surface as generic
-  // "non-2xx" / FunctionsHttpError messages without the word "token".
   if (
     m.includes("invalid") ||
     m.includes("share link") ||
@@ -46,9 +44,10 @@ export function PublicWishlistPage() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
 
   useDocumentMeta({
-    title: t("publicWishlistSeoTitle") !== "\u2014"
-      ? t("publicWishlistSeoTitle")
-      : "Shared wishlist \u00b7 Montra",
+    title:
+      t("publicWishlistSeoTitle") !== "\u2014"
+        ? t("publicWishlistSeoTitle")
+        : "Shared wishlist · Montra",
     description:
       t("publicWishlistSeoDescription") !== "\u2014"
         ? t("publicWishlistSeoDescription")
@@ -78,9 +77,7 @@ export function PublicWishlistPage() {
           status: "ok",
           title:
             payload.title ||
-            (t("publicWishlistTitle") !== "\u2014"
-              ? t("publicWishlistTitle")
-              : "Wishlist"),
+            (t("publicWishlistTitle") !== "\u2014" ? t("publicWishlistTitle") : "Wishlist"),
           items: payload.items,
         });
       } catch (reason) {
@@ -95,10 +92,14 @@ export function PublicWishlistPage() {
     };
   }, [token, t]);
 
+  const homeLabel =
+    t("publicWishlistHome") !== "\u2014" ? t("publicWishlistHome") : "Go to Montra";
+
   return (
-    <main className="marketing-main public-wishlist-page">
-      <section className="panel marketing-hero public-wishlist-hero">
-        <p className="eyebrow">
+    <main className="marketing-main">
+      <section className="mkt-hero">
+        <div className="mkt-hero-glow" aria-hidden />
+        <p className="mkt-eyebrow">
           {t("publicWishlistEyebrow") !== "\u2014" ? t("publicWishlistEyebrow") : "Montra"}
         </p>
         <h1>
@@ -108,7 +109,7 @@ export function PublicWishlistPage() {
               ? t("publicWishlistTitle")
               : "Wishlist"}
         </h1>
-        <p className="marketing-lead">
+        <p className="mkt-lead">
           {t("publicWishlistLead") !== "\u2014"
             ? t("publicWishlistLead")
             : "Items someone wanted to share with you."}
@@ -116,60 +117,56 @@ export function PublicWishlistPage() {
       </section>
 
       {state.status === "loading" && (
-        <div className="panel loading-block" role="status">
-          {t("loading") !== "\u2014" ? t("loading") : "Loading\u2026"}
+        <div className="mkt-card" role="status">
+          {t("loading") !== "\u2014" ? t("loading") : "Loading…"}
         </div>
       )}
 
       {state.status === "error" && (
-        <section className="panel section-panel">
-          <div className="empty-state">
-            <span className="empty-art">
-              <Gift size={22} />
-            </span>
-            <h3>
-              {state.kind === "empty"
-                ? t("publicWishlistEmptyTitle") !== "\u2014"
-                  ? t("publicWishlistEmptyTitle")
-                  : "This wishlist is empty"
-                : state.kind === "disabled"
-                  ? t("publicWishlistDisabledTitle") !== "\u2014"
-                    ? t("publicWishlistDisabledTitle")
-                    : "Sharing is turned off"
-                  : state.kind === "invalid"
-                    ? t("publicWishlistInvalidTitle") !== "\u2014"
-                      ? t("publicWishlistInvalidTitle")
-                      : "This link is not available"
-                    : t("publicWishlistErrorTitle") !== "\u2014"
-                      ? t("publicWishlistErrorTitle")
-                      : "Could not load this wishlist"}
-            </h3>
-            <p>
-              {state.kind === "empty"
-                ? t("publicWishlistEmptyBody") !== "\u2014"
-                  ? t("publicWishlistEmptyBody")
-                  : "There are no items to show right now."
-                : state.kind === "disabled"
-                  ? t("publicWishlistDisabledBody") !== "\u2014"
-                    ? t("publicWishlistDisabledBody")
-                    : "The owner has disabled this share link."
-                  : state.kind === "invalid"
-                    ? t("publicWishlistInvalidBody") !== "\u2014"
-                      ? t("publicWishlistInvalidBody")
-                      : "The link may be incorrect or no longer valid."
-                    : t("publicWishlistErrorBody") !== "\u2014"
-                      ? t("publicWishlistErrorBody")
-                      : "Please try again later."}
-            </p>
-            <Link to="/" className="primary-button">
-              {t("publicWishlistHome") !== "\u2014" ? t("publicWishlistHome") : "Go to Montra"}
-            </Link>
-          </div>
+        <section className="mkt-card" style={{ textAlign: "center", padding: 32 }}>
+          <Gift size={28} style={{ margin: "0 auto 12px", color: "#10b981" }} />
+          <h3 style={{ margin: "0 0 8px" }}>
+            {state.kind === "empty"
+              ? t("publicWishlistEmptyTitle") !== "\u2014"
+                ? t("publicWishlistEmptyTitle")
+                : "This wishlist is empty"
+              : state.kind === "disabled"
+                ? t("publicWishlistDisabledTitle") !== "\u2014"
+                  ? t("publicWishlistDisabledTitle")
+                  : "Sharing is turned off"
+                : state.kind === "invalid"
+                  ? t("publicWishlistInvalidTitle") !== "\u2014"
+                    ? t("publicWishlistInvalidTitle")
+                    : "This link is not available"
+                  : t("publicWishlistErrorTitle") !== "\u2014"
+                    ? t("publicWishlistErrorTitle")
+                    : "Could not load this wishlist"}
+          </h3>
+          <p className="mkt-lead" style={{ marginInline: "auto" }}>
+            {state.kind === "empty"
+              ? t("publicWishlistEmptyBody") !== "\u2014"
+                ? t("publicWishlistEmptyBody")
+                : "There are no items to show right now."
+              : state.kind === "disabled"
+                ? t("publicWishlistDisabledBody") !== "\u2014"
+                  ? t("publicWishlistDisabledBody")
+                  : "The owner has disabled this share link."
+                : state.kind === "invalid"
+                  ? t("publicWishlistInvalidBody") !== "\u2014"
+                    ? t("publicWishlistInvalidBody")
+                    : "This share link is invalid or expired."
+                  : t("publicWishlistErrorBody") !== "\u2014"
+                    ? t("publicWishlistErrorBody")
+                    : "Check your connection and try again later."}
+          </p>
+          <Link to="/" className="mkt-btn mkt-btn-primary" style={{ marginTop: 16 }}>
+            {homeLabel}
+          </Link>
         </section>
       )}
 
       {state.status === "ok" && (
-        <div className="wishlist-grid public-wishlist-grid">
+        <div className="mkt-grid">
           {state.items.map((item, index) => (
             <PublicWishlistCard key={`${item.name}-${index}`} item={item} language={language} t={t} />
           ))}
@@ -194,48 +191,62 @@ function PublicWishlistCard({
     t("wishlistPurchased") !== "\u2014" ? t("wishlistPurchased") : "Purchased";
   const openLabel =
     t("wishlistOpenProduct") !== "\u2014" ? t("wishlistOpenProduct") : "Open product";
+  const href = safeExternalHref(item.url);
 
   return (
-    <article className={`panel wishlist-card ${item.purchased ? "is-purchased" : ""}`}>
-      <div className="wishlist-card-media">
+    <article className="mkt-card" style={{ opacity: item.purchased ? 0.7 : 1 }}>
+      <div
+        style={{
+          height: 140,
+          borderRadius: 12,
+          marginBottom: 12,
+          background: "rgba(16,185,129,0.08)",
+          display: "grid",
+          placeItems: "center",
+          overflow: "hidden",
+        }}
+      >
         {item.image_url && !imgFailed ? (
           <img
             src={item.image_url}
             alt={item.name}
             onError={() => setImgFailed(true)}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <div className="wishlist-img-placeholder">
-            <Gift size={22} />
-          </div>
-        )}
-        {item.purchased && (
-          <span className="wishlist-purchased-badge">
-            <Check size={12} /> {purchasedLabel}
-          </span>
+          <Gift size={28} color="#10b981" />
         )}
       </div>
-      <div className="wishlist-card-body">
-        <div className="wishlist-card-top">
-          <strong className={`wishlist-card-name ${item.purchased ? "is-purchased" : ""}`}>
-            {item.name}
-          </strong>
-          <strong className="wishlist-card-price">{priceLabel}</strong>
-        </div>
-        {item.details && <p className="wishlist-card-details">{item.details}</p>}
-        {safeExternalHref(item.url) ? (
-          <div className="wishlist-card-actions">
-            <a
-              className="text-button wishlist-link-btn"
-              href={safeExternalHref(item.url)!}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink size={14} /> {openLabel}
-            </a>
-          </div>
-        ) : null}
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+        <strong
+          style={{
+            fontSize: 15,
+            textDecoration: item.purchased ? "line-through" : undefined,
+          }}
+        >
+          {item.name}
+        </strong>
+        <strong style={{ whiteSpace: "nowrap" }}>{priceLabel}</strong>
       </div>
+      {item.purchased ? (
+        <p style={{ margin: "6px 0 0", fontSize: 12, color: "#10b981" }}>
+          <Check size={12} style={{ display: "inline", verticalAlign: "-2px" }} /> {purchasedLabel}
+        </p>
+      ) : null}
+      {item.details ? (
+        <p style={{ margin: "8px 0 0", fontSize: 13, color: "#9fb3a6" }}>{item.details}</p>
+      ) : null}
+      {href ? (
+        <a
+          className="mkt-btn mkt-btn-ghost"
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ marginTop: 12, padding: "8px 0" }}
+        >
+          <ExternalLink size={14} /> {openLabel}
+        </a>
+      ) : null}
     </article>
   );
 }

@@ -1,5 +1,6 @@
 /**
- * Application entry — foundation shell + marketing + feature CSS.
+ * Live application entry — foundation + marketing only.
+ * Does not load the previous globals / plus / marketing.css cascade.
  */
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
@@ -10,10 +11,6 @@ import { CurrencyProvider } from "../lib/currency";
 import { LanguageProvider } from "../lib/i18n";
 import "./foundation.css";
 import "../styles/marketing-v2.css";
-import "../styles/globals-base.css";
-import "../styles/globals.css";
-import "../styles/plus.css";
-import "../styles/personalize-themes.css";
 
 if (Capacitor.isNativePlatform()) {
   const path = window.location.pathname || "/";
