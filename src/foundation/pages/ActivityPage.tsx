@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useTransactions } from "../../hooks/useTransactions";
 import { useDisplayCurrency } from "../../lib/currency";
-import { readLanguage } from "../../lib/i18n";
+import { readLanguage, useTranslation } from "../../lib/i18n";
 import { formatDate, formatMoney } from "../../lib/utils";
 import type { Transaction, TransactionInput, TransactionType } from "../../types/transaction";
 import { PageHeader } from "../ui/PageHeader";
@@ -21,12 +22,14 @@ function TransactionRow({
   convertFromBase,
   onEdit,
   onDelete,
+  t,
 }: {
   tx: Transaction;
   currency: string;
   convertFromBase: (amountInBase: number, toCurrency?: string) => number;
   onEdit: () => void;
   onDelete: () => void;
+  t: (k: string, f: string) => string;
 }) {
   const isIn = tx.type === "in";
   const locale = readLanguage();
@@ -74,22 +77,14 @@ function TransactionRow({
           color: "inherit",
         }}
       >
-        <div
-          style={{
-            fontWeight: 600,
-            fontSize: "var(--m-text-sm)",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
+        <div style={{ fontWeight: 600, fontSize: "var(--m-text-sm)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {tx.name}
         </div>
         <div style={{ fontSize: "var(--m-text-xs)", color: "var(--m-text-muted)", marginTop: 2 }}>
           {formatDate(tx.date)}
           {tx.method ? ` · ${tx.method}` : ""}
           {" · "}
-          {isIn ? "Receive" : "Send"}
+          {isIn ? t("txReceive", "Receive") : t("txSend", "Send")}
         </div>
       </button>
       <div
@@ -105,16 +100,9 @@ function TransactionRow({
       </div>
       <button
         type="button"
-        aria-label="Delete"
+        aria-label={t("delete", "Delete")}
         onClick={onDelete}
-        style={{
-          background: "none",
-          border: "none",
-          color: "var(--m-text-muted)",
-          cursor: "pointer",
-          padding: 4,
-          fontSize: 16,
-        }}
+        style={{ background: "none", border: "none", color: "var(--m-text-muted)", cursor: "pointer", padding: 4, fontSize: 16 }}
       >
         ×
       </button>
@@ -124,6 +112,12 @@ function TransactionRow({
 
 export function ActivityPage() {
   const auth = useAuth();
+  const location = useLocation();
+  const translate = useTranslation();
+  const t = (key: string, fallback: string) => {
+    const v = translate(key);
+    return v && v !== "—" && v !== key ? v : fallback;
+  };
   const { transactions, isLoading, error, refresh, save, remove } = useTransactions(auth.user?.id);
   const { currency, convertFromBase, convertToBase, ratesReady } = useDisplayCurrency();
   const [showForm, setShowForm] = useState(false);
@@ -137,6 +131,11 @@ export function ActivityPage() {
   const [date, setDate] = useState(todayISO());
   const [method, setMethod] = useState("");
   const [note, setNote] = useState("");
+
+  useEffect(() => {
+    const st = location.state as { openCreate?: boolean } | null;
+    if (st?.openCreate) openCreate();
+  }, [location.state]);
 
   function openCreate() {
     setEditing(null);
@@ -167,11 +166,11 @@ export function ActivityPage() {
     setFormError(null);
     const num = Number(amount);
     if (!name.trim()) {
-      setFormError("Name is required.");
+      setFormError(t("validationNameRequired", "Name is required."));
       return;
     }
     if (!Number.isFinite(num) || num <= 0) {
-      setFormError("Enter a valid amount greater than zero.");
+      setFormError(t("validationAmount", "Enter a valid amount greater than zero."));
       return;
     }
     const amountInBase = convertToBase(num, currency);
@@ -191,19 +190,19 @@ export function ActivityPage() {
       setShowForm(false);
       setEditing(null);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Could not save.");
+      setFormError(err instanceof Error ? err.message : t("saveFailed", "Could not save."));
     } finally {
       setBusy(false);
     }
   }
 
   async function handleDelete(tx: Transaction) {
-    if (!window.confirm(`Delete “${tx.name}”?`)) return;
+    if (!window.confirm(t("confirmDeleteTx", `Delete “${tx.name}”?`).replace("{name}", tx.name))) return;
     setBusy(true);
     try {
       await remove(tx);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Could not delete.");
+      setFormError(err instanceof Error ? err.message : t("deleteFailed", "Could not delete."));
     } finally {
       setBusy(false);
     }
@@ -212,131 +211,75 @@ export function ActivityPage() {
   return (
     <div className="m-anim-in">
       <PageHeader
-        title="Activity"
-        subtitle="Your transactions"
+        title={t("navActivity", "Activity")}
+        subtitle={t("activitySubtitle", "Your transactions")}
         action={
           <Button size="sm" onClick={openCreate}>
-            + Add
+            + {t("add", "Add")}
           </Button>
         }
       />
 
       {showForm ? (
         <Card padding="lg" className="m-anim-scale" style={{ marginBottom: 16 }}>
-          <h2 style={{ margin: "0 0 16px", fontSize: 16 }}>{editing ? "Edit transaction" : "New transaction"}</h2>
+          <h2 style={{ margin: "0 0 16px", fontSize: 16 }}>
+            {editing ? t("editTransaction", "Edit transaction") : t("newTransaction", "New transaction")}
+          </h2>
           <form onSubmit={(e) => void submit(e)}>
             <div className="m-field" style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                onClick={() => setType("in")}
-                style={{
-                  flex: 1,
-                  padding: 12,
-                  borderRadius: 12,
-                  border: type === "in" ? "1px solid var(--m-accent)" : "1px solid var(--m-border)",
-                  background: type === "in" ? "var(--m-accent-soft)" : "transparent",
-                  color: type === "in" ? "var(--m-positive)" : "var(--m-text-muted)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Income
+              <button type="button" onClick={() => setType("in")} style={{ flex: 1, padding: 12, borderRadius: 12, border: type === "in" ? "1px solid var(--m-accent)" : "1px solid var(--m-border)", background: type === "in" ? "var(--m-accent-soft)" : "transparent", color: type === "in" ? "var(--m-positive)" : "var(--m-text-muted)", fontWeight: 600, cursor: "pointer" }}>
+                {t("income", "Income")}
               </button>
-              <button
-                type="button"
-                onClick={() => setType("out")}
-                style={{
-                  flex: 1,
-                  padding: 12,
-                  borderRadius: 12,
-                  border: type === "out" ? "1px solid var(--m-border-strong)" : "1px solid var(--m-border)",
-                  background: type === "out" ? "rgba(255,255,255,0.06)" : "transparent",
-                  color: "var(--m-text)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Expense
+              <button type="button" onClick={() => setType("out")} style={{ flex: 1, padding: 12, borderRadius: 12, border: type === "out" ? "1px solid var(--m-border-strong)" : "1px solid var(--m-border)", background: type === "out" ? "rgba(255,255,255,0.06)" : "transparent", color: "var(--m-text)", fontWeight: 600, cursor: "pointer" }}>
+                {t("expense", "Expense")}
               </button>
             </div>
             <div className="m-field">
-              <label className="m-label" htmlFor="tx-name">
-                Name
-              </label>
+              <label className="m-label" htmlFor="tx-name">{t("fieldName", "Name")}</label>
               <input id="tx-name" className="m-input" value={name} onChange={(e) => setName(e.target.value)} required maxLength={120} />
             </div>
             <div className="m-field" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label className="m-label" htmlFor="tx-amount">
-                  Amount ({currency})
-                </label>
-                <input
-                  id="tx-amount"
-                  className="m-input"
-                  type="number"
-                  inputMode="decimal"
-                  min="0.01"
-                  step="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
+                <label className="m-label" htmlFor="tx-amount">{t("fieldAmount", "Amount")} ({currency})</label>
+                <input id="tx-amount" className="m-input" type="number" inputMode="decimal" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required />
               </div>
               <div>
-                <label className="m-label" htmlFor="tx-date">
-                  Date
-                </label>
+                <label className="m-label" htmlFor="tx-date">{t("fieldDate", "Date")}</label>
                 <input id="tx-date" className="m-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
               </div>
             </div>
             <div className="m-field">
-              <label className="m-label" htmlFor="tx-method">
-                Method (optional)
-              </label>
-              <input id="tx-method" className="m-input" value={method} onChange={(e) => setMethod(e.target.value)} placeholder="Card, cash…" />
+              <label className="m-label" htmlFor="tx-method">{t("fieldMethod", "Method (optional)")}</label>
+              <input id="tx-method" className="m-input" value={method} onChange={(e) => setMethod(e.target.value)} />
             </div>
             <div className="m-field">
-              <label className="m-label" htmlFor="tx-note">
-                Note (optional)
-              </label>
+              <label className="m-label" htmlFor="tx-note">{t("fieldNote", "Note (optional)")}</label>
               <input id="tx-note" className="m-input" value={note} onChange={(e) => setNote(e.target.value)} />
             </div>
-            {formError ? (
-              <p role="alert" style={{ color: "var(--m-negative)", fontSize: 13, margin: "0 0 12px" }}>
-                {formError}
-              </p>
-            ) : null}
+            {formError ? <p role="alert" style={{ color: "var(--m-negative)", fontSize: 13, margin: "0 0 12px" }}>{formError}</p> : null}
             <div style={{ display: "flex", gap: 8 }}>
-              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} disabled={busy}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={busy}>
-                {busy ? "Saving…" : "Save"}
-              </Button>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} disabled={busy}>{t("cancel", "Cancel")}</Button>
+              <Button type="submit" disabled={busy}>{busy ? t("saving", "Saving…") : t("save", "Save")}</Button>
             </div>
           </form>
         </Card>
       ) : null}
 
       {isLoading ? (
-        <LoadingState label="Loading your transactions…" />
+        <LoadingState label={t("loadingTransactions", "Loading your transactions…")} />
       ) : error ? (
         <Card>
           <div style={{ textAlign: "center", padding: "var(--m-space-6)" }}>
-            <p role="alert" style={{ margin: "0 0 16px", color: "var(--m-negative)", fontSize: "var(--m-text-sm)" }}>
-              {error}
-            </p>
-            <Button variant="secondary" onClick={() => void refresh()}>
-              Try again
-            </Button>
+            <p role="alert" style={{ margin: "0 0 16px", color: "var(--m-negative)", fontSize: "var(--m-text-sm)" }}>{error}</p>
+            <Button variant="secondary" onClick={() => void refresh()}>{t("tryAgain", "Try again")}</Button>
           </div>
         </Card>
       ) : transactions.length === 0 && !showForm ? (
         <Card>
           <EmptyState
-            title="No transactions yet"
-            description="Add income or expenses. Nothing is created automatically."
-            actionLabel="Add first transaction"
+            title={t("emptyTransactions", "No transactions yet")}
+            description={t("emptyTransactionsBody", "Add income or expenses. Nothing is created automatically.")}
+            actionLabel={t("addFirstTransaction", "Add first transaction")}
             onAction={openCreate}
           />
         </Card>
@@ -344,10 +287,10 @@ export function ActivityPage() {
         <Card padding="md" className="m-anim-in m-anim-delay-1">
           {!ratesReady ? (
             <p style={{ margin: "0 0 8px", fontSize: "var(--m-text-xs)", color: "var(--m-text-muted)" }}>
-              Using fallback rates until live rates load.
+              {t("fallbackRates", "Using fallback rates until live rates load.")}
             </p>
           ) : null}
-          <div role="list" aria-label="Transactions">
+          <div role="list" aria-label={t("navActivity", "Transactions")}>
             {transactions.map((tx) => (
               <div key={tx.id} role="listitem">
                 <TransactionRow
@@ -356,6 +299,7 @@ export function ActivityPage() {
                   convertFromBase={convertFromBase}
                   onEdit={() => openEdit(tx)}
                   onDelete={() => void handleDelete(tx)}
+                  t={t}
                 />
               </div>
             ))}

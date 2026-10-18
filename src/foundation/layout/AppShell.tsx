@@ -2,16 +2,19 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { usePlusEntitlement } from "../../hooks/usePlusEntitlement";
+import { useTranslation } from "../../lib/i18n";
 
-const navItems = [
-  { to: "/app", end: true, label: "Home", icon: "⌂" },
-  { to: "/app/activity", label: "Activity", icon: "☰" },
-  { to: "/app/analytics", label: "Analytics", icon: "◔" },
-  { to: "/app/goals", label: "Goals", icon: "◎" },
-  { to: "/app/more", label: "More", icon: "⋯" },
-] as const;
-
-function NavItem({ to, end, label, icon }: { to: string; end?: boolean; label: string; icon: string }) {
+function BottomNavItem({
+  to,
+  end,
+  label,
+  icon,
+}: {
+  to: string;
+  end?: boolean;
+  label: string;
+  icon: string;
+}) {
   return (
     <NavLink
       to={to}
@@ -21,13 +24,13 @@ function NavItem({ to, end, label, icon }: { to: string; end?: boolean; label: s
         flexDirection: "column",
         alignItems: "center",
         gap: 2,
-        padding: "8px 12px",
+        padding: "6px 8px",
         borderRadius: "var(--m-radius-md)",
         color: isActive ? "var(--m-accent)" : "var(--m-text-muted)",
         textDecoration: "none",
-        fontSize: "var(--m-text-xs)",
+        fontSize: 10,
         fontWeight: isActive ? 600 : 500,
-        transition: "color var(--m-duration)",
+        minWidth: 52,
       })}
     >
       <span style={{ fontSize: 18, lineHeight: 1 }} aria-hidden>
@@ -65,61 +68,53 @@ export function AppShell({ children }: { children?: ReactNode }) {
   const auth = useAuth();
   const plus = usePlusEntitlement(auth.user?.id);
   const navigate = useNavigate();
+  const t = useTranslation();
+
+  const label = (key: string, fallback: string) => {
+    const v = t(key);
+    return v && v !== "—" && v !== key ? v : fallback;
+  };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100dvh",
-        background: "var(--m-bg)",
-      }}
-    >
-      {/* Desktop side navigation */}
+    <div style={{ display: "flex", minHeight: "100dvh", background: "var(--m-bg)" }}>
       <aside
+        className="m-side-nav"
         style={{
           display: "none",
           width: "var(--m-side-width)",
           flexShrink: 0,
           borderRight: "1px solid var(--m-border)",
           background: "var(--m-bg-elevated)",
-          padding: "var(--m-space-6) var(--m-space-3)",
+          padding: "var(--m-space-4)",
           flexDirection: "column",
-          gap: "var(--m-space-2)",
+          gap: 4,
         }}
-        className="m-side-nav"
       >
-        <div
-          style={{
-            padding: "0 var(--m-space-3) var(--m-space-6)",
-            fontWeight: 700,
-            fontSize: "var(--m-text-lg)",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          Montra
+        <div style={{ padding: "8px 14px 20px", display: "flex", alignItems: "center", gap: 8 }}>
+          <strong style={{ letterSpacing: "0.04em" }}>MONTRA</strong>
           {plus.hasPlus ? (
             <span
               style={{
-                marginLeft: 8,
-                fontSize: 11,
-                fontWeight: 600,
+                fontSize: 10,
+                fontWeight: 700,
                 color: "var(--m-gold)",
-                background: "var(--m-gold-soft)",
+                background: "rgba(232,197,71,0.12)",
                 padding: "2px 8px",
-                borderRadius: "var(--m-radius-full)",
+                borderRadius: 99,
               }}
             >
               Plus
             </span>
           ) : null}
         </div>
-        <SideNavItem to="/app" end label="Home" />
-        <SideNavItem to="/app/activity" label="Activity" />
-        <SideNavItem to="/app/analytics" label="Analytics" />
-        <SideNavItem to="/app/goals" label="Goals" />
-        <SideNavItem to="/app/wishlist" label="Wishlist" />
-        <SideNavItem to="/app/recurring" label="Recurring" />
-        <SideNavItem to="/app/more" label="More" />
+        <SideNavItem to="/app" end label={label("navHome", "Home")} />
+        <SideNavItem to="/app/activity" label={label("navActivity", "Activity")} />
+        <SideNavItem to="/app/receipts" label={label("navReceipts", "Receipts")} />
+        <SideNavItem to="/app/analytics" label={label("navAnalytics", "Analytics")} />
+        <SideNavItem to="/app/goals" label={label("navGoals", "Goals")} />
+        <SideNavItem to="/app/wishlist" label={label("navWishlist", "Wishlist")} />
+        <SideNavItem to="/app/recurring" label={label("navRecurring", "Recurring")} />
+        <SideNavItem to="/app/more" label={label("navMore", "More")} />
         <div style={{ flex: 1 }} />
         <button
           type="button"
@@ -134,13 +129,13 @@ export function AppShell({ children }: { children?: ReactNode }) {
             fontSize: "var(--m-text-sm)",
           }}
         >
-          Sign out
+          {label("navSignOut", "Sign out")}
         </button>
       </aside>
 
-      {/* Main content */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <main
+          className="m-main"
           style={{
             flex: 1,
             padding: "var(--m-space-4)",
@@ -149,13 +144,12 @@ export function AppShell({ children }: { children?: ReactNode }) {
             width: "100%",
             marginInline: "auto",
           }}
-          className="m-main"
         >
           {children ?? <Outlet />}
         </main>
 
-        {/* Mobile bottom navigation */}
         <nav
+          className="m-bottom-nav"
           style={{
             position: "fixed",
             bottom: 0,
@@ -171,12 +165,35 @@ export function AppShell({ children }: { children?: ReactNode }) {
             zIndex: 40,
             paddingBottom: "env(safe-area-inset-bottom, 0)",
           }}
-          className="m-bottom-nav"
-          aria-label="Primary"
+          aria-label={label("mainNavigation", "Primary")}
         >
-          {navItems.map((item) => (
-            <NavItem key={item.to} {...item} />
-          ))}
+          <BottomNavItem to="/app" end label={label("navHome", "Home")} icon="⌂" />
+          <BottomNavItem to="/app/activity" label={label("navActivity", "Activity")} icon="☰" />
+          <button
+            type="button"
+            aria-label={label("navAddTransaction", "Add")}
+            onClick={() => navigate("/app/activity", { state: { openCreate: true } })}
+            style={{
+              width: 52,
+              height: 52,
+              marginTop: -18,
+              borderRadius: "50%",
+              border: "none",
+              background: "linear-gradient(135deg, #34d399, #059669)",
+              color: "#04110a",
+              fontSize: 28,
+              fontWeight: 600,
+              boxShadow: "0 4px 20px rgba(16,185,129,0.4)",
+              cursor: "pointer",
+              display: "grid",
+              placeItems: "center",
+              lineHeight: 1,
+            }}
+          >
+            +
+          </button>
+          <BottomNavItem to="/app/receipts" label={label("navReceipts", "Receipts")} icon="◫" />
+          <BottomNavItem to="/app/more" label={label("navMore", "More")} icon="⋯" />
         </nav>
       </div>
 

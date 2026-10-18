@@ -1,20 +1,25 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { useTranslation } from "../../lib/i18n";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 
-/**
- * New login surface — independent of the previous LoginPage.
- * Uses the verified auth service contracts (Google OAuth + email OTP).
- */
 export function LoginPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const t = useTranslation();
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const from = (location.state as { from?: string } | null)?.from || "/app";
+
+  const label = (key: string, fallback: string) => {
+    const v = t(key);
+    return v && v !== "—" && v !== key ? v : fallback;
+  };
 
   if (!auth.isLoading && auth.user) {
     navigate(from.startsWith("/") ? from : "/app", { replace: true });
@@ -26,7 +31,7 @@ export function LoginPage() {
     try {
       await action();
     } catch {
-      /* auth.authError is set by the hook */
+      /* auth.authError set by hook */
     } finally {
       setBusy(false);
     }
@@ -42,17 +47,17 @@ export function LoginPage() {
         background: "radial-gradient(ellipse at top, #0e1a14 0%, var(--m-bg) 55%)",
       }}
     >
-      <Card padding="lg" style={{ width: "100%", maxWidth: 400 }}>
+      <Card padding="lg" style={{ width: "100%", maxWidth: 400 }} className="m-anim-scale">
         <div style={{ textAlign: "center", marginBottom: "var(--m-space-6)" }}>
           <h1 style={{ margin: 0, fontSize: "var(--m-text-2xl)", fontWeight: 700 }}>Montra</h1>
           <p style={{ margin: "8px 0 0", color: "var(--m-text-secondary)", fontSize: "var(--m-text-sm)" }}>
-            Track your money. Understand your money. Plan your money.
+            {label("loginTagline", "Track your money. Understand your money. Plan your money.")}
           </p>
         </div>
 
         {!auth.isConfigured ? (
           <p style={{ color: "var(--m-warning)", fontSize: "var(--m-text-sm)" }}>
-            Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.
+            Supabase is not configured.
           </p>
         ) : null}
 
@@ -75,10 +80,10 @@ export function LoginPage() {
         <Button
           fullWidth
           disabled={busy || !auth.isConfigured}
-          onClick={() => run(() => auth.signInWithProvider("google"))}
+          onClick={() => void run(() => auth.signInWithProvider("google"))}
           style={{ marginBottom: "var(--m-space-3)" }}
         >
-          Continue with Google
+          {label("loginGoogle", "Continue with Google")}
         </Button>
 
         <div
@@ -92,37 +97,80 @@ export function LoginPage() {
           }}
         >
           <div style={{ flex: 1, height: 1, background: "var(--m-border)" }} />
-          or email
+          {label("loginOrEmail", "or email")}
           <div style={{ flex: 1, height: 1, background: "var(--m-border)" }} />
         </div>
 
-        <label style={{ display: "block", marginBottom: 6, fontSize: "var(--m-text-sm)", color: "var(--m-text-secondary)" }}>
-          Email
+        <label className="m-label" htmlFor="login-email">
+          {label("loginEmail", "Email")}
         </label>
         <input
+          id="login-email"
+          className="m-input"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          style={{
-            width: "100%",
-            padding: "12px 14px",
-            marginBottom: "var(--m-space-3)",
-            borderRadius: "var(--m-radius-md)",
-            border: "1px solid var(--m-border-strong)",
-            background: "var(--m-bg-input)",
-            color: "var(--m-text)",
-            outline: "none",
-          }}
+          autoComplete="email"
+          disabled={otpSent}
+          style={{ marginBottom: 12 }}
         />
-        <Button
-          fullWidth
-          variant="secondary"
-          disabled={busy || !auth.isConfigured || !email.trim()}
-          onClick={() => run(() => auth.signInWithEmail(email.trim()))}
-        >
-          Send magic link
-        </Button>
+
+        {otpSent ? (
+          <>
+            <label className="m-label" htmlFor="login-code">
+              {label("loginCode", "Verification code")}
+            </label>
+            <input
+              id="login-code"
+              className="m-input"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="123456"
+              style={{ marginBottom: 12 }}
+            />
+            <Button
+              fullWidth
+              disabled={busy || !code.trim()}
+              onClick={() =>
+                void run(async () => {
+                  await auth.verifyEmailCode(email.trim(), code.trim());
+                  navigate(from.startsWith("/") ? from : "/app", { replace: true });
+                })
+              }
+            >
+              {label("loginVerify", "Verify and sign in")}
+            </Button>
+            <Button
+              fullWidth
+              variant="ghost"
+              style={{ marginTop: 8 }}
+              disabled={busy}
+              onClick={() => {
+                setOtpSent(false);
+                setCode("");
+              }}
+            >
+              {label("loginBack", "Use a different email")}
+            </Button>
+          </>
+        ) : (
+          <Button
+            fullWidth
+            variant="secondary"
+            disabled={busy || !auth.isConfigured || !email.trim()}
+            onClick={() =>
+              void run(async () => {
+                await auth.signInWithEmail(email.trim());
+                setOtpSent(true);
+              })
+            }
+          >
+            {label("loginSendCode", "Send sign-in code")}
+          </Button>
+        )}
       </Card>
     </div>
   );
