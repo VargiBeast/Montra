@@ -18,26 +18,10 @@ import { MarketingLayout } from "../pages/public/MarketingLayout";
 import { HomePublic } from "../pages/public/HomePublic";
 import { FeaturesPublic } from "../pages/public/FeaturesPublic";
 import { PricingPublic } from "../pages/public/PricingPublic";
+import { PlusPublic } from "../pages/public/PlusPublic";
 import { SimplePublic } from "../pages/public/SimplePublic";
 import { PublicWishlistPage } from "../pages/public/PublicWishlistPage";
 import { NotFoundPublic } from "../pages/public/NotFoundPublic";
-import { useDocumentMeta } from "../lib/seo";
-import { useTranslation } from "../lib/i18n";
-
-/** Public Plus — same new UI as in-app, without AppShell. */
-function PlusPublic() {
-  const t = useTranslation();
-  useDocumentMeta({
-    title: t("seoPlusTitle"),
-    description: t("seoPlusDescription"),
-    path: "/plus",
-  });
-  return (
-    <main className="marketing-main" style={{ maxWidth: 480, marginInline: "auto" }}>
-      <PlusPageNew />
-    </main>
-  );
-}
 
 export function FoundationRoutes() {
   return (
