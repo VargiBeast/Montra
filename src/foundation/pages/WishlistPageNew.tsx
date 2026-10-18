@@ -16,7 +16,7 @@ export function WishlistPageNew() {
   const auth = useAuth();
   const wishlist = useWishlist(auth.user?.id);
   const goals = useSavingsGoals(auth.user?.id);
-  const { currency, convertFromBase, convertToBase } = useDisplayCurrency();
+  const { currency } = useDisplayCurrency();
   const locale = readLanguage();
 
   const [showForm, setShowForm] = useState(false);
