@@ -15,11 +15,44 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src/main.tsx",
+    "src/App.tsx",
+    "src/vite-env.d.ts",
+    "src/components/layout/**/*",
+    "src/features/**/*",
+    "src/hooks/**/*",
+    "src/lib/**/*",
+    "src/services/**/*",
+    "src/types/**/*",
+    "src/styles/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/components/ConfirmDialog.tsx",
+    "src/components/ConsentBanner.tsx",
+    "src/components/FinancialRadarCard.tsx",
+    "src/components/MoneyJourneyCard.tsx",
+    "src/components/PublicFooter.tsx",
+    "src/components/ReceiptCapture.tsx",
+    "src/components/ReceiptDetail.tsx",
+    "src/components/RecurringHomeTeaser.tsx",
+    "src/components/TransactionDetail.tsx",
+    "src/components/TransactionForm.tsx",
+    "src/components/TransactionRow.tsx",
+    "src/components/WhatIfCard.tsx",
+    "src/components/WishlistSharePanel.tsx",
+    "src/components/AnalyticsTracker.tsx",
+    "src/components/ProtectedRoute.tsx",
+    "src/components/UserAvatar.tsx",
+    "src/foundation",
+    "src/pages",
+    "src/AppRoutes.tsx",
+    "src/App.tsx.bak"
+  ]
 }

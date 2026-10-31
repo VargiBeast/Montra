@@ -1,8 +1,6 @@
-import { useAuth } from '@/features/authentication/AuthProvider';
-import {
-  User, Globe, Palette, CreditCard, Shield, HelpCircle, LogOut, ChevronRight, Target, Gift,
-} from 'lucide-react';
+import { CreditCard, HelpCircle, LogOut, ChevronRight, Target, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/authentication/AuthProvider';
 import { GoalsSection } from '@/features/goals/GoalsSection';
 import { WishlistSection } from '@/features/wishlist/WishlistSection';
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
@@ -27,12 +25,18 @@ export function MorePage() {
       </header>
 
       <section className="more__section">
-        <h2><Target size={14} style={{display:'inline',marginRight:6}} />Goals</h2>
+        <h2>
+          <Target size={14} style={{ display: 'inline', marginRight: 6 }} />
+          Goals
+        </h2>
         <GoalsSection />
       </section>
 
       <section className="more__section">
-        <h2><Gift size={14} style={{display:'inline',marginRight:6}} />Wishlist</h2>
+        <h2>
+          <Gift size={14} style={{ display: 'inline', marginRight: 6 }} />
+          Wishlist
+        </h2>
         <WishlistSection />
       </section>
 
@@ -44,7 +48,9 @@ export function MorePage() {
           onChange={(e) => setCurrency(e.target.value as typeof currency)}
         >
           {SUPPORTED_CURRENCIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
         <p className="more__hint">Amounts are stored in NOK and converted for display.</p>
@@ -55,7 +61,9 @@ export function MorePage() {
         <ul className="more__list">
           <li>
             <button type="button" className="more__item" onClick={() => navigate('/plus')}>
-              <CreditCard size={20} /><span>Montra Plus</span><ChevronRight size={18} className="more__chevron" />
+              <CreditCard size={20} />
+              <span>Montra Plus</span>
+              <ChevronRight size={18} className="more__chevron" />
             </button>
           </li>
         </ul>
@@ -66,7 +74,9 @@ export function MorePage() {
         <ul className="more__list">
           <li>
             <button type="button" className="more__item">
-              <HelpCircle size={20} /><span>Help & legal</span><ChevronRight size={18} className="more__chevron" />
+              <HelpCircle size={20} />
+              <span>Help & legal</span>
+              <ChevronRight size={18} className="more__chevron" />
             </button>
           </li>
         </ul>

@@ -2,13 +2,17 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Home, List, Plus, Receipt, MoreHorizontal } from 'lucide-react';
 import './AppShell.css';
 
-const navItems = [
+type NavItem =
+  | { to: string; label: string; icon: typeof Home; end?: boolean; isCentral?: false }
+  | { to: string; label: string; icon: typeof Plus; isCentral: true };
+
+const navItems: NavItem[] = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/activity', label: 'Activity', icon: List },
   { to: '/add', label: 'Add', icon: Plus, isCentral: true },
   { to: '/receipts', label: 'Receipts', icon: Receipt },
   { to: '/more', label: 'More', icon: MoreHorizontal },
-] as const;
+];
 
 export function AppShell() {
   const navigate = useNavigate();
@@ -35,7 +39,7 @@ export function AppShell() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={'end' in item ? item.end : false}
+              end={item.end}
               className={({ isActive }) =>
                 `app-shell__item${isActive ? ' app-shell__item--active' : ''}`
               }
