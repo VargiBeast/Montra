@@ -3,7 +3,7 @@ import type { Transaction } from '@/types/transaction';
 import { toIsoDate, round2 } from './utils';
 
 export interface MonthForecast {
-  freEnoughData: boolean;
+  hasEnoughData: boolean;
   expectedSpending: number | null;
   expectedIncome: number | null;
   expectedNet: number | null;
@@ -34,7 +34,7 @@ export function buildMonthForecast(all: Transaction[], now = new Date()): MonthF
 
   if (day < 3 && spendingSoFar === 0 && incomeSoFar === 0) {
     return {
-      freEnoughData: false,
+      hasEnoughData: false,
       expectedSpending: null,
       expectedIncome: null,
       expectedNet: null,
@@ -50,7 +50,7 @@ export function buildMonthForecast(all: Transaction[], now = new Date()): MonthF
   const expectedIncome = incomeSoFar > 0 ? round2(incomeSoFar * factor) : null;
 
   return {
-    freEnoughData: true,
+    hasEnoughData: true,
     expectedSpending,
     expectedIncome,
     expectedNet: expectedIncome != null ? round2(expectedIncome - expectedSpending) : null,
@@ -78,15 +78,11 @@ export function buildSimpleInsights(all: Transaction[]): string[] {
   if (spend === 0 && monthTx.length > 0) {
     insights.push('No expenses recorded this month yet.');
   }
-  if freEnough(all)) {
+  if (all.length >= 5) {
     const forecast = buildMonthForecast(all);
     if (forecast.expectedSpending && forecast.expectedSpending > 0) {
-      insights.push(`Projected spending this month: around the current pace.`);
+      insights.push('Projected spending this month follows your current pace.');
     }
   }
   return insights.slice(0, 4);
-}
-
-function freEnough(all: Transaction[]) {
-  return all.length >= 5;
 }

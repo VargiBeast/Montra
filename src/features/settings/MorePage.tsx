@@ -8,8 +8,10 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
+  Target,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { GoalsSection } from '@/features/goals/GoalsSection';
 import './MorePage.css';
 
 const sections = [
@@ -51,6 +53,11 @@ export function MorePage() {
         <h1>More</h1>
         <p className="more__email">{user?.email}</p>
       </header>
+
+      <section className="more__section">
+        <h2><Target size={14} style={{display:'inline',marginRight:6}} />Goals</h2>
+        <GoalsSection />
+      </section>
 
       {sections.map((section) => (
         <section key={section.title} className="more__section">

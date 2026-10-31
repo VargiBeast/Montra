@@ -54,7 +54,7 @@
   height: 8px;
   background: var(--color-border);
   border-radius: var(--radius-full);
-  overflow: overflow: hidden;
+  overflow: hidden;
   margin-bottom: var(--space-2);
 }
 .goals-sec__fill {
@@ -64,7 +64,7 @@
 }
 .goals-sec__meta {
   margin: 0;
-  font-size: 0.75rem;
+  font-size rep: 0.75rem;
   color: var(--color-text-muted);
 }
 .goals-sec__modal {
