@@ -14,8 +14,8 @@
 .home__badge {
   display: inline-block;
   padding: 0.25rem 0.625rem;
-  background: rgb(16 185 129 / 0.12);
-  color: var(--color-emerald-700);
+  background: rgb(5 150 105 / 0.15);
+  color: var(--color-emerald-800);
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: var(--radius-full);
@@ -25,7 +25,7 @@
 .home__greeting h1 {
   margin: 0;
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -35,17 +35,17 @@
 }
 
 .home__balance-card {
-  background: linear-gradient(145deg, var(--color-emerald-900) 0%, var(--color-emerald-700) 100%);
+  background: linear-gradient(145deg, #064e3b 0%, #047857 100%);
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
-  color: white;
+  color: #ffffff;
   box-shadow: var(--shadow-card);
 }
 
 .home__balance-label {
   margin: 0;
   font-size: 0.875rem;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .home__balance-value {
@@ -58,7 +58,7 @@
 .home__balance-hint {
   margin: 0 0 var(--space-5);
   font-size: 0.8125rem;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .home__balance-actions {
@@ -72,22 +72,13 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.875rem;
-  background: rgb(255 255 255 / 0.15);
-  color: white;
-  transition: background var(--duration) var(--ease);
+  background: rgb(255 255 255 / 0.18);
+  color: #ffffff;
 }
 
 .home__action--primary {
-  background: var(--color-lime-400);
-  color: var(--color-emerald-950);
-}
-
-.home__action:hover {
-  background: rgb(255 255 255 / 0.25);
-}
-
-.home__action--primary:hover {
-  background: var(--color-lime-300);
+  background: #a3e635;
+  color: #022c22;
 }
 
 .home__section {
@@ -104,7 +95,7 @@
 .home__section-header h2 {
   margin: 0;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -125,6 +116,7 @@
   align-items: center;
   gap: var(--space-3);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
 }
 
 .home__stat-icon {
@@ -137,12 +129,12 @@
 }
 
 .home__stat-icon--in {
-  background: rgb(16 185 129 / 0.12);
-  color: var(--color-emerald-600);
+  background: rgb(5 150 105 / 0.15);
+  color: var(--color-emerald-700);
 }
 
 .home__stat-icon--out {
-  background: rgb(239 68 68 / 0.1);
+  background: rgb(220 38 38 / 0.1);
   color: var(--color-danger);
 }
 
@@ -150,12 +142,14 @@
   margin: 0;
   font-size: 0.75rem;
   color: var(--color-text-muted);
+  font-weight: 500;
 }
 
 .home__stat-value {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
+  color: var(--color-text);
 }
 
 .home__card {
@@ -163,11 +157,12 @@
   border-radius: var(--radius-xl);
   padding: var(--space-5);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
 }
 
 .home__card--empty {
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 }
 
@@ -186,6 +181,7 @@
   border-radius: var(--radius-xl);
   padding: var(--space-4);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
 }
 
 .home__goal-header {
@@ -197,17 +193,18 @@
 .home__goal-name {
   font-weight: 600;
   font-size: 0.9375rem;
+  color: var(--color-text);
 }
 
 .home__goal-pct {
   font-weight: 700;
-  color: var(--color-emerald-600);
+  color: var(--color-emerald-700);
   font-size: 0.875rem;
 }
 
 .home__goal-bar {
   height: 8px;
-  background: var(--color-border);
+  background: #e2e8f0;
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: var(--space-2);
@@ -215,9 +212,8 @@
 
 .home__goal-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-emerald-500), var(--color-lime-400));
+  background: linear-gradient(90deg, #059669, #a3e635);
   border-radius: var(--radius-full);
-  transition: width 0.4s var(--ease);
 }
 
 .home__goal-meta {
@@ -234,6 +230,7 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
 }
 
 .home__tx-item {
@@ -255,8 +252,9 @@
 }
 
 .home__tx-name {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9375rem;
+  color: var(--color-text);
 }
 
 .home__tx-date {
@@ -270,7 +268,7 @@
 }
 
 .home__tx-amount--in {
-  color: var(--color-emerald-600);
+  color: var(--color-emerald-700);
 }
 
 .home__tx-amount--out {
