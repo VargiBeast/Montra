@@ -8,7 +8,8 @@ export function LoginPage() {
   const { signIn, signUp, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/';
+  const from =
+    (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/app';
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -31,7 +32,7 @@ export function LoginPage() {
       return;
     }
 
-    navigate(from, { replace: true });
+    navigate(from.startsWith('/app') ? from : '/app', { replace: true });
   }
 
   if (!isSupabaseConfigured) {
@@ -82,7 +83,11 @@ export function LoginPage() {
             />
           </div>
 
-          {error && <div className="auth-error" role="alert">{error}</div>}
+          {error && (
+            <div className="auth-error" role="alert">
+              {error}
+            </div>
+          )}
 
           <button type="submit" className="auth-submit" disabled={submitting || loading}>
             {submitting ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
