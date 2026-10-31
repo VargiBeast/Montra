@@ -16,9 +16,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
+    "paths": { "@/*": ["src/*"] },
     "types": ["vite/client"]
   },
   "include": [
@@ -37,6 +35,7 @@
     "src/features/wishlist/WishlistSection.tsx",
     "src/features/plus/PlusPage.tsx",
     "src/features/settings/MorePage.tsx",
+    "src/features/marketing/LandingPage.tsx",
     "src/hooks/useTransactions.ts",
     "src/hooks/useSavingsGoals.ts",
     "src/hooks/useReceipts.ts",

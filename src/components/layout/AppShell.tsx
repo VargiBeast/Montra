@@ -7,11 +7,11 @@ type NavItem =
   | { to: string; label: string; icon: typeof Plus; isCentral: true };
 
 const navItems: NavItem[] = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/activity', label: 'Activity', icon: List },
+  { to: '/app', label: 'Home', icon: Home, end: true },
+  { to: '/app/activity', label: 'Activity', icon: List },
   { to: '/add', label: 'Add', icon: Plus, isCentral: true },
-  { to: '/receipts', label: 'Receipts', icon: Receipt },
-  { to: '/more', label: 'More', icon: MoreHorizontal },
+  { to: '/app/receipts', label: 'Receipts', icon: Receipt },
+  { to: '/app/more', label: 'More', icon: MoreHorizontal },
 ];
 
 export function AppShell() {
@@ -30,7 +30,7 @@ export function AppShell() {
               key={item.to}
               type="button"
               className="app-shell__central"
-              onClick={() => navigate('/activity?action=add')}
+              onClick={() => navigate('/app/activity?action=add')}
               aria-label="Add transaction"
             >
               <Plus size={28} strokeWidth={2.5} />
