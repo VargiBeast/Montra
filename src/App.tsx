@@ -14,12 +14,11 @@ function RootRedirect() {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 36, height: 36, border: '3px solid #e2e8f0', borderTopColor: '#0f172a', borderRadius: '50%' }} />
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090b' }}>
+        <div style={{ width: 36, height: 36, border: '3px solid #3f3f46', borderTopColor: '#fbbf24', borderRadius: '50%' }} />
       </div>
     );
   }
-  // Logged-in users go to app; others see landing
   return user ? <Navigate to="/app" replace /> : <LandingPage />;
 }
 
@@ -30,7 +29,6 @@ export default function App() {
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/plus" element={<PlusPage />} />
-
         <Route
           path="/app"
           element={
@@ -44,7 +42,6 @@ export default function App() {
           <Route path="receipts" element={<ReceiptsPage />} />
           <Route path="more" element={<MorePage />} />
         </Route>
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>

@@ -1,27 +1,34 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, TrendingUp, Receipt, Target } from 'lucide-react';
+import {
+  ArrowRight,
+  Shield,
+  TrendingUp,
+  Receipt,
+  Target,
+  Sparkles,
+} from 'lucide-react';
 import './LandingPage.css';
 
 const features = [
   {
     icon: TrendingUp,
-    title: 'Track everything',
-    body: 'Income, expenses and balance in one clean view. Always up to date.',
+    title: 'Clear balance',
+    body: 'Income, expenses and net in one view. Always in NOK, always yours.',
   },
   {
     icon: Receipt,
-    title: 'Receipts with OCR',
-    body: 'Snap a receipt. We extract the details — you confirm before anything is saved.',
+    title: 'Receipts + OCR',
+    body: 'Photograph a receipt. We suggest details — you confirm before anything is saved.',
   },
   {
     icon: Target,
-    title: 'Goals & wishlist',
-    body: 'Save toward what matters and keep wishlists linked to real progress.',
+    title: 'Goals that stick',
+    body: 'Track progress toward what you actually want. Linked to wishlist when it helps.',
   },
   {
     icon: Shield,
-    title: 'Private by design',
-    body: 'Your data is isolated per account. No shared feeds, no surprises.',
+    title: 'Private by default',
+    body: 'Your data is isolated per account. No shared feeds, no ads in the product.',
   },
 ];
 
@@ -29,7 +36,10 @@ export function LandingPage() {
   return (
     <div className="landing">
       <header className="landing__nav">
-        <div className="landing__brand">Montra</div>
+        <div className="landing__brand">
+          <span className="landing__mark">M</span>
+          Montra
+        </div>
         <div className="landing__nav-actions">
           <Link to="/login" className="landing__link">
             Sign in
@@ -41,33 +51,62 @@ export function LandingPage() {
       </header>
 
       <section className="landing__hero">
-        <p className="landing__eyebrow">Personal finance, refined</p>
-        <h1>
-          Track your money.
-          <br />
-          Understand it.
-          <br />
-          Plan it.
-        </h1>
-        <p className="landing__lead">
-          Montra is a private space for transactions, receipts, goals and clear insights —
-          without the noise of a typical banking app.
-        </p>
-        <div className="landing__hero-actions">
-          <Link to="/login" className="landing__cta">
-            Open Montra <ArrowRight size={18} />
-          </Link>
-          <a href="#features" className="landing__ghost">
-            See features
-          </a>
+        <div className="landing__hero-copy">
+          <p className="landing__eyebrow">
+            <Sparkles size={14} /> Personal finance, refined
+          </p>
+          <h1>
+            Track your money.
+            <br />
+            <span className="landing__accent">Understand it.</span>
+            <br />
+            Plan it.
+          </h1>
+          <p className="landing__lead">
+            A private space for transactions, receipts, goals and clear insights —
+            without the noise of a typical banking app.
+          </p>
+          <div className="landing__hero-actions">
+            <Link to="/login" className="landing__cta">
+              Open Montra <ArrowRight size={18} />
+            </Link>
+            <a href="#features" className="landing__ghost">
+              See features
+            </a>
+          </div>
+        </div>
+
+        <div className="landing__mock" aria-hidden>
+          <div className="landing__mock-card">
+            <div className="landing__mock-label">Total balance</div>
+            <div className="landing__mock-balance">12 480 kr</div>
+            <div className="landing__mock-row">
+              <div className="landing__mock-chip landing__mock-chip--in">
+                <span>Income</span>
+                <strong>8 200</strong>
+              </div>
+              <div className="landing__mock-chip landing__mock-chip--out">
+                <span>Expenses</span>
+                <strong>5 640</strong>
+              </div>
+            </div>
+            <div className="landing__mock-bar">
+              <div className="landing__mock-fill" style={{ width: '62%' }} />
+            </div>
+            <div className="landing__mock-meta">MacBook goal · 62%</div>
+          </div>
         </div>
       </section>
 
       <section id="features" className="landing__features">
         <h2>Built for clarity</h2>
-        <div className="landing__grid">
-          {features.map((f) => (
-            <article key={f.title} className="landing__card">
+        <div className="landing__bento">
+          {features.map((f, i) => (
+            <article
+              key={f.title}
+              className={`landing__card${i === 0 ? ' landing__card--wide' : ''}`}
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
               <div className="landing__icon">
                 <f.icon size={22} strokeWidth={1.75} />
               </div>
@@ -81,14 +120,14 @@ export function LandingPage() {
       <section className="landing__cta-block">
         <h2>Ready when you are</h2>
         <p>Create an account in under a minute. Your data stays yours.</p>
-        <Link to="/login" className="landing__cta">
-          Get started free
+        <Link to="/login" className="landing__cta landing__cta--on-dark">
+          Get started free <ArrowRight size={18} />
         </Link>
       </section>
 
       <footer className="landing__footer">
-        <span>Montra</span>
-        <span className="landing__footer-meta">© {new Date().getFullYear()}</span>
+        <span className="landing__footer-brand">Montra</span>
+        <span>© {new Date().getFullYear()}</span>
       </footer>
     </div>
   );
