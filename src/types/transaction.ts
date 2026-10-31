@@ -1,4 +1,4 @@
-export type TransactionType = "in" | "out";
+export type TransactionType = 'in' | 'out';
 
 export interface Transaction {
   id: string;
@@ -23,11 +23,4 @@ export interface TransactionInput {
   link: string | null;
   note: string | null;
   image: File | null;
-}
-
-export interface BackupFile {
-  app: "Saldo" | "Montra";
-  version: number;
-  exportedAt: string;
-  transactions: Transaction[];
 }

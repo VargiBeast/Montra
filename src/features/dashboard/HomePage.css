@@ -111,12 +111,6 @@
   color: var(--color-text);
 }
 
-.home__link {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-emerald-600);
-}
-
 .home__stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -179,4 +173,106 @@
 
 .home__card--empty p {
   margin: 0;
+}
+
+.home__goals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.home__goal-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.home__goal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.home__goal-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.home__goal-pct {
+  font-weight: 700;
+  color: var(--color-emerald-600);
+  font-size: 0.875rem;
+}
+
+.home__goal-bar {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.home__goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-emerald-500), var(--color-lime-400));
+  border-radius: var(--radius-full);
+  transition: width 0.4s var(--ease);
+}
+
+.home__goal-meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.home__tx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.home__tx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.home__tx-list li:last-child {
+  border-bottom: none;
+}
+
+.home__tx-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home__tx-name {
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.home__tx-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.home__tx-amount {
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.home__tx-amount--in {
+  color: var(--color-emerald-600);
+}
+
+.home__tx-amount--out {
+  color: var(--color-danger);
 }
