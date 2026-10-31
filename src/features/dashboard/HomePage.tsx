@@ -132,7 +132,7 @@ export function HomePage() {
         {goalsLoading ? (
           <div className="home__card home__card--empty">
             <p>Loading goals…</p>
-          </div>
+div>
         ) : activeGoals.length === 0 ? (
           <div className="home__card home__card--empty">
             <p>Create a savings goal to start tracking progress.</p>
@@ -147,7 +147,7 @@ export function HomePage() {
               return (
                 <div key={goal.id} className="home__goal-card">
                   <div className="home__goal-header">
-                    <span className="home__goal-name">{goal.goal.name}</span>
+                    <span className="home__goal-name">{goal.name}</span>
                     <span className="home__goal-pct">{pct}%</span>
                   </div>
                   <div className="home__goal-bar">
@@ -185,9 +185,7 @@ export function HomePage() {
                   <span className="home__tx-name">{tx.name}</span>
                   <span className="home__tx-date">{tx.date}</span>
                 </div>
-                <span
-                  className={`home__tx-amount home__tx-amount--${tx.type}`}
-                >
+                <span className={`home__tx-amount home__tx-amount--${tx.type}`}>
                   {tx.type === 'in' ? '+' : '−'}
                   {formatMoney(Number(tx.amount))}
                 </span>
