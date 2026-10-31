@@ -3,19 +3,24 @@
   padding-top: calc(var(--safe-top) + var(--space-4));
 }
 
-.home__hero { margin-bottom: var(--space-6); }
-.home__greeting { margin-bottom: var(--space-4); }
+.home__hero {
+  margin-bottom: var(--space-6);
+}
+
+.home__greeting {
+  margin-bottom: var(--space-4);
+}
 
 .home__badge {
   display: inline-block;
   padding: 0.25rem 0.625rem;
-  background: var(--color-surface-2);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: var(--radius-full);
   margin-bottom: var(--space-2);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .home__greeting h1 {
@@ -28,21 +33,23 @@
 
 .home__greeting strong {
   font-weight: 700;
-  color: var(--color-ink);
+  color: var(--color-text);
 }
 
+/* Balance card — elevated dark surface, high contrast */
 .home__balance-card {
-  background: var(--color-ink);
+  background: linear-gradient(160deg, #27272a 0%, #18181b 100%);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
-  color: #fff;
-  box-shadow: var(--shadow-card);
+  color: #fafafa;
+  box-shadow: var(--shadow-md);
 }
 
 .home__balance-label {
   margin: 0;
   font-size: 0.875rem;
-  opacity: 0.75;
+  color: #a1a1aa;
 }
 
 .home__balance-value {
@@ -50,12 +57,13 @@
   font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.03em;
+  color: #fafafa;
 }
 
 .home__balance-hint {
   margin: 0 0 var(--space-5);
   font-size: 0.8125rem;
-  opacity: 0.55;
+  color: #71717a;
 }
 
 .home__balance-actions {
@@ -69,16 +77,20 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.875rem;
-  background: rgb(255 255 255 / 0.12);
-  color: #fff;
+  background: rgb(255 255 255 / 0.08);
+  color: #fafafa;
+  border: 1px solid rgb(255 255 255 / 0.12);
 }
 
 .home__action--primary {
-  background: #fff;
-  color: var(--color-ink);
+  background: #fbbf24;
+  color: #09090b;
+  border: none;
 }
 
-.home__section { margin-bottom: var(--space-6); }
+.home__section {
+  margin-bottom: var(--space-6);
+}
 
 .home__section-header {
   display: flex;
@@ -104,14 +116,13 @@
 }
 
 .home__stat {
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border, #27272a);
 }
 
 .home__stat-icon {
@@ -124,19 +135,19 @@
 }
 
 .home__stat-icon--in {
-  background: var(--color-success-bg);
-  color: var(--color-income);
+  background: rgb(74 222 128 / 0.15);
+  color: #4ade80;
 }
 
 .home__stat-icon--out {
-  background: var(--color-danger-bg);
-  color: var(--color-expense);
+  background: rgb(248 113 113 / 0.15);
+  color: #f87171;
 }
 
 .home__stat-label {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #71717a);
   font-weight: 500;
 }
 
@@ -144,24 +155,25 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--color-text, #fafafa);
 }
 
 .home__card {
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-xl);
   padding: var(--space-5);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border, #27272a);
 }
 
 .home__card--empty {
   text-align: center;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #71717a);
   font-size: 0.875rem;
 }
 
-.home__card--empty p { margin: 0; }
+.home__card--empty p {
+  margin: 0;
+}
 
 .home__goals {
   display: flex;
@@ -170,11 +182,10 @@
 }
 
 .home__goal-card {
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border, #27272a);
 }
 
 .home__goal-header {
@@ -186,18 +197,18 @@
 .home__goal-name {
   font-weight: 600;
   font-size: 0.9375rem;
-  color: var(--color-text);
+  color: var(--color-text, #fafafa);
 }
 
 .home__goal-pct {
   font-weight: 700;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #a1a1aa);
   font-size: 0.875rem;
 }
 
 .home__goal-bar {
   height: 8px;
-  background: var(--color-surface-2);
+  background: rgb(255 255 255 / 0.08);
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: var(--space-2);
@@ -205,25 +216,24 @@
 
 .home__goal-fill {
   height: 100%;
-  background: var(--color-ink);
+  background: linear-gradient(90deg, #fbbf24, #fde68a);
   border-radius: var(--radius-full);
 }
 
 .home__goal-meta {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #71717a);
 }
 
 .home__tx-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border, #27272a);
 }
 
 .home__tx-item {
@@ -231,10 +241,12 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border, #27272a);
 }
 
-.home__tx-list li:last-child { border-bottom: none; }
+.home__tx-list li:last-child {
+  border-bottom: none;
+}
 
 .home__tx-info {
   display: flex;
@@ -245,12 +257,12 @@
 .home__tx-name {
   font-weight: 600;
   font-size: 0.9375rem;
-  color: var(--color-text);
+  color: var(--color-text, #fafafa);
 }
 
 .home__tx-date {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #71717a);
 }
 
 .home__tx-amount {
@@ -258,5 +270,10 @@
   font-size: 0.9375rem;
 }
 
-.home__tx-amount--in { color: var(--color-income); }
-.home__tx-amount--out { color: var(--color-expense); }
+.home__tx-amount--in {
+  color: #4ade80;
+}
+
+.home__tx-amount--out {
+  color: #f87171;
+}
