@@ -7,7 +7,7 @@ import type { WishlistItem, WishlistItemInput } from '@/types/wishlist';
 export function useWishlist() {
   const { user } = useAuth();
   const [items, setItems] = useState<WishlistItem[]>([]);
-  const  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     if (!supabase || !user) {

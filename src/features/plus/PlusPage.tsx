@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Check, Sparkles } from 'lucide-react';
 import { startPlusCheckout, type PlusInterval } from '@/lib/stripe';
-import './Plus roundPage.css';
+import './PlusPage.css';
 
 const features = [
   'Advanced analytics & trends',
