@@ -132,7 +132,7 @@ export function HomePage() {
         {goalsLoading ? (
           <div className="home__card home__card--empty">
             <p>Loading goals…</p>
-div>
+          </div>
         ) : activeGoals.length === 0 ? (
           <div className="home__card home__card--empty">
             <p>Create a savings goal to start tracking progress.</p>
