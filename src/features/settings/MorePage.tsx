@@ -1,46 +1,18 @@
 import { useAuth } from '@/features/authentication/AuthProvider';
 import {
-  User,
-  Globe,
-  Palette,
-  CreditCard,
-  Shield,
-  HelpCircle,
-  LogOut,
-  ChevronRight,
-  Target,
+  User, Globe, Palette, CreditCard, Shield, HelpCircle, LogOut, ChevronRight, Target, Gift,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GoalsSection } from '@/features/goals/GoalsSection';
+import { WishlistSection } from '@/features/wishlist/WishlistSection';
+import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
+import { SUPPORTED_CURRENCIES } from '@/lib/currency';
 import './MorePage.css';
-
-const sections = [
-  {
-    title: 'Account',
-    items: [
-      { icon: User, label: 'Profile', path: '/more/profile' },
-      { icon: CreditCard, label: 'Montra Plus', path: '/plus' },
-    ],
-  },
-  {
-    title: 'Preferences',
-    items: [
-      { icon: Globe, label: 'Language & currency', path: '/more/preferences' },
-      { icon: Palette, label: 'Appearance', path: '/more/appearance' },
-    ],
-  },
-  {
-    title: 'Support',
-    items: [
-      { icon: Shield, label: 'Security', path: '/more/security' },
-      { icon: HelpCircle, label: 'Help & legal', path: '/more/help' },
-    ],
-  },
-];
 
 export function MorePage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { currency, setCurrency } = useDisplayCurrency();
 
   async function handleLogout() {
     await signOut();
@@ -59,30 +31,49 @@ export function MorePage() {
         <GoalsSection />
       </section>
 
-      {sections.map((section) => (
-        <section key={section.title} className="more__section">
-          <h2>{section.title}</h2>
-          <ul className="more__list">
-            {section.items.map((item) => (
-              <li key={item.label}>
-                <button
-                  type="button"
-                  className="more__item"
-                  onClick={() => navigate(item.path)}
-                >
-                  <item.icon size={20} />
-                  <span>{item.label}</span>
-                  <ChevronRight size={18} className="more__chevron" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <section className="more__section">
+        <h2><Gift size={14} style={{display:'inline',marginRight:6}} />Wishlist</h2>
+        <WishlistSection />
+      </section>
+
+      <section className="more__section">
+        <h2>Display currency</h2>
+        <select
+          className="more__select"
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value as typeof currency)}
+        >
+          {SUPPORTED_CURRENCIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <p className="more__hint">Amounts are stored in NOK and converted for display.</p>
+      </section>
+
+      <section className="more__section">
+        <h2>Account</h2>
+        <ul className="more__list">
+          <li>
+            <button type="button" className="more__item" onClick={() => navigate('/plus')}>
+              <CreditCard size={20} /><span>Montra Plus</span><ChevronRight size={18} className="more__chevron" />
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <section className="more__section">
+        <h2>Support</h2>
+        <ul className="more__list">
+          <li>
+            <button type="button" className="more__item">
+              <HelpCircle size={20} /><span>Help & legal</span><ChevronRight size={18} className="more__chevron" />
+            </button>
+          </li>
+        </ul>
+      </section>
 
       <button type="button" className="more__logout" onClick={handleLogout}>
-        <LogOut size={20} />
-        Sign out
+        <LogOut size={20} /> Sign out
       </button>
     </div>
   );
