@@ -18,11 +18,14 @@ export function useReceipts() {
       return;
     }
     setLoading(true);
+    setError(null);
     try {
       const data = await listReceipts(supabase, user.id);
       setReceipts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load receipts');
+      const msg = err instanceof Error ? err.message : 'Failed to load receipts';
+      setError(msg);
+      console.error('[useReceipts]', err);
     } finally {
       setLoading(false);
     }
@@ -35,8 +38,12 @@ export function useReceipts() {
   const upload = useCallback(
     async (file: File) => {
       if (!supabase || !user) throw new Error('Not authenticated');
-      // OCR first – suggestions only
-      let meta: { extracted_text?: string; amount?: number | null; merchant?: string | null; date?: string | null } = {};
+      let meta: {
+        extracted_text?: string;
+        amount?: number | null;
+        merchant?: string | null;
+        date?: string | null;
+      } = {};
       try {
         const ocr = await runLocalOcr(file);
         meta = {
