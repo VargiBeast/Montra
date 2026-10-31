@@ -24,35 +24,63 @@
     "src/main.tsx",
     "src/App.tsx",
     "src/vite-env.d.ts",
-    "src/components/layout/**/*",
-    "src/features/**/*",
-    "src/hooks/**/*",
-    "src/lib/**/*",
-    "src/services/**/*",
-    "src/types/**/*",
-    "src/styles/**/*"
+
+    "src/components/layout/AppShell.tsx",
+    "src/components/layout/AppShell.css",
+
+    "src/features/authentication/AuthProvider.tsx",
+    "src/features/authentication/ProtectedRoute.tsx",
+    "src/features/authentication/LoginPage.tsx",
+    "src/features/authentication/auth.css",
+
+    "src/features/dashboard/HomePage.tsx",
+    "src/features/dashboard/HomePage.css",
+
+    "src/features/transactions/ActivityPage.tsx",
+    "src/features/transactions/ActivityPage.css",
+    "src/features/transactions/TransactionForm.tsx",
+    "src/features/transactions/TransactionForm.css",
+
+    "src/features/receipts/ReceiptsPage.tsx",
+    "src/features/receipts/ReceiptsPage.css",
+
+    "src/features/goals/GoalsSection.tsx",
+    "src/features/goals/GoalsSection.css",
+
+    "src/features/wishlist/WishlistSection.tsx",
+    "src/features/wishlist/WishlistSection.css",
+
+    "src/features/plus/PlusPage.tsx",
+    "src/features/plus/PlusPage.css",
+
+    "src/features/settings/MorePage.tsx",
+    "src/features/settings/MorePage.css",
+
+    "src/hooks/useTransactions.ts",
+    "src/hooks/useSavingsGoals.ts",
+    "src/hooks/useReceipts.ts",
+    "src/hooks/useWishlist.ts",
+    "src/hooks/useDisplayCurrency.ts",
+
+    "src/lib/supabase.ts",
+    "src/lib/utils.ts",
+    "src/lib/currency.ts",
+    "src/lib/insights.ts",
+    "src/lib/stripe.ts",
+    "src/lib/i18n.ts",
+    "src/lib/localOcr.ts",
+
+    "src/services/transactions.ts",
+    "src/services/receipts.ts",
+    "src/services/wishlist.ts",
+
+    "src/types/transaction.ts",
+    "src/types/savingsGoal.ts",
+    "src/types/wishlist.ts",
+    "src/types/receipt.ts",
+    "src/types/recurringPayment.ts",
+
+    "src/styles/global.css"
   ],
-  "exclude": [
-    "node_modules",
-    "src/components/ConfirmDialog.tsx",
-    "src/components/ConsentBanner.tsx",
-    "src/components/FinancialRadarCard.tsx",
-    "src/components/MoneyJourneyCard.tsx",
-    "src/components/PublicFooter.tsx",
-    "src/components/ReceiptCapture.tsx",
-    "src/components/ReceiptDetail.tsx",
-    "src/components/RecurringHomeTeaser.tsx",
-    "src/components/TransactionDetail.tsx",
-    "src/components/TransactionForm.tsx",
-    "src/components/TransactionRow.tsx",
-    "src/components/WhatIfCard.tsx",
-    "src/components/WishlistSharePanel.tsx",
-    "src/components/AnalyticsTracker.tsx",
-    "src/components/ProtectedRoute.tsx",
-    "src/components/UserAvatar.tsx",
-    "src/foundation",
-    "src/pages",
-    "src/AppRoutes.tsx",
-    "src/App.tsx.bak"
-  ]
+  "exclude": ["node_modules", "dist"]
 }
