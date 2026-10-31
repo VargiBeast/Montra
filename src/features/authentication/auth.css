@@ -10,11 +10,12 @@
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-2xl);
   padding: var(--space-8);
-  box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn var(--motion-base, 220ms) var(--ease-out, ease) both;
 }
 
 .auth-brand {
@@ -26,21 +27,21 @@
   width: 52px;
   height: 52px;
   margin: 0 auto var(--space-4);
-  background: var(--color-ink);
+  background: var(--color-accent, #fbbf24);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1.35rem;
-  color: #fff;
+  color: #09090b;
 }
 
 .auth-brand h1 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-ink);
+  color: var(--color-text);
   letter-spacing: -0.02em;
 }
 
@@ -72,13 +73,14 @@
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .auth-field input:focus {
   outline: none;
-  border-color: var(--color-ink);
-  box-shadow: 0 0 0 3px rgb(15 23 42 / 0.08);
+  border-color: var(--color-accent, #fbbf24);
+  box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
 }
 
 .auth-error {
@@ -92,10 +94,15 @@
 .auth-submit {
   margin-top: var(--space-2);
   padding: 0.875rem 1.25rem;
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-accent, #fbbf24);
+  color: #09090b;
   font-weight: 600;
   border-radius: var(--radius-md);
+  transition: transform var(--motion-fast, 150ms) ease;
+}
+
+.auth-submit:active {
+  transform: scale(0.98);
 }
 
 .auth-submit:disabled {
@@ -111,7 +118,7 @@
 }
 
 .auth-switch button {
-  color: var(--color-ink);
+  color: var(--color-accent, #fbbf24);
   font-weight: 600;
 }
 
@@ -126,8 +133,8 @@
 .auth-loading__spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-ink);
+  border: 3px solid var(--color-border-strong);
+  border-top-color: var(--color-accent, #fbbf24);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }

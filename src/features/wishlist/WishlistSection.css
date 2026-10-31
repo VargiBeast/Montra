@@ -1,15 +1,15 @@
 .wish__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); }
-.wish__header h2 { margin: 0; font-size: 1rem; font-weight: 600; }
-.wish__add { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.875rem; color: var(--color-emerald-600); }
-.wish__empty { color: var(--color-text-muted); font-size: 0.875rem; text-align: center; padding: var(--space-6); background: var(--color-surface); border-radius: var(--radius-xl); }
+.wish__header h2 { margin: 0; font-size: 1rem; font-weight: 600; color: var(--color-text); }
+.wish__add { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.875rem; color: var(--color-accent, #fbbf24); }
+.wish__empty { color: var(--color-text-muted); font-size: 0.875rem; text-align: center; padding: var(--space-6); background: var(--color-bg-elevated, #18181b); border: 1px solid var(--color-border); border-radius: var(--radius-xl); }
 .wish__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-.wish__item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); background: var(--color-surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
-.wish__name { font-weight: 500; display: block; }
+.wish__item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); background: var(--color-bg-elevated, #18181b); border: 1px solid var(--color-border); border-radius: var(--radius-xl); }
+.wish__name { font-weight: 500; display: block; color: var(--color-text); }
 .wish__price { font-size: 0.8125rem; color: var(--color-text-muted); }
-.wish__modal { position: fixed; inset: 0; background: rgb(0 0 0 / 0.4); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
-.wish__form { background: var(--color-surface); border-radius: var(--radius-2xl); padding: var(--space-6); width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: var(--space-3); }
-.wish__form h3 { margin: 0 0 var(--space-2); }
-.wish__form input { padding: 0.75rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.wish__modal { position: fixed; inset: 0; background: rgb(0 0 0 / 0.6); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-4); }
+.wish__form { background: var(--color-bg-elevated, #18181b); border: 1px solid var(--color-border-strong); border-radius: var(--radius-2xl); padding: var(--space-6); width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: var(--space-3); }
+.wish__form h3 { margin: 0 0 var(--space-2); color: var(--color-text); }
+.wish__form input { padding: 0.75rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-bg); color: var(--color-text); }
 .wish__actions { display: flex; gap: var(--space-3); }
-.wish__actions button { flex: 1; padding: 0.75rem; border-radius: var(--radius-md); font-weight: 600; }
-.wish__actions button[type='submit'] { background: var(--color-emerald-600); color: white; }
+.wish__actions button { flex: 1; padding: 0.75rem; border-radius: var(--radius-md); font-weight: 600; color: var(--color-text-secondary); }
+.wish__actions button[type='submit'] { background: var(--color-accent, #fbbf24); color: #09090b; }

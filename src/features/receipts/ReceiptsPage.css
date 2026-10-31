@@ -7,7 +7,8 @@
   margin: 0 0 var(--space-5);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-emerald-900);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
 .receipts__actions {
@@ -23,16 +24,21 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-5);
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  color: var(--color-emerald-700);
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 0.875rem;
+  transition: border-color var(--motion-base, 220ms) ease, transform var(--motion-fast, 150ms) ease;
+}
+
+.receipts__action:active {
+  transform: scale(0.98);
 }
 
 .receipts__action:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .receipts__status {
@@ -40,16 +46,16 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3);
-  background: rgb(16 185 129 / 0.1);
+  background: var(--color-accent-soft, rgb(251 191 36 / 0.15));
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  color: var(--color-emerald-800);
+  color: var(--color-accent, #fbbf24);
   margin-bottom: var(--space-4);
 }
 
 .receipts__error {
   padding: var(--space-3);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   color: var(--color-danger);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-4);
@@ -66,6 +72,7 @@
   font-size: 0.875rem;
   max-width: 280px;
   margin: var(--space-2) auto 0;
+  color: var(--color-text-secondary);
 }
 
 .receipts__list {
@@ -81,9 +88,9 @@
   display: flex;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
 }
 
 .receipts__item-info {
@@ -94,6 +101,7 @@
 .receipts__merchant {
   font-weight: 600;
   display: block;
+  color: var(--color-text);
 }
 
 .receipts__meta {
@@ -119,4 +127,8 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin { animation: none; }
 }
