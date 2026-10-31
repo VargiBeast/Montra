@@ -31,7 +31,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-emerald-900);
+  color: var(--color-ink);
 }
 
 .tx-form__close {
@@ -55,14 +55,13 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.875rem;
-  background: var(--color-bg);
+  background: var(--color-surface-2);
   color: var(--color-text-secondary);
-  transition: all var(--duration) var(--ease);
 }
 
 .tx-form__type-btn--active {
-  background: var(--color-emerald-600);
-  color: white;
+  background: var(--color-ink);
+  color: #fff;
 }
 
 .tx-form__body {
@@ -86,20 +85,20 @@
 
 .tx-form__field input {
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface);
 }
 
 .tx-form__field input:focus {
   outline: none;
-  border-color: var(--color-emerald-500);
-  box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15);
+  border-color: var(--color-ink);
+  box-shadow: 0 0 0 3px rgb(15 23 42 / 0.08);
 }
 
 .tx-form__error {
   padding: var(--space-3);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   color: var(--color-danger);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
@@ -108,21 +107,17 @@
 .tx-form__submit {
   margin-top: var(--space-2);
   padding: 0.875rem;
-  background: linear-gradient(135deg, var(--color-emerald-600), var(--color-emerald-500));
-  color: white;
+  background: var(--color-ink);
+  color: #fff;
   font-weight: 600;
   border-radius: var(--radius-md);
 }
 
 .tx-form__submit:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 @media (min-width: 640px) {
-  .tx-form-overlay {
-    align-items: center;
-  }
-  .tx-form {
-    border-radius: var(--radius-2xl);
-  }
+  .tx-form-overlay { align-items: center; }
+  .tx-form { border-radius: var(--radius-2xl); }
 }
