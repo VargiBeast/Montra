@@ -1,81 +1,49 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
-import * as wishlistService from "../services/wishlist";
-import type { WishlistItem, WishlistItemInput } from "../types/wishlist";
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/features/authentication/AuthProvider';
+import { listWishlist, saveWishlistItem, deleteWishlistItem } from '@/services/wishlist';
+import type { WishlistItem, WishlistItemInput } from '@/types/wishlist';
 
-export function useWishlist(userId: string | undefined) {
+export function useWishlist() {
+  const { user } = useAuth();
   const [items, setItems] = useState<WishlistItem[]>([]);
-  const [isLoading, setIsLoading] = useState(Boolean(userId));
-  const [error, setError] = useState<string | null>(null);
-  const [loadedUserId, setLoadedUserId] = useState<string | undefined>();
-  const latestRequest = useRef(0);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const requestId = ++latestRequest.current;
-    if (!userId || !supabase) {
+    if (!supabase || !user) {
       setItems([]);
-      setLoadedUserId(undefined);
-      setError(null);
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
-    setIsLoading(true);
-    setError(null);
+    setLoading(true);
     try {
-      const result = await wishlistService.listWishlistItems(supabase, userId);
-      if (requestId === latestRequest.current) {
-        setItems(result);
-        setLoadedUserId(userId);
-        setError(null);
-      }
-    } catch (reason) {
-      console.error("Could not load wishlist.", reason);
-      if (requestId === latestRequest.current) {
-        setError("We couldn\u2019t load your wishlist. Check your connection and try again.");
-        setLoadedUserId(userId);
-      }
+      setItems(await listWishlist(supabase, user.id));
     } finally {
-      if (requestId === latestRequest.current) setIsLoading(false);
+      setLoading(false);
     }
-  }, [userId]);
+  }, [user]);
 
   useEffect(() => {
-    void refresh();
+    refresh();
   }, [refresh]);
 
   const save = useCallback(
     async (input: WishlistItemInput, existing?: WishlistItem) => {
-      if (!userId || !supabase) throw new Error("Sign in before saving wishlist items.");
-      await wishlistService.saveWishlistItem(supabase, userId, input, existing);
+      if (!supabase || !user) throw new Error('Not authenticated');
+      await saveWishlistItem(supabase, user.id, input, existing);
       await refresh();
     },
-    [userId, refresh],
+    [user, refresh],
   );
 
   const remove = useCallback(
     async (item: WishlistItem) => {
-      if (!userId || !supabase) throw new Error("Sign in before deleting wishlist items.");
-      await wishlistService.deleteWishlistItem(supabase, userId, item);
+      if (!supabase || !user) throw new Error('Not authenticated');
+      await deleteWishlistItem(supabase, user.id, item);
       await refresh();
     },
-    [userId, refresh],
+    [user, refresh],
   );
 
-  const getImageUrl = useCallback(
-    async (path: string) => {
-      if (!userId || !supabase) throw new Error("Sign in to view this image.");
-      return wishlistService.getSignedWishlistImageUrl(supabase, userId, path);
-    },
-    [userId],
-  );
-
-  return {
-    items: userId && loadedUserId === userId ? items : [],
-    isLoading: Boolean(userId) && isLoading,
-    error,
-    refresh,
-    save,
-    remove,
-    getImageUrl,
-  };
+  return { items, loading, refresh, save, remove };
 }

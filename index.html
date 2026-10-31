@@ -1,96 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#070a08" />
-    <meta name="application-name" content="Montra" />
-    <meta name="description" content="Montra is a personal money journal for tracking spending, receipts, savings goals and wishlists." />
-    <meta name="robots" content="index, follow" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Montra" />
-    <meta property="og:title" content="Montra — personal money management" />
-    <meta property="og:description" content="Track spending, receipts, savings goals and wishlists with Montra." />
-    <meta property="og:url" content="https://www.montra.cash/" />
-    <meta property="og:image" content="https://www.montra.cash/icons/icon-512.png" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Montra — personal money management" />
-    <meta name="twitter:description" content="Track spending, receipts, savings goals and wishlists with Montra." />
-    <meta name="twitter:image" content="https://www.montra.cash/icons/icon-512.png" />
-    <link rel="canonical" href="https://www.montra.cash/" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Montra" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" href="/icons/favicon.png" type="image/png" sizes="32x32" />
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <title>Montra — personal money management</title>
-    <script>
-      (function () {
-        try {
-          var saved = localStorage.getItem("saldo-theme") || localStorage.getItem("saldo_theme");
-          var mode = saved === "light" || saved === "dark" || saved === "system" ? saved : "system";
-          var dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-          document.documentElement.dataset.theme = dark ? "dark" : "light";
-          var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute("content", dark ? "#070a08" : "#f4f7f5");
-        } catch (e) {}
-      })();
-    </script>
-    <script>
-      (function () {
-        try {
-          var standalone =
-            window.matchMedia("(display-mode: standalone)").matches ||
-            window.matchMedia("(display-mode: fullscreen)").matches ||
-            window.navigator.standalone === true;
-          if (!standalone) return;
-          var path = window.location.pathname || "/";
-          if (path === "/" || path === "") {
-            window.location.replace("/app" + window.location.search + window.location.hash);
-          }
-        } catch (e) {}
-      })();
-    </script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag("consent", "default", {
-        analytics_storage: "denied",
-        ad_storage: "denied",
-        ad_user_data: "denied",
-        ad_personalization: "denied",
-        wait_for_update: 500
-      });
-      try {
-        var c = localStorage.getItem("montra.analytics.consent");
-        if (c === "granted" || c === "denied") {
-          gtag("consent", "update", {
-            analytics_storage: c === "granted" ? "granted" : "denied",
-            ad_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied"
-          });
-        }
-      } catch (e) {}
-    </script>
-    <script>
-      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-M7PLP5TK');
-    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#064e3b" />
+    <meta name="description" content="Montra — Track your money. Understand your money. Plan your money." />
+    <title>Montra</title>
   </head>
   <body>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M7PLP5TK"
-    height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
     <div id="root"></div>
-    <!-- New foundation entry — does not load the previous main.tsx cascade -->
-    <script type="module" src="/src/foundation/main-entry.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

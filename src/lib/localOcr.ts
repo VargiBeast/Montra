@@ -1,35 +1,35 @@
-import { createWorker, type Worker } from "tesseract.js";
+/** Local Tesseract OCR – never auto-creates transactions. */
+import Tesseract from 'tesseract.js';
 
-let workerPromise: Promise<Worker> | null = null;
-
-async function getWorker(): Promise<Worker> {
-  if (!workerPromise) {
-    workerPromise = createWorker("eng+nor", 1, {
-      workerBlobURL: true,
-      cacheMethod: "read",
-    }).catch((error) => {
-      workerPromise = null;
-      throw error;
-    });
-  }
-  return workerPromise;
+export interface OcrResult {
+  text: string;
+  suggestedAmount: number | null;
+  suggestedMerchant: string | null;
+  suggestedDate: string | null;
 }
 
-export async function recognizeReceiptText(file: Blob): Promise<string> {
-  const worker = await getWorker();
-  const result = await worker.recognize(file);
-  return result.data.text ?? "";
-}
+export async function runLocalOcr(file: File): Promise<OcrResult> {
+  const { data } = await Tesseract.recognize(file, 'eng+nor', {
+    logger: () => {},
+  });
 
-/** Terminate the shared OCR worker (optional — call when leaving receipts for a long time). */
-export async function releaseOcrWorker(): Promise<void> {
-  if (!workerPromise) return;
-  try {
-    const worker = await workerPromise;
-    await worker.terminate();
-  } catch {
-    /* ignore terminate errors */
-  } finally {
-    workerPromise = null;
+  const text = data.text || '';
+  const amountMatch = text.match(/(?:total|sum|beløp|amount)[:\s]*([0-9]+[.,][0-9]{2})/i)
+    || text.match(/([0-9]+[.,][0-9]{2})\s*(?:kr|nok|,-)/i);
+  const suggestedAmount = amountMatch
+    ? parseFloat(amountMatch[1].replace(',', '.'))
+    : null;
+
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  const suggestedMerchant = lines[0]?.slice(0, 60) || null;
+
+  const dateMatch = text.match(/(\d{2})[./-](\d{2})[./-](\d{2,4})/);
+  let suggestedDate: string | null = null;
+  if (dateMatch) {
+    const [, d, m, y] = dateMatch;
+    const year = y.length === 2 ? `20${y}` : y;
+    suggestedDate = `${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
   }
+
+  return { text, suggestedAmount, suggestedMerchant, suggestedDate };
 }

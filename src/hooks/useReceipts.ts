@@ -1,126 +1,68 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
-import * as receiptService from "../services/receipts";
-import type { Receipt } from "../types/receipt";
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/features/authentication/AuthProvider';
+import { listReceipts, uploadReceipt, deleteReceipt } from '@/services/receipts';
+import { runLocalOcr } from '@/lib/localOcr';
+import type { Receipt } from '@/types/receipt';
 
-export function useReceipts(userId: string | undefined) {
+export function useReceipts() {
+  const { user } = useAuth();
   const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [isLoading, setIsLoading] = useState(Boolean(userId));
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [loadedUserId, setLoadedUserId] = useState<string | null>(null);
-  const latestRequest = useRef(0);
 
   const refresh = useCallback(async () => {
-    if (!userId || !supabase) {
+    if (!supabase || !user) {
       setReceipts([]);
-      setLoadedUserId(null);
-      setError(null);
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
-    const requestId = ++latestRequest.current;
-    setIsLoading(true);
-    const requestTimeout = window.setTimeout(() => {
-      if (requestId === latestRequest.current) {
-        setError("We couldn’t load your receipts. Check your connection and try again.");
-        setLoadedUserId(userId);
-        setIsLoading(false);
-      }
-    }, 15000);
+    setLoading(true);
     try {
-      const result = await receiptService.listReceipts(supabase, userId);
-      if (requestId === latestRequest.current) {
-        setReceipts(result);
-        setLoadedUserId(userId);
-        setError(null);
-      }
-    } catch (reason) {
-      console.error("Could not load receipts.", reason);
-      if (requestId === latestRequest.current) {
-        setError("We couldn’t load your receipts. Check your connection and try again.");
-        setLoadedUserId(userId);
-      }
+      const data = await listReceipts(supabase, user.id);
+      setReceipts(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load receipts');
     } finally {
-      window.clearTimeout(requestTimeout);
-      if (requestId === latestRequest.current) setIsLoading(false);
+      setLoading(false);
     }
-  }, [userId]);
+  }, [user]);
 
   useEffect(() => {
-    void refresh();
-    return () => {
-      latestRequest.current += 1;
-    };
+    refresh();
   }, [refresh]);
 
   const upload = useCallback(
-    async (image: File, currency = "NOK") => {
-      if (!userId || !supabase) throw new Error("Sign in before uploading receipts.");
+    async (file: File) => {
+      if (!supabase || !user) throw new Error('Not authenticated');
+      // OCR first – suggestions only
+      let meta: { extracted_text?: string; amount?: number | null; merchant?: string | null; date?: string | null } = {};
       try {
-        const created = await receiptService.uploadReceipt(supabase, userId, image, currency);
-        await refresh();
-        return created;
-      } catch (error) {
-        console.error("Could not upload a receipt.", error);
-        throw new Error("We couldn’t upload this receipt. Check your connection and try again.");
+        const ocr = await runLocalOcr(file);
+        meta = {
+          extracted_text: ocr.text,
+          amount: ocr.suggestedAmount,
+          merchant: ocr.suggestedMerchant,
+          date: ocr.suggestedDate,
+        };
+      } catch {
+        // OCR failure is non-fatal
       }
-    },
-    [refresh, userId],
-  );
-
-  const update = useCallback(
-    async (
-      receipt: Receipt,
-      fields: {
-        merchant: string | null;
-        total_amount: number | null;
-        currency: string;
-        receipt_date: string | null;
-        status: Receipt["status"];
-      },
-    ) => {
-      if (!userId || !supabase) throw new Error("Sign in before updating receipts.");
-      try {
-        await receiptService.updateReceipt(supabase, userId, receipt.id, fields);
-      } catch (error) {
-        console.error("Could not update a receipt.", error);
-        throw new Error("We couldn’t save this receipt. Check your connection and try again.");
-      }
+      const receipt = await uploadReceipt(supabase, user.id, file, meta);
       await refresh();
+      return receipt;
     },
-    [refresh, userId],
+    [user, refresh],
   );
 
   const remove = useCallback(
     async (receipt: Receipt) => {
-      if (!userId || !supabase) throw new Error("Sign in before deleting receipts.");
-      try {
-        await receiptService.deleteReceipt(supabase, userId, receipt);
-      } catch (error) {
-        console.error("Could not delete a receipt.", error);
-        throw new Error("We couldn’t delete this receipt. Check your connection and try again.");
-      }
+      if (!supabase || !user) throw new Error('Not authenticated');
+      await deleteReceipt(supabase, user.id, receipt);
       await refresh();
     },
-    [refresh, userId],
+    [user, refresh],
   );
 
-  const getImageUrl = useCallback(
-    (path: string) => {
-      if (!userId || !supabase) return Promise.reject(new Error("Sign in to view this image."));
-      return receiptService.getSignedReceiptUrl(supabase, userId, path);
-    },
-    [userId],
-  );
-
-  return {
-    receipts,
-    isLoading: isLoading || (Boolean(userId) && loadedUserId !== userId),
-    error,
-    refresh,
-    upload,
-    update,
-    remove,
-    getImageUrl,
-  };
+  return { receipts, loading, error, refresh, upload, remove };
 }

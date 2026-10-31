@@ -1,76 +1,108 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
-import * as savingsGoalsService from "../services/savingsGoals";
-import type { SavingsGoal, SavingsGoalInput } from "../types/savingsGoal";
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/features/authentication/AuthProvider';
+import type { SavingsGoal, SavingsGoalInput } from '@/types/savingsGoal';
 
-export function useSavingsGoals(userId: string | undefined) {
+const TABLE = 'savings_goals';
+
+export function useSavingsGoals() {
+  const { user } = useAuth();
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
-  const [isLoading, setIsLoading] = useState(Boolean(userId));
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [loadedUserId, setLoadedUserId] = useState<string | undefined>();
-  const latestRequest = useRef(0);
 
   const refresh = useCallback(async () => {
-    const requestId = ++latestRequest.current;
-    if (!userId || !supabase) {
+    if (!supabase || !user) {
       setGoals([]);
-      setLoadedUserId(undefined);
-      setError(null);
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     try {
-      const result = await savingsGoalsService.listSavingsGoals(supabase, userId);
-      if (requestId === latestRequest.current) {
-        setGoals(result);
-        setLoadedUserId(userId);
-        setError(null);
-      }
-    } catch (reason) {
-      console.error("Could not load savings goals.", reason);
-      if (requestId === latestRequest.current) {
-        const detail =
-          reason instanceof Error && reason.message.trim()
-            ? reason.message
-            : "We couldn\u2019t load your savings goals. Check your connection and try again.";
-        setError(detail);
-        setLoadedUserId(userId);
-      }
+      const { data, error: qError } = await supabase
+        .from(TABLE)
+        .select('id, user_id, name, target_amount, current_amount, deadline, created_at, updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+      if (qError) throw qError;
+      setGoals(
+        (data ?? []).map((row) => ({
+          ...row,
+          target_amount: Number(row.target_amount),
+          current_amount: Number(row.current_amount),
+          deadline: row.deadline ?? null,
+        })),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load goals');
     } finally {
-      if (requestId === latestRequest.current) setIsLoading(false);
+      setLoading(false);
     }
-  }, [userId]);
+  }, [user]);
 
   useEffect(() => {
-    void refresh();
+    refresh();
   }, [refresh]);
 
   const save = useCallback(
     async (input: SavingsGoalInput, existing?: SavingsGoal) => {
-      if (!userId || !supabase) throw new Error("Sign in before saving goals.");
-      await savingsGoalsService.saveSavingsGoal(supabase, userId, input, existing);
+      if (!supabase || !user) throw new Error('Not authenticated');
+      const name = input.name.trim();
+      if (!name) throw new Error('Name is required');
+      if (!Number.isFinite(input.target_amount) || input.target_amount <= 0) {
+        throw new Error('Target must be greater than zero');
+      }
+      const now = new Date().toISOString();
+      if (existing) {
+        const { error: uError } = await supabase
+          .from(TABLE)
+          .update({
+            name,
+            target_amount: input.target_amount,
+            current_amount: input.current_amount,
+            deadline: input.deadline,
+            updated_at: now,
+          })
+          .eq('id', existing.id)
+          .eq('user_id', user.id);
+        if (uError) throw uError;
+      } else {
+        const { error: iError } = await supabase.from(TABLE).insert({
+          user_id: user.id,
+          name,
+          target_amount: input.target_amount,
+          current_amount: input.current_amount,
+          deadline: input.deadline,
+          created_at: now,
+          updated_at: now,
+        });
+        if (iError) throw iError;
+      }
       await refresh();
     },
-    [userId, refresh],
+    [user, refresh],
   );
 
   const remove = useCallback(
     async (goal: SavingsGoal) => {
-      if (!userId || !supabase) throw new Error("Sign in before deleting goals.");
-      await savingsGoalsService.deleteSavingsGoal(supabase, userId, goal);
+      if (!supabase || !user) throw new Error('Not authenticated');
+      // Unlink wishlist items first (preserves existing relationship direction)
+      await supabase
+        .from('wishlists')
+        .update({ savings_goal_id: null, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('savings_goal_id', goal.id);
+      const { error: dError } = await supabase
+        .from(TABLE)
+        .delete()
+        .eq('id', goal.id)
+        .eq('user_id', user.id);
+      if (dError) throw dError;
       await refresh();
     },
-    [userId, refresh],
+    [user, refresh],
   );
 
-  return {
-    goals: userId && loadedUserId === userId ? goals : [],
-    isLoading: Boolean(userId) && isLoading,
-    error,
-    refresh,
-    save,
-    remove,
-  };
+  return { goals, loading, error, refresh, save, remove };
 }
