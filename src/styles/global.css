@@ -1,4 +1,4 @@
-/* Montra — premium dark theme (resolved) */
+/* Montra — premium dark theme */
 
 :root {
   --color-bg: #09090b;
@@ -10,22 +10,18 @@
   --color-text-muted: #71717a;
   --color-border: #27272a;
   --color-border-strong: #3f3f46;
-
   --color-ink: #fafafa;
   --color-accent: #fbbf24;
   --color-accent-soft: rgb(251 191 36 / 0.15);
   --color-cta: #fafafa;
   --color-cta-text: #09090b;
-
   --color-danger: #f87171;
   --color-danger-bg: rgb(248 113 113 / 0.12);
   --color-success: #4ade80;
   --color-success-bg: rgb(74 222 128 / 0.12);
   --color-income: #4ade80;
   --color-expense: #f87171;
-
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -35,26 +31,21 @@
   --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
-
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
-
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-md: 0 8px 24px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 16px 48px rgb(0 0 0 / 0.45);
   --shadow-glow: 0 0 40px rgb(251 191 36 / 0.12);
-
   --nav-height: 4.5rem;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
-
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 280ms;
-
   --motion-fast: 150ms;
   --motion-base: 220ms;
   --motion-slow: 360ms;
@@ -74,14 +65,8 @@
   }
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 body {
   margin: 0;
@@ -100,31 +85,10 @@ body {
   flex-direction: column;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  padding: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; padding: 0; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
 
 .sr-only {
   position: absolute;
@@ -139,37 +103,6 @@ svg {
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -177,4 +110,9 @@ svg {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }

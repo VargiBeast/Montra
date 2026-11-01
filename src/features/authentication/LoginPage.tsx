@@ -14,7 +14,6 @@ export function LoginPage() {
     const { error: authError } = await signInWithGoogle();
     setSubmitting(false);
     if (authError) setError(authError);
-    // On success Supabase redirects away
   }
 
   if (!isSupabaseConfigured) {
@@ -56,7 +55,7 @@ export function LoginPage() {
         </button>
 
         <p className="auth-note">
-          By continuing you agree to use Montra with your Google account.
+          Sign in or create an account with Google. One tap — no password.
         </p>
       </div>
     </div>
