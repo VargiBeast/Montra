@@ -1,23 +1,26 @@
 .tx-form-overlay {
   position: fixed;
   inset: 0;
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(0 0 0 / 0.65);
   display: flex;
   align-items: flex-end;
   justify-content: center;
   z-index: 100;
   padding: var(--space-4);
   padding-bottom: calc(var(--space-4) + var(--safe-bottom));
+  animation: fadeIn var(--motion-base, 220ms) ease both;
 }
 
 .tx-form {
   width: 100%;
   max-width: 440px;
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   max-height: 90dvh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
+  animation: sheetUp var(--motion-base, 220ms) var(--ease-out, ease) both;
 }
 
 .tx-form__header {
@@ -31,7 +34,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-ink);
+  color: var(--color-text, #fafafa);
 }
 
 .tx-form__close {
@@ -55,13 +58,15 @@
   border-radius: var(--radius-full);
   font-weight: 600;
   font-size: 0.875rem;
-  background: var(--color-surface-2);
-  color: var(--color-text-secondary);
+  background: var(--color-surface, #27272a);
+  color: var(--color-text-secondary, #a1a1aa);
+  border: 1px solid var(--color-border);
 }
 
 .tx-form__type-btn--active {
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-accent, #fbbf24);
+  color: #09090b;
+  border-color: transparent;
 }
 
 .tx-form__body {
@@ -80,20 +85,25 @@
 .tx-form__field label {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #a1a1aa);
 }
 
 .tx-form__field input {
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-bg, #09090b);
+  color: var(--color-text, #fafafa);
+}
+
+.tx-form__field input::placeholder {
+  color: var(--color-text-muted, #71717a);
 }
 
 .tx-form__field input:focus {
   outline: none;
-  border-color: var(--color-ink);
-  box-shadow: 0 0 0 3px rgb(15 23 42 / 0.08);
+  border-color: var(--color-accent, #fbbf24);
+  box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
 }
 
 .tx-form__error {
@@ -107,14 +117,19 @@
 .tx-form__submit {
   margin-top: var(--space-2);
   padding: 0.875rem;
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-accent, #fbbf24);
+  color: #09090b;
   font-weight: 600;
   border-radius: var(--radius-md);
 }
 
 .tx-form__submit:disabled {
   opacity: 0.55;
+}
+
+@keyframes sheetUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 640px) {

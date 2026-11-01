@@ -41,46 +41,20 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--color-text, #fafafa);
   letter-spacing: -0.02em;
 }
 
 .auth-tagline {
   margin: var(--space-2) 0 0;
-  color: var(--color-text-muted);
+  color: var(--color-text-muted, #71717a);
   font-size: 0.9375rem;
 }
 
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.auth-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.auth-field label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-}
-
-.auth-field input {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
-  background: var(--color-bg);
-  color: var(--color-text);
-}
-
-.auth-field input:focus {
-  outline: none;
-  border-color: var(--color-accent, #fbbf24);
-  box-shadow: 0 0 0 3px rgb(251 191 36 / 0.15);
+.auth-config-hint {
+  color: var(--color-text-secondary, #a1a1aa);
+  font-size: 0.9375rem;
+  line-height: 1.5;
 }
 
 .auth-error {
@@ -89,37 +63,44 @@
   color: var(--color-danger);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
+  margin-bottom: var(--space-4);
 }
 
-.auth-submit {
-  margin-top: var(--space-2);
-  padding: 0.875rem 1.25rem;
-  background: var(--color-accent, #fbbf24);
-  color: #09090b;
+.auth-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 0.9rem 1.25rem;
+  background: #ffffff;
+  color: #1f1f1f;
   font-weight: 600;
+  font-size: 0.975rem;
   border-radius: var(--radius-md);
-  transition: transform var(--motion-fast, 150ms) ease;
+  border: 1px solid #e5e5e5;
+  transition: transform var(--motion-fast, 150ms) ease, box-shadow var(--motion-fast, 150ms) ease;
 }
 
-.auth-submit:active {
+.auth-google:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+}
+
+.auth-google:active {
   transform: scale(0.98);
 }
 
-.auth-submit:disabled {
-  opacity: 0.55;
+.auth-google:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.auth-switch {
-  margin: var(--space-6) 0 0;
+.auth-note {
+  margin: var(--space-5) 0 0;
   text-align: center;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.auth-switch button {
-  color: var(--color-accent, #fbbf24);
-  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #71717a);
+  line-height: 1.5;
 }
 
 .auth-loading {

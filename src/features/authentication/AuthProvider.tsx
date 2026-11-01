@@ -13,10 +13,8 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: string | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -49,15 +47,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signInWithGoogle = useCallback(async () => {
     if (!supabase) return { error: 'Supabase is not configured.' };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
-  }, []);
-
-  const signUp = useCallback(async (email: string, password: string) => {
-    if (!supabase) return { error: 'Supabase is not configured.' };
-    const { error } = await supabase.auth.signUp({ email, password });
+    const redirectTo = `${window.location.origin}/app`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
     return { error: error?.message ?? null };
   }, []);
 
@@ -66,16 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   }, []);
 
-  const resetPassword = useCallback(async (email: string) => {
-    if (!supabase) return { error: 'Supabase is not configured.' };
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    return { error: error?.message ?? null };
-  }, []);
-
   return (
-    <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut, resetPassword }}
-    >
+    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
