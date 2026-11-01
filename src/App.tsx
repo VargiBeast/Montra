@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './features/authentication/AuthProvider';
+import { AuthProvider } from './features/authentication/AuthProvider';
 import { ProtectedRoute } from './features/authentication/ProtectedRoute';
 import { AppShell } from './components/layout/AppShell';
 import { LoginPage } from './features/authentication/LoginPage';
@@ -11,24 +11,11 @@ import { PlusPage } from './features/plus/PlusPage';
 import { LandingPage } from './features/marketing/LandingPage';
 import { LegalPage } from './features/legal/LegalPage';
 
-function RootRedirect() {
-  const { user, loading } = useAuth();
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090b' }}>
-        <div style={{ width: 36, height: 36, border: '3px solid #3f3f46', borderTopColor: '#fbbf24', borderRadius: '50%' }} />
-      </div>
-    );
-  }
-  // Always show marketing site at / ; logged-in users use /app
-  return <LandingPage />;
-}
-
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/" element={<RootRedirect />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/plus" element={<PlusPage />} />
         <Route path="/legal/:doc" element={<LegalPage />} />
