@@ -1,10 +1,10 @@
 import { supabase } from './supabase';
 
-export type PlusInterval = 'month' | 'year';
+export type PlusPlan = 'monthly' | 'yearly';
 
-/** Calls the existing create-stripe-checkout Edge Function. */
+/** Calls create-stripe-checkout Edge Function with the contract it expects. */
 export async function startPlusCheckout(
-  interval: PlusInterval,
+  plan: PlusPlan,
 ): Promise<{ url: string } | { error: string }> {
   if (!supabase) return { error: 'Supabase is not configured' };
 
@@ -15,26 +15,26 @@ export async function startPlusCheckout(
 
   try {
     const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
-      body: {
-        interval,
-        success_url: `${window.location.origin}/plus?checkout=success`,
-        cancel_url: `${window.location.origin}/plus?checkout=cancelled`,
-      },
+      body: { plan },
     });
 
     if (error) {
-      // Surface a clearer message for common Edge Function failures
       const msg = error.message || '';
       if (msg.includes('non-2xx') || msg.includes('FunctionsHttpError')) {
+        const detail =
+          data && typeof data === 'object' && 'error' in data
+            ? String((data as { error?: string }).error)
+            : null;
         return {
           error:
-            'Checkout is not available right now. Stripe may not be fully configured for this environment.',
+            detail ||
+            'Checkout is not available right now. Please try again or contact support.',
         };
       }
       return { error: msg || 'Checkout failed' };
     }
 
-    if (data?.url) return { url: data.url };
+    if (data?.url) return { url: data.url as string };
     if (data?.error) return { error: String(data.error) };
     return { error: 'Checkout did not return a URL' };
   } catch (err) {
