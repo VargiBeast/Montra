@@ -2,7 +2,6 @@ import { supabase } from './supabase';
 
 export type PlusPlan = 'monthly' | 'yearly';
 
-/** Calls create-stripe-checkout Edge Function with the contract it expects. */
 export async function startPlusCheckout(
   plan: PlusPlan,
 ): Promise<{ url: string } | { error: string }> {
@@ -38,8 +37,41 @@ export async function startPlusCheckout(
     if (data?.error) return { error: String(data.error) };
     return { error: 'Checkout did not return a URL' };
   } catch (err) {
+    return { error: err instanceof Error ? err.message : 'Checkout failed' };
+  }
+}
+
+/** Opens Stripe Customer Portal when Edge Function exists; otherwise returns a clear error. */
+export async function openBillingPortal(): Promise<{ url: string } | { error: string }> {
+  if (!supabase) return { error: 'Supabase is not configured' };
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) return { error: 'You need to be signed in' };
+
+  try {
+    const { data, error } = await supabase.functions.invoke('create-stripe-portal', {
+      body: {
+        return_url: `${window.location.origin}/plus`,
+      },
+    });
+
+    if (error) {
+      return {
+        error:
+          'Subscription management is not available yet. Use the link in your Stripe receipt email, or contact support.',
+      };
+    }
+    if (data?.url) return { url: data.url as string };
     return {
-      error: err instanceof Error ? err.message : 'Checkout failed',
+      error:
+        'Subscription management is not available yet. Use the link in your Stripe receipt email, or contact support.',
+    };
+  } catch {
+    return {
+      error:
+        'Subscription management is not available yet. Use the link in your Stripe receipt email, or contact support.',
     };
   }
 }

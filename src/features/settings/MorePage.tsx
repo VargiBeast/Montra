@@ -1,20 +1,46 @@
-import { CreditCard, HelpCircle, LogOut, ChevronRight, Target, Gift, FileText, Shield, RotateCcw } from 'lucide-react';
+import {
+  CreditCard,
+  HelpCircle,
+  LogOut,
+  ChevronRight,
+  Target,
+  Gift,
+  FileText,
+  Shield,
+  RotateCcw,
+  Globe,
+} from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/features/authentication/AuthProvider';
 import { GoalsSection } from '@/features/goals/GoalsSection';
 import { WishlistSection } from '@/features/wishlist/WishlistSection';
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
 import { SUPPORTED_CURRENCIES } from '@/lib/currency';
+import {
+  SUPPORTED_LOCALES,
+  LOCALE_LABELS,
+  getLocale,
+  setLocale,
+  type Locale,
+  t,
+} from '@/lib/i18n';
+import { useState } from 'react';
 import './MorePage.css';
 
 export function MorePage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { currency, setCurrency } = useDisplayCurrency();
+  const [locale, setLocaleState] = useState<Locale>(() => getLocale());
 
   async function handleLogout() {
     await signOut();
     navigate('/login');
+  }
+
+  function handleLocale(next: Locale) {
+    setLocale(next);
+    setLocaleState(next);
   }
 
   return (
@@ -38,6 +64,24 @@ export function MorePage() {
           Wishlist
         </h2>
         <WishlistSection />
+      </section>
+
+      <section className="more__section">
+        <h2>
+          <Globe size={14} style={{ display: 'inline', marginRight: 6 }} />
+          {t('more.language')}
+        </h2>
+        <select
+          className="more__select"
+          value={locale}
+          onChange={(e) => handleLocale(e.target.value as Locale)}
+        >
+          {SUPPORTED_LOCALES.map((code) => (
+            <option key={code} value={code}>
+              {LOCALE_LABELS[code]}
+            </option>
+          ))}
+        </select>
       </section>
 
       <section className="more__section">

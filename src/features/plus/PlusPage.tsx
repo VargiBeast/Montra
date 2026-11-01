@@ -1,21 +1,28 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Check, Sparkles } from 'lucide-react';
-import { startPlusCheckout, type PlusPlan } from '@/lib/stripe';
+import { Check, Sparkles, BarChart3, LineChart, Shield, Settings } from 'lucide-react';
+import { startPlusCheckout, openBillingPortal, type PlusPlan } from '@/lib/stripe';
 import './PlusPage.css';
 
-const features = [
-  'Advanced analytics & trends',
-  'Financial forecasts',
-  'Personalized insights',
-  'Priority support',
+const freeFeatures = [
+  'Transactions & balance',
+  'Receipts with OCR',
+  'Savings goals & wishlist',
+  'Multi-currency display',
+];
+
+const plusFeatures = [
+  { icon: BarChart3, text: 'Spending breakdowns by category' },
+  { icon: LineChart, text: 'Trends and monthly forecasts' },
+  { icon: Sparkles, text: 'Personalized insights' },
+  { icon: Shield, text: 'Priority support' },
 ];
 
 export function PlusPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const checkout = params.get('checkout');
-  const [loading, setLoading] = useState<PlusPlan | null>(null);
+  const [loading, setLoading] = useState<PlusPlan | 'portal' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleCheckout(plan: PlusPlan) {
@@ -23,11 +30,17 @@ export function PlusPage() {
     setLoading(plan);
     const result = await startPlusCheckout(plan);
     setLoading(null);
-    if ('url' in result) {
-      window.location.href = result.url;
-    } else {
-      setError(result.error);
-    }
+    if ('url' in result) window.location.href = result.url;
+    else setError(result.error);
+  }
+
+  async function handleManage() {
+    setError(null);
+    setLoading('portal');
+    const result = await openBillingPortal();
+    setLoading(null);
+    if ('url' in result) window.location.href = result.url;
+    else setError(result.error);
   }
 
   return (
@@ -38,11 +51,11 @@ export function PlusPage() {
 
       {checkout === 'success' && (
         <div className="plus__banner plus__banner--success">
-          Welcome to Montra Plus! Your subscription is active.
+          Welcome to Montra Plus. Your subscription is active.
         </div>
       )}
       {checkout === 'cancelled' && (
-        <div className="plus__banner">Checkout was cancelled. You can try again anytime.</div>
+        <div className="plus__banner">Checkout was cancelled. You can start again anytime.</div>
       )}
       {error && <div className="plus__banner">{error}</div>}
 
@@ -51,17 +64,40 @@ export function PlusPage() {
           <Sparkles size={28} />
         </div>
         <h1>Montra Plus</h1>
-        <p>Unlock advanced planning, forecasts and deeper insights.</p>
+        <p>Deeper clarity on spending, trends and what comes next — without the noise.</p>
+      </div>
+
+      <div className="plus__compare">
+        <div className="plus__col">
+          <h3>Free</h3>
+          <ul>
+            {freeFeatures.map((f) => (
+              <li key={f}>
+                <Check size={16} /> {f}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="plus__col plus__col--plus">
+          <h3>Plus</h3>
+          <ul>
+            {plusFeatures.map((f) => (
+              <li key={f.text}>
+                <f.icon size={16} /> {f.text}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="plus__pricing">
         <div className="plus__plan plus__plan--featured">
-          <span className="plus__badge">Popular</span>
+          <span className="plus__badge">Best value</span>
           <h2>Yearly</h2>
           <p className="plus__price">
             329 <span>NOK</span>
           </p>
-          <p className="plus__period">per year · 7-day trial</p>
+          <p className="plus__period">per year · 7-day free trial</p>
           <button
             type="button"
             className="plus__cta"
@@ -76,7 +112,7 @@ export function PlusPage() {
           <p className="plus__price">
             39 <span>NOK</span>
           </p>
-          <p className="plus__period">per month · 7-day trial</p>
+          <p className="plus__period">per month · 7-day free trial</p>
           <button
             type="button"
             className="plus__cta plus__cta--secondary"
@@ -88,17 +124,19 @@ export function PlusPage() {
         </div>
       </div>
 
-      <ul className="plus__features">
-        {features.map((f) => (
-          <li key={f}>
-            <Check size={18} />
-            {f}
-          </li>
-        ))}
-      </ul>
+      <button
+        type="button"
+        className="plus__manage"
+        disabled={loading === 'portal'}
+        onClick={handleManage}
+      >
+        <Settings size={18} />
+        {loading === 'portal' ? 'Opening…' : 'Manage subscription'}
+      </button>
 
       <p className="plus__note">
-        7-day free trial. Cancel anytime. Charged via Stripe after the trial.
+        Trial first, then billed via Stripe. Cancel anytime. See{' '}
+        <a href="/legal/refund">Refund policy</a> and <a href="/legal/terms">Terms</a>.
       </p>
     </div>
   );
