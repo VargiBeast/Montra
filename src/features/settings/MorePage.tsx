@@ -1,5 +1,5 @@
-import { CreditCard, HelpCircle, LogOut, ChevronRight, Target, Gift } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CreditCard, HelpCircle, LogOut, ChevronRight, Target, Gift, FileText, Shield, RotateCcw } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/features/authentication/AuthProvider';
 import { GoalsSection } from '@/features/goals/GoalsSection';
 import { WishlistSection } from '@/features/wishlist/WishlistSection';
@@ -70,12 +70,33 @@ export function MorePage() {
       </section>
 
       <section className="more__section">
-        <h2>Support</h2>
+        <h2>Legal</h2>
         <ul className="more__list">
+          <li>
+            <Link to="/legal/privacy" className="more__item">
+              <Shield size={20} />
+              <span>Privacy policy</span>
+              <ChevronRight size={18} className="more__chevron" />
+            </Link>
+          </li>
+          <li>
+            <Link to="/legal/terms" className="more__item">
+              <FileText size={20} />
+              <span>Terms of service</span>
+              <ChevronRight size={18} className="more__chevron" />
+            </Link>
+          </li>
+          <li>
+            <Link to="/legal/refund" className="more__item">
+              <RotateCcw size={20} />
+              <span>Refund policy</span>
+              <ChevronRight size={18} className="more__chevron" />
+            </Link>
+          </li>
           <li>
             <button type="button" className="more__item">
               <HelpCircle size={20} />
-              <span>Help & legal</span>
+              <span>Help</span>
               <ChevronRight size={18} className="more__chevron" />
             </button>
           </li>

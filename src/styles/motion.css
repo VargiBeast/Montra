@@ -1,11 +1,9 @@
-/* Montra motion system — restrained, purposeful */
-
+/* Montra motion — restrained */
 :root {
   --motion-fast: 150ms;
   --motion-base: 220ms;
   --motion-slow: 360ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -20,11 +18,6 @@
   animation: fadeUp var(--motion-slow) var(--ease-out) both;
 }
 
-.animate-in-delay-1 { animation-delay: 40ms; }
-.animate-in-delay-2 { animation-delay: 80ms; }
-.animate-in-delay-3 { animation-delay: 120ms; }
-.animate-in-delay-4 { animation-delay: 160ms; }
-
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -33,23 +26,4 @@
 @keyframes scaleIn {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes sheetUp {
-  from { opacity: 0; transform: translateY(100%); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.pressable {
-  transition: transform var(--motion-fast) var(--ease-out), opacity var(--motion-fast) var(--ease-out);
-}
-.pressable:active {
-  transform: scale(0.97);
-}
-
-.card-interactive {
-  transition: border-color var(--motion-base) var(--ease-out), transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out);
-}
-.card-interactive:hover {
-  transform: translateY(-1px);
 }

@@ -9,6 +9,7 @@ import { ReceiptsPage } from './features/receipts/ReceiptsPage';
 import { MorePage } from './features/settings/MorePage';
 import { PlusPage } from './features/plus/PlusPage';
 import { LandingPage } from './features/marketing/LandingPage';
+import { LegalPage } from './features/legal/LegalPage';
 
 function RootRedirect() {
   const { user, loading } = useAuth();
@@ -19,7 +20,8 @@ function RootRedirect() {
       </div>
     );
   }
-  return user ? <Navigate to="/app" replace /> : <LandingPage />;
+  // Always show marketing site at / ; logged-in users use /app
+  return <LandingPage />;
 }
 
 export default function App() {
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/plus" element={<PlusPage />} />
+        <Route path="/legal/:doc" element={<LegalPage />} />
+
         <Route
           path="/app"
           element={
@@ -42,6 +46,7 @@ export default function App() {
           <Route path="receipts" element={<ReceiptsPage />} />
           <Route path="more" element={<MorePage />} />
         </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>

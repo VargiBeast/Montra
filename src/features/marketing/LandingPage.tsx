@@ -126,8 +126,15 @@ export function LandingPage() {
       </section>
 
       <footer className="landing__footer">
-        <span className="landing__footer-brand">Montra</span>
-        <span>© {new Date().getFullYear()}</span>
+        <div className="landing__footer-top">
+          <span className="landing__footer-brand">Montra</span>
+          <nav className="landing__footer-links" aria-label="Legal">
+            <Link to="/legal/privacy">Privacy</Link>
+            <Link to="/legal/terms">Terms</Link>
+            <Link to="/legal/refund">Refunds</Link>
+          </nav>
+        </div>
+        <p className="landing__footer-copy">© {new Date().getFullYear()} Montra</p>
       </footer>
     </div>
   );
