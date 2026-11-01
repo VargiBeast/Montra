@@ -9,6 +9,7 @@ import {
   Shield,
   RotateCcw,
   Globe,
+  BarChart3,
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/features/authentication/AuthProvider';
@@ -49,6 +50,23 @@ export function MorePage() {
         <h1>More</h1>
         <p className="more__email">{user?.email}</p>
       </header>
+
+      <section className="more__section">
+        <h2>Insights</h2>
+        <ul className="more__list">
+          <li>
+            <button
+              type="button"
+              className="more__item"
+              onClick={() => navigate('/app/analytics')}
+            >
+              <BarChart3 size={20} />
+              <span>Advanced analytics</span>
+              <ChevronRight size={18} className="more__chevron" />
+            </button>
+          </li>
+        </ul>
+      </section>
 
       <section className="more__section">
         <h2>

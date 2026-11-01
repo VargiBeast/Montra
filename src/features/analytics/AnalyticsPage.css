@@ -1,0 +1,375 @@
+.an {
+  min-height: 100%;
+  padding: 1rem 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  background: #09090b;
+  color: #fafafa;
+}
+
+.an__top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.an__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #a1a1aa;
+  align-self: flex-start;
+}
+
+.an__top h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.an__sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: #71717a;
+}
+
+.an__loading,
+.an__empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #71717a;
+  font-size: 0.9375rem;
+}
+
+.an__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 1.25rem;
+}
+
+/* Gate */
+.an__gate {
+  text-align: center;
+  padding: 2.5rem 1.25rem;
+  background: linear-gradient(160deg, #1c1917, #18181b);
+  border: 1px solid rgb(251 191 36 / 0.28);
+  border-radius: 1.5rem;
+}
+
+.an__gate-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fbbf24;
+  color: #09090b;
+  border-radius: 1rem;
+}
+
+.an__gate h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.an__gate p {
+  margin: 0 auto 1.25rem;
+  max-width: 22rem;
+  color: #a1a1aa;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.an__gate-cta {
+  display: inline-flex;
+  padding: 0.8rem 1.35rem;
+  background: #fbbf24;
+  color: #09090b;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+
+/* Hero */
+.an__hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.an__kpi {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 1rem;
+  padding: 0.9rem;
+}
+
+.an__kpi--wide {
+  grid-column: 1 / -1;
+  background: linear-gradient(145deg, #1c1917, #18181b);
+  border-color: rgb(251 191 36 / 0.2);
+}
+
+.an__kpi-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #71717a;
+}
+
+.an__kpi-value {
+  display: block;
+  margin: 0.35rem 0 0.15rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.an__kpi--wide .an__kpi-value {
+  font-size: 1.75rem;
+}
+
+.an__kpi-hint {
+  font-size: 0.75rem;
+  color: #71717a;
+}
+
+.an__pos { color: #4ade80; }
+.an__neg { color: #f87171; }
+
+/* Cards */
+.an__card {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 1.25rem;
+  padding: 1.15rem;
+  margin-bottom: 0.85rem;
+}
+
+.an__card--compact h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.an__card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.an__card-head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.an__muted {
+  font-size: 0.75rem;
+  color: #71717a;
+}
+
+.an__legend {
+  font-size: 0.6875rem;
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.an__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.an__dot--in { background: #4ade80; }
+.an__dot--out { background: #f87171; }
+
+/* Chart */
+.an__chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.4rem;
+  height: 140px;
+}
+
+.an__chart-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 0.35rem;
+}
+
+.an__chart-bars {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+}
+
+.an__chart-bar {
+  width: 10px;
+  border-radius: 4px 4px 0 0;
+  min-height: 3px;
+}
+
+.an__chart-bar--in {
+  background: linear-gradient(180deg, #86efac, #16a34a);
+}
+
+.an__chart-bar--out {
+  background: linear-gradient(180deg, #fca5a5, #dc2626);
+}
+
+.an__chart-label {
+  font-size: 0.625rem;
+  color: #71717a;
+}
+
+/* Methods */
+.an__methods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.an__methods li {
+  margin-bottom: 0.85rem;
+}
+
+.an__methods li:last-child {
+  margin-bottom: 0;
+}
+
+.an__method-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  margin-bottom: 0.3rem;
+}
+
+.an__method-name {
+  color: #e4e4e7;
+  font-weight: 500;
+}
+
+.an__method-amt {
+  color: #a1a1aa;
+  font-variant-numeric: tabular-nums;
+}
+
+.an__method-track {
+  height: 7px;
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.an__method-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24, #fde68a);
+  border-radius: 9999px;
+}
+
+.an__method-share {
+  font-size: 0.6875rem;
+  color: #52525b;
+}
+
+.an__grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.an__big {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.an__card--compact .an__muted {
+  margin: 0.25rem 0 0;
+}
+
+/* Forecast */
+.an__card--forecast {
+  border-color: rgb(251 191 36 / 0.22);
+  background: linear-gradient(160deg, #1a1714, #18181b);
+}
+
+.an__forecast-note {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+.an__forecast-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 400px) {
+  .an__forecast-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.an__forecast-grid div {
+  background: rgb(0 0 0 / 0.35);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+.an__forecast-grid span {
+  display: block;
+  font-size: 0.6875rem;
+  color: #71717a;
+  margin-bottom: 0.25rem;
+}
+
+.an__forecast-grid strong {
+  font-size: 1rem;
+}
+
+.an__disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 1rem 0 0;
+  font-size: 0.75rem;
+  color: #52525b;
+  line-height: 1.45;
+}

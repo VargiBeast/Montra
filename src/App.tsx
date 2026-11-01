@@ -10,6 +10,7 @@ import { MorePage } from './features/settings/MorePage';
 import { PlusPage } from './features/plus/PlusPage';
 import { LandingPage } from './features/marketing/LandingPage';
 import { LegalPage } from './features/legal/LegalPage';
+import { AnalyticsPage } from './features/analytics/AnalyticsPage';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="activity" element={<ActivityPage />} />
           <Route path="receipts" element={<ReceiptsPage />} />
           <Route path="more" element={<MorePage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

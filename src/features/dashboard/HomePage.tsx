@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/authentication/AuthProvider';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useSavingsGoals } from '@/hooks/useSavingsGoals';
@@ -6,10 +7,11 @@ import { usePlusEntitlement } from '@/hooks/usePlusEntitlement';
 import { formatMoney, toIsoDate } from '@/lib/utils';
 import { PlusTeaser } from '@/components/PlusTeaser';
 import { SpendingInsights } from '@/features/analytics/SpendingInsights';
-import { TrendingUp, ArrowUpRight, ArrowDownRight, Target, Radar } from 'lucide-react';
+import { TrendingUp, ArrowUpRight, ArrowDownRight, Target, Radar, ChevronRight } from 'lucide-react';
 import './HomePage.css';
 
 export function HomePage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { transactions, loading: txLoading } = useTransactions();
   const { goals, loading: goalsLoading } = useSavingsGoals();
@@ -114,7 +116,16 @@ export function HomePage() {
 
       {!plusLoading &&
         (hasPlus ? (
-          <SpendingInsights transactions={transactions} />
+          <>
+            <SpendingInsights transactions={transactions} />
+            <button
+              type="button"
+              className="home__analytics-link"
+              onClick={() => navigate('/app/analytics')}
+            >
+              Open advanced analytics <ChevronRight size={18} />
+            </button>
+          </>
         ) : (
           <PlusTeaser variant="app" />
         ))}
@@ -128,13 +139,18 @@ export function HomePage() {
         <div className="home__card home__card--empty">
           <p>
             {hasPlus
-              ? transactions.length < 3
-                ? 'Add a few more transactions for richer radar insights.'
-                : 'Radar uses your Plus insights above. More detail coming soon.'
-              : transactions.length < 3
-                ? 'Add a few more transactions to unlock personalized insights.'
-                : 'Upgrade to Plus for spending breakdowns and trends.'}
+              ? 'Full breakdowns and forecast live under Advanced analytics.'
+              : 'Upgrade to Plus for spending breakdowns, trends and forecast.'}
           </p>
+          {hasPlus && (
+            <button
+              type="button"
+              className="home__analytics-link home__analytics-link--inline"
+              onClick={() => navigate('/app/analytics')}
+            >
+              View analytics <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       </section>
 
