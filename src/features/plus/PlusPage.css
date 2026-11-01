@@ -8,22 +8,22 @@
 .plus__back {
   margin-bottom: var(--space-4);
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #a1a1aa);
 }
 
 .plus__banner {
   margin-bottom: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #a1a1aa);
 }
 
 .plus__banner--success {
   background: var(--color-success-bg);
-  color: var(--color-income);
+  color: var(--color-success);
   border-color: transparent;
 }
 
@@ -36,24 +36,24 @@
   width: 64px;
   height: 64px;
   margin: 0 auto var(--space-4);
-  background: var(--color-ink);
+  background: var(--color-accent, #fbbf24);
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #09090b;
 }
 
 .plus__hero h1 {
   margin: 0 0 var(--space-2);
   font-size: 1.75rem;
-  color: var(--color-ink);
+  color: var(--color-text, #fafafa);
   letter-spacing: -0.02em;
 }
 
 .plus__hero p {
   margin: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #a1a1aa);
 }
 
 .plus__pricing {
@@ -64,17 +64,16 @@
 
 .plus__plan {
   position: relative;
-  background: var(--color-surface);
+  background: var(--color-bg-elevated, #18181b);
   border-radius: var(--radius-2xl);
   padding: var(--space-6);
   text-align: center;
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
 }
 
 .plus__plan--featured {
-  border: 2px solid var(--color-ink);
-  box-shadow: var(--shadow-card);
+  border: 2px solid var(--color-accent, #fbbf24);
+  box-shadow: var(--shadow-glow);
 }
 
 .plus__badge {
@@ -83,8 +82,8 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 0.25rem 0.75rem;
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-accent, #fbbf24);
+  color: #09090b;
   font-size: 0.75rem;
   font-weight: 700;
   border-radius: var(--radius-full);
@@ -93,18 +92,20 @@
 .plus__plan h2 {
   margin: 0 0 var(--space-2);
   font-size: 1.125rem;
+  color: var(--color-text, #fafafa);
 }
 
 .plus__price {
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--color-ink);
+  color: var(--color-text, #fafafa);
 }
 
 .plus__price span {
   font-size: 1rem;
   font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .plus__period {
@@ -116,15 +117,15 @@
 .plus__cta {
   width: 100%;
   padding: 0.875rem;
-  background: var(--color-ink);
-  color: #fff;
+  background: var(--color-accent, #fbbf24);
+  color: #09090b;
   font-weight: 600;
   border-radius: var(--radius-full);
 }
 
 .plus__cta--secondary {
-  background: var(--color-surface-2);
-  color: var(--color-ink);
+  background: var(--color-surface, #27272a);
+  color: var(--color-text, #fafafa);
 }
 
 .plus__cta:disabled {
@@ -143,10 +144,11 @@
   gap: var(--space-3);
   padding: var(--space-3) 0;
   font-size: 0.9375rem;
+  color: var(--color-text, #fafafa);
 }
 
 .plus__features svg {
-  color: var(--color-ink);
+  color: var(--color-accent, #fbbf24);
   flex-shrink: 0;
 }
 
