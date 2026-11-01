@@ -3,6 +3,7 @@ import { useAuth } from '@/features/authentication/AuthProvider';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useSavingsGoals } from '@/hooks/useSavingsGoals';
 import { formatMoney, toIsoDate } from '@/lib/utils';
+import { PlusTeaser } from '@/components/PlusTeaser';
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Target, Radar } from 'lucide-react';
 import './HomePage.css';
 
@@ -107,6 +108,8 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      <PlusTeaser variant="app" />
 
       <section className="home__section">
         <div className="home__section-header">

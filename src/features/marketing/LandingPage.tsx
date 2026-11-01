@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   Shield,
@@ -33,6 +33,8 @@ const features = [
 ];
 
 export function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="landing">
       <header className="landing__nav">
@@ -114,6 +116,27 @@ export function LandingPage() {
               <p>{f.body}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="landing__plus-wrap">
+        <div className="landing__plus">
+          <div className="landing__plus-badge">
+            <Sparkles size={14} /> Montra Plus
+          </div>
+          <h2>See where your money really goes</h2>
+          <p>
+            Category breakdowns, trends and forecasts — so you understand patterns, not just
+            balances. Try Plus free for 7 days.
+          </p>
+          <div className="landing__plus-bars" aria-hidden>
+            <div><i style={{ width: '48%' }} /><span>Food & dining</span></div>
+            <div><i style={{ width: '31%' }} /><span>Transport</span></div>
+            <div><i style={{ width: '21%' }} /><span>Shopping</span></div>
+          </div>
+          <button type="button" className="landing__cta landing__cta--on-dark" onClick={() => navigate('/plus')}>
+            Explore Plus <ArrowRight size={18} />
+          </button>
         </div>
       </section>
 
