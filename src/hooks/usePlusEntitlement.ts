@@ -1,29 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import {
   isPlusEntitlementActive,
   type PlusEntitlement,
-} from "../lib/plus";
+} from '@/lib/plus';
 
 export type PlusEntitlementState = {
-  /** True while the first entitlement fetch is in flight. */
   isLoading: boolean;
-  /** True when Plus is currently unlocked for the UI. */
   hasPlus: boolean;
-  /** Raw entitlement row (or null if none / signed out). */
   entitlement: PlusEntitlement | null;
-  /** Last fetch error message, if any. */
   error: string | null;
-  /** Re-fetch entitlement from Supabase. */
   refresh: () => Promise<void>;
 };
 
-/**
- * Centralized Plus access for the authenticated user.
- *
- * Reads public.plus_entitlements under RLS (own row only).
- * Does not call Stripe or write entitlement rows.
- */
+/** Reads public.plus_entitlements under RLS (own row only). */
 export function usePlusEntitlement(userId: string | null | undefined): PlusEntitlementState {
   const [isLoading, setIsLoading] = useState(Boolean(userId));
   const [entitlement, setEntitlement] = useState<PlusEntitlement | null>(null);
@@ -45,18 +35,18 @@ export function usePlusEntitlement(userId: string | null | undefined): PlusEntit
     setIsLoading(true);
     try {
       const { data, error: queryError } = await supabase
-        .from("plus_entitlements")
+        .from('plus_entitlements')
         .select(
-          "user_id, stripe_customer_id, stripe_subscription_id, status, current_period_end, created_at, updated_at",
+          'user_id, stripe_customer_id, stripe_subscription_id, status, current_period_end, created_at, updated_at',
         )
-        .eq("user_id", userId)
+        .eq('user_id', userId)
         .maybeSingle();
 
       if (id !== requestId.current) return;
 
       if (queryError) {
-        console.error("plus_entitlements fetch failed:", queryError);
-        setError("Could not load Plus status.");
+        console.error('plus_entitlements fetch failed:', queryError);
+        setError('Could not load Plus status.');
         setEntitlement(null);
       } else {
         setError(null);
@@ -64,8 +54,8 @@ export function usePlusEntitlement(userId: string | null | undefined): PlusEntit
       }
     } catch (err) {
       if (id !== requestId.current) return;
-      console.error("plus_entitlements fetch error:", err);
-      setError("Could not load Plus status.");
+      console.error('plus_entitlements fetch error:', err);
+      setError('Could not load Plus status.');
       setEntitlement(null);
     } finally {
       if (id === requestId.current) setIsLoading(false);

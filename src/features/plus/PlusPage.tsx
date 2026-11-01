@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Check, Sparkles, BarChart3, LineChart, Shield, Settings } from 'lucide-react';
+import { useAuth } from '@/features/authentication/AuthProvider';
+import { usePlusEntitlement } from '@/hooks/usePlusEntitlement';
 import { startPlusCheckout, openBillingPortal, type PlusPlan } from '@/lib/stripe';
+import { PLUS_PRICING } from '@/lib/plus';
 import './PlusPage.css';
 
 const freeFeatures = [
@@ -12,15 +15,17 @@ const freeFeatures = [
 ];
 
 const plusFeatures = [
-  { icon: BarChart3, text: 'Spending breakdowns by category' },
-  { icon: LineChart, text: 'Trends and monthly forecasts' },
-  { icon: Sparkles, text: 'Personalized insights' },
+  { icon: BarChart3, text: 'Spending by payment method' },
+  { icon: LineChart, text: '6-month expense trends' },
+  { icon: Sparkles, text: 'Monthly net & burn overview' },
   { icon: Shield, text: 'Priority support' },
 ];
 
 export function PlusPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { hasPlus, entitlement, isLoading, refresh } = usePlusEntitlement(user?.id);
   const checkout = params.get('checkout');
   const [loading, setLoading] = useState<PlusPlan | 'portal' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +48,10 @@ export function PlusPage() {
     else setError(result.error);
   }
 
+  if (checkout === 'success') {
+    void refresh();
+  }
+
   return (
     <div className="plus">
       <button type="button" className="plus__back" onClick={() => navigate(-1)}>
@@ -51,7 +60,8 @@ export function PlusPage() {
 
       {checkout === 'success' && (
         <div className="plus__banner plus__banner--success">
-          Welcome to Montra Plus. Your subscription is active.
+          Checkout complete. If Plus is not unlocked yet, wait a moment and refresh — Stripe syncs
+          entitlement automatically.
         </div>
       )}
       {checkout === 'cancelled' && (
@@ -59,12 +69,26 @@ export function PlusPage() {
       )}
       {error && <div className="plus__banner">{error}</div>}
 
+      {!isLoading && hasPlus && (
+        <div className="plus__banner plus__banner--success">
+          Montra Plus is active
+          {entitlement?.status ? ` (${entitlement.status})` : ''}
+          {entitlement?.current_period_end
+            ? ` · renews/ends ${new Date(entitlement.current_period_end).toLocaleDateString()}`
+            : ''}
+        </div>
+      )}
+
       <div className="plus__hero">
         <div className="plus__icon">
           <Sparkles size={28} />
         </div>
         <h1>Montra Plus</h1>
-        <p>Deeper clarity on spending, trends and what comes next — without the noise.</p>
+        <p>
+          {hasPlus
+            ? 'Your insights are unlocked on Home. Manage billing below if you need to.'
+            : 'Deeper clarity on spending and trends — without the noise.'}
+        </p>
       </div>
 
       <div className="plus__compare">
@@ -90,39 +114,41 @@ export function PlusPage() {
         </div>
       </div>
 
-      <div className="plus__pricing">
-        <div className="plus__plan plus__plan--featured">
-          <span className="plus__badge">Best value</span>
-          <h2>Yearly</h2>
-          <p className="plus__price">
-            329 <span>NOK</span>
-          </p>
-          <p className="plus__period">per year · 7-day free trial</p>
-          <button
-            type="button"
-            className="plus__cta"
-            disabled={!!loading}
-            onClick={() => handleCheckout('yearly')}
-          >
-            {loading === 'yearly' ? 'Redirecting…' : 'Start free trial'}
-          </button>
+      {!hasPlus && (
+        <div className="plus__pricing">
+          <div className="plus__plan plus__plan--featured">
+            <span className="plus__badge">Best value</span>
+            <h2>Yearly</h2>
+            <p className="plus__price">
+              {PLUS_PRICING.yearlyAmount} <span>NOK</span>
+            </p>
+            <p className="plus__period">per year · {PLUS_PRICING.trialDays}-day free trial</p>
+            <button
+              type="button"
+              className="plus__cta"
+              disabled={!!loading}
+              onClick={() => handleCheckout('yearly')}
+            >
+              {loading === 'yearly' ? 'Redirecting…' : 'Start free trial'}
+            </button>
+          </div>
+          <div className="plus__plan">
+            <h2>Monthly</h2>
+            <p className="plus__price">
+              {PLUS_PRICING.monthlyAmount} <span>NOK</span>
+            </p>
+            <p className="plus__period">per month · {PLUS_PRICING.trialDays}-day free trial</p>
+            <button
+              type="button"
+              className="plus__cta plus__cta--secondary"
+              disabled={!!loading}
+              onClick={() => handleCheckout('monthly')}
+            >
+              {loading === 'monthly' ? 'Redirecting…' : 'Start free trial'}
+            </button>
+          </div>
         </div>
-        <div className="plus__plan">
-          <h2>Monthly</h2>
-          <p className="plus__price">
-            39 <span>NOK</span>
-          </p>
-          <p className="plus__period">per month · 7-day free trial</p>
-          <button
-            type="button"
-            className="plus__cta plus__cta--secondary"
-            disabled={!!loading}
-            onClick={() => handleCheckout('monthly')}
-          >
-            {loading === 'monthly' ? 'Redirecting…' : 'Start free trial'}
-          </button>
-        </div>
-      </div>
+      )}
 
       <button
         type="button"
@@ -135,7 +161,7 @@ export function PlusPage() {
       </button>
 
       <p className="plus__note">
-        Trial first, then billed via Stripe. Cancel anytime. See{' '}
+        Entitlement is read from your account (status active or trialing). See{' '}
         <a href="/legal/refund">Refund policy</a> and <a href="/legal/terms">Terms</a>.
       </p>
     </div>

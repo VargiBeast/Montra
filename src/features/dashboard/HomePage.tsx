@@ -2,8 +2,10 @@ import { useMemo } from 'react';
 import { useAuth } from '@/features/authentication/AuthProvider';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useSavingsGoals } from '@/hooks/useSavingsGoals';
+import { usePlusEntitlement } from '@/hooks/usePlusEntitlement';
 import { formatMoney, toIsoDate } from '@/lib/utils';
 import { PlusTeaser } from '@/components/PlusTeaser';
+import { SpendingInsights } from '@/features/analytics/SpendingInsights';
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Target, Radar } from 'lucide-react';
 import './HomePage.css';
 
@@ -11,6 +13,7 @@ export function HomePage() {
   const { user } = useAuth();
   const { transactions, loading: txLoading } = useTransactions();
   const { goals, loading: goalsLoading } = useSavingsGoals();
+  const { hasPlus, isLoading: plusLoading } = usePlusEntitlement(user?.id);
 
   const firstName =
     (user?.user_metadata?.full_name as string | undefined)?.split(' ')[0] ||
@@ -55,7 +58,7 @@ export function HomePage() {
     <div className="home">
       <header className="home__hero">
         <div className="home__greeting">
-          <span className="home__badge">Montra</span>
+          <span className="home__badge">Montra{hasPlus ? ' Plus' : ''}</span>
           <h1>
             {greeting}, <strong>{firstName}</strong>
           </h1>
@@ -109,7 +112,12 @@ export function HomePage() {
         </div>
       </section>
 
-      <PlusTeaser variant="app" />
+      {!plusLoading &&
+        (hasPlus ? (
+          <SpendingInsights transactions={transactions} />
+        ) : (
+          <PlusTeaser variant="app" />
+        ))}
 
       <section className="home__section">
         <div className="home__section-header">
@@ -119,9 +127,13 @@ export function HomePage() {
         </div>
         <div className="home__card home__card--empty">
           <p>
-            {transactions.length < 3
-              ? 'Add a few more transactions to unlock personalized insights.'
-              : 'Insights engine ready — full radar view coming in next iteration.'}
+            {hasPlus
+              ? transactions.length < 3
+                ? 'Add a few more transactions for richer radar insights.'
+                : 'Radar uses your Plus insights above. More detail coming soon.'
+              : transactions.length < 3
+                ? 'Add a few more transactions to unlock personalized insights.'
+                : 'Upgrade to Plus for spending breakdowns and trends.'}
           </p>
         </div>
       </section>
