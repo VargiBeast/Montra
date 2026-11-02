@@ -39,7 +39,7 @@ export function LandingPage() {
     <div className="landing">
       <header className="landing__nav">
         <div className="landing__brand">
-          <span className="landing__mark">M</span>
+          <img src="/favicon.svg" alt="" width="28" height="28" style={{borderRadius:8}} />
           Montra
         </div>
         <div className="landing__nav-actions">
@@ -100,6 +100,16 @@ export function LandingPage() {
         </div>
       </section>
 
+      
+      <section className="landing__privacy">
+        <h2>Private by design</h2>
+        <p>Your data is isolated per account. No shared feeds, no ads, no third-party selling.</p>
+        <ul>
+          <li>Isolated storage</li>
+          <li>No ads</li>
+          <li>You confirm every receipt</li>
+        </ul>
+      </section>
       <section id="features" className="landing__features">
         <h2>Built for clarity</h2>
         <div className="landing__bento">
