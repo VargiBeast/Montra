@@ -13,7 +13,7 @@ function applyTheme() {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       'content',
-      dark ? '#07100d' : '#f2f7f4'
+      dark ? '#0f1419' : '#f7f8fa'
     );
   } catch {
     document.documentElement.dataset.theme = 'dark';
