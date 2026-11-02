@@ -74,10 +74,10 @@ export function HomePage() {
           <p className="home__balance-hint">Based on your transactions · NOK</p>
 
           <div className="home__balance-actions">
-            <button type="button" className="home__action home__action--primary">
+            <button type="button" className="home__action home__action--primary" onClick={() => navigate('/app/activity')}>
               Add money
             </button>
-            <button type="button" className="home__action">
+            <button type="button" className="home__action" onClick={() => navigate('/app/activity')}>
               Transfer
             </button>
           </div>
