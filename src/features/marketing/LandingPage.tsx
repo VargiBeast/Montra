@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -34,9 +35,30 @@ const features = [
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const nodes = root.querySelectorAll<HTMLElement>('[data-reveal]');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -8% 0px' }
+    );
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
+
 
   return (
-    <div className="landing">
+    <div className="landing" ref={rootRef}>
       <header className="landing__nav">
         <div className="landing__brand">
           <img src="/favicon.svg" alt="" width="28" height="28" style={{borderRadius:8}} />
@@ -101,7 +123,7 @@ export function LandingPage() {
       </section>
 
       
-      <section className="landing__privacy">
+      <section className="landing__privacy" data-reveal>
         <h2>Private by design</h2>
         <p>Your data is isolated per account. No shared feeds, no ads, no third-party selling.</p>
         <ul>
@@ -110,7 +132,7 @@ export function LandingPage() {
           <li>You confirm every receipt</li>
         </ul>
       </section>
-      <section id="features" className="landing__features">
+      <section id="features" className="landing__features" data-reveal>
         <h2>Built for clarity</h2>
         <div className="landing__bento">
           {features.map((f, i) => (
@@ -129,7 +151,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing__plus-wrap">
+      <section className="landing__plus-wrap" data-reveal>
         <div className="landing__plus">
           <div className="landing__plus-badge">
             <Sparkles size={14} /> Montra Plus
@@ -150,7 +172,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing__cta-block">
+      <section className="landing__cta-block" data-reveal>
         <h2>Ready when you are</h2>
         <p>Create an account in under a minute. Your data stays yours.</p>
         <Link to="/login" className="landing__cta landing__cta--on-dark">
