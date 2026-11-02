@@ -85,6 +85,40 @@
   font-weight: 600;
 }
 
+.more__theme-toggle {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-2);
+  max-width: 260px;
+}
+
+.more__theme-toggle button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 9px;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 650;
+  transition: background var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.more__theme-toggle button:hover {
+  color: var(--color-text);
+}
+
+.more__theme-toggle button.is-active {
+  color: var(--color-cta-text);
+  background: var(--color-cta);
+  box-shadow: var(--shadow-sm);
+}
+
 .more__select {
   width: 100%;
   padding: 0.75rem 1rem;

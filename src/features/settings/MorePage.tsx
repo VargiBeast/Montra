@@ -10,6 +10,8 @@ import {
   RotateCcw,
   Globe,
   BarChart3,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/features/authentication/AuthProvider';
@@ -25,7 +27,7 @@ import {
   type Locale,
   t,
 } from '@/lib/i18n';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './MorePage.css';
 
 export function MorePage() {
@@ -33,6 +35,15 @@ export function MorePage() {
   const navigate = useNavigate();
   const { currency, setCurrency } = useDisplayCurrency();
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = window.localStorage.getItem('montra-theme');
+    return saved === 'light' ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('montra-theme', theme);
+  }, [theme]);
 
   async function handleLogout() {
     await signOut();
@@ -116,6 +127,18 @@ export function MorePage() {
           ))}
         </select>
         <p className="more__hint">Amounts are stored in NOK and converted for display.</p>
+      </section>
+
+      <section className="more__section">
+        <h2>Appearance</h2>
+        <div className="more__theme-toggle" role="group" aria-label="Appearance">
+          <button type="button" className={theme === 'light' ? 'is-active' : ''} onClick={() => setTheme('light')} aria-pressed={theme === 'light'}>
+            <Sun size={16} /> Light
+          </button>
+          <button type="button" className={theme === 'dark' ? 'is-active' : ''} onClick={() => setTheme('dark')} aria-pressed={theme === 'dark'}>
+            <Moon size={16} /> Dark
+          </button>
+        </div>
       </section>
 
       <section className="more__section">
