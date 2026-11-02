@@ -21,7 +21,7 @@ export function AppShell() {
   const [collapsed, setCollapsed] = useState(false);
   return <div className={`app-shell${collapsed ? ' app-shell--collapsed' : ''}`}>
     <aside className="app-shell__sidebar" aria-label="Primary navigation">
-      <div className="app-shell__brand"><img src="/branding/mark-light.png" alt="" /><span>montra</span></div>
+      <div className="app-shell__brand"><img src="/favicon.svg" alt="" width="28" height="28" /><span>montra</span></div>
       <button className="app-shell__collapse" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}>{collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}</button>
       <div className="app-shell__label">Workspace</div>
       <nav className="app-shell__links">{items.map((item) => <NavItem key={item.to} item={item} compact={collapsed} />)}</nav>
