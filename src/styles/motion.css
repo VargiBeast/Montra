@@ -42,3 +42,29 @@
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Longer polished entrance animations */
+@keyframes slowFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slowScaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.landing__hero,
+.landing__features,
+.landing__plus-wrap,
+.landing__cta-block {
+  animation: slowFadeUp 0.8s var(--ease-out) both;
+}
+
+.landing__mock {
+  animation: slowScaleIn 1s var(--ease-out) 0.15s both;
+}
+
+.landing__card {
+  animation: slowFadeUp 0.7s var(--ease-out) both;
+}
