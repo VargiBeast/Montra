@@ -5,6 +5,23 @@ import App from './App';
 import './styles/global.css';
 import './styles/motion.css';
 
+function applyTheme() {
+  try {
+    const saved = localStorage.getItem('saldo-theme') ?? localStorage.getItem('saldo_theme') ?? 'system';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const dark = saved === 'dark' || (saved === 'system' && prefersDark);
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      'content',
+      dark ? '#0f1419' : '#f7f8fa'
+    );
+  } catch {
+    document.documentElement.dataset.theme = 'dark';
+  }
+}
+
+applyTheme();
+
 const root = document.getElementById('root');
 
 if (!root) {
